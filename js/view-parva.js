@@ -1,5 +1,5 @@
 // Parva: the year's lists, as in the PDF's front matter, plus search across every observance.
-import { h, parseDate, WDAYS, store, verseLines } from './util.js';
+import { h, parseDate, WDAYS } from './util.js';
 import * as data from './data.js';
 import { icon, GROUP_ICONS, names, missing } from './parts.js';
 
@@ -14,9 +14,10 @@ export async function renderParva(ctx, root) {
     .map(([g, items]) => [g, items.filter(([, key]) => ctx.showKey(key))])
     .filter(([g, items]) => items.length || g !== 'anadhyayana'));
   const groups = Object.keys(lists);
-  const special = ['navanaayakaah', ...(meta.uuna ? ['uunashraaddha'] : [])];
-  let current = store('parva') || 'EkAdazI-vrata';
-  if (![...groups, ...special].includes(current)) current = groups[0];
+  const special = meta.uuna ? ['uunashraaddha'] : [];
+  // Every festival of the year, in date order: what the tab opens on.
+  const all = Object.entries(meta.fests).flatMap(([date, keys]) => keys.filter(ctx.showKey).map((key) => [date, key]));
+  let current = 'all';
   let query = '';
 
   const body = h('div', { class: 'parva-body' });
@@ -45,44 +46,44 @@ export async function renderParva(ctx, root) {
     return h('ul', { class: 'rows' }, out);
   };
 
-  function nava() {
-    const T = S.nava;
-    const sthaanas = Object.keys(T.sthaana);
-    const out = [h('p', { class: 'nava-line' }, `${L('asminsamvatsare')} ` +
-      sthaanas.map((s) => `${T.sthaana[s]} ${T.graha1[meta.nava[s]]}`).join(', ') + '।')];
-    for (const s of sthaanas) {
-      const g = meta.nava[s];
-      out.push(h('div', { class: 'shloka-card' },
-        h('div', { class: 'shloka-head' }, `${T.graha6[g]} ${T.sthaana_tvasya[s]}${T.tvasya_phalam}`),
-        h('p', { class: 'shloka' }, verseLines(T.phala[s]?.[{ bhAnuH: 'sUryaH', sOmaH: 'candraH' }[g] || g] || ''))));
-      if (s === 'mantrI' && meta.nava.rAjA === meta.nava.mantrI) {
-        out.push(h('div', { class: 'shloka-card' }, h('div', { class: 'shloka-head' }, T.rajamantri_title),
-          h('p', { class: 'shloka' }, verseLines(T.rajamantri))));
-      }
-    }
-    return out;
+  // Open a list at what comes next, not at the start of the year.
+  // Open a list at what comes next, not at the start of the year.
+  function upcomingFirst() {
+    const next = body.querySelector('li:not(.past)');
+    if (!next || next === body.querySelector('li')) return;
+    next.classList.add('upcoming');
+    requestAnimationFrame(() => {
+      const prevRow = next.previousElementSibling || next;
+      const top = prevRow.getBoundingClientRect().top + window.scrollY - 170;
+      if (top > window.innerHeight * 0.4) window.scrollTo(0, top);
+    });
   }
 
   function draw() {
     chips.replaceChildren(
+      h('button', {
+        type: 'button', class: 'pchip' + (current === 'all' && !query ? ' active' : ''),
+        onclick: () => { current = 'all'; query = ''; search.value = ''; draw(); },
+      }, h('span', null, L('sarvaani')), h('span', { class: 'pchip-count' }, ctx.num(all.length))),
       ...groups.map((g) => h('button', {
         type: 'button', class: 'pchip' + (g === current && !query ? ' active' : ''),
-        onclick: () => { current = g; store('parva', g); query = ''; search.value = ''; draw(); },
+        onclick: () => { current = g; query = ''; search.value = ''; draw(); },
       }, icon(GROUP_ICONS[g], 18), h('span', null, (S.festgroup[g] || g).replace(/-[^-]*$/, '')),
       h('span', { class: 'pchip-count' }, ctx.num(new Set(lists[g].map((i) => i[0])).size)))),
       ...special.map((g) => h('button', {
         type: 'button', class: 'pchip' + (g === current && !query ? ' active' : ''),
-        onclick: () => { current = g; store('parva', g); query = ''; search.value = ''; draw(); },
+        onclick: () => { current = g; query = ''; search.value = ''; draw(); },
       }, h('span', null, L(g)))));
     if (query) {
       const q = query.toLowerCase();
       const hits = [];
       for (const [date, keys] of Object.entries(meta.fests)) {
-        for (const key of keys) if (ctx.showKey(key) && (F[key] || '').toLowerCase().includes(q) || key.toLowerCase().includes(q)) hits.push([date, key]);
+        for (const key of keys) if (ctx.showKey(key) && ((F[key] || '').toLowerCase().includes(q) || key.toLowerCase().includes(q))) hits.push([date, key]);
       }
       body.replaceChildren(h('h2', { class: 'block-title' }, `${L('anveshanam')} (${ctx.num(hits.length)})`), rows(hits));
-    } else if (current === 'navanaayakaah') {
-      body.replaceChildren(h('h2', { class: 'block-title' }, `॥${L('navanaayakaah')}॥`), ...nava());
+    } else if (current === 'all') {
+      body.replaceChildren(rows(all));
+      upcomingFirst();
     } else if (current === 'uunashraaddha') {
       body.replaceChildren(h('h2', { class: 'block-title' }, L('uunashraaddha')),
         h('ul', { class: 'rows' }, meta.uuna.map(([date, naks]) => h('li', { class: date < ctx.now.date ? 'past' : '' },
@@ -93,16 +94,7 @@ export async function renderParva(ctx, root) {
         h('h2', { class: 'block-title' }, icon(GROUP_ICONS[current], 22), ' ',
           `${S.festgroup[current] || current} (${ctx.num(new Set(items.map((i) => i[0])).size)})`),
         rows(items));
-      const next = body.querySelector('li:not(.past)');
-      if (next && next !== body.querySelector('li')) next.classList.add('upcoming');
-      // Open the list at what comes next, not at the start of the year.
-      if (next && next.classList.contains('upcoming')) {
-        requestAnimationFrame(() => {
-          const prevRow = next.previousElementSibling || next;
-          const top = prevRow.getBoundingClientRect().top + window.scrollY - 170;
-          if (top > window.innerHeight * 0.4) window.scrollTo(0, top);
-        });
-      }
+      upcomingFirst();
     }
   }
 

@@ -49,9 +49,5 @@ export async function renderDina(ctx, root) {
     festivalList(ctx, day),
     h('section', { class: 'footer' }, footerLines(ctx, day, { full: false })),
     h('div', { class: 'share-row' }, shareButton(ctx, () => ctx.openShare({ day, meta }))),
-    h('nav', { class: 'more' },
-      h('button', { type: 'button', class: 'more-btn', onclick: () => ctx.go({ view: 'pathana' }) }, L('pathanam'), h('span', { 'aria-hidden': 'true' }, ' ›')),
-      h('button', { type: 'button', class: 'more-btn', onclick: () => ctx.go({ view: 'kala' }) }, L('kaalaah'), h('span', { 'aria-hidden': 'true' }, ' ›')),
-      h('button', { type: 'button', class: 'more-btn', onclick: () => ctx.go({ view: 'vistara' }) }, L('vistarah'), h('span', { 'aria-hidden': 'true' }, ' ›'))),
   );
 }

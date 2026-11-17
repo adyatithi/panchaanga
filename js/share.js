@@ -113,17 +113,22 @@ function pen(g) {
       g.font = `${size}px ${latin ? '"Alegreya Sans", sans-serif' : stack}`;
       g.fillStyle = color;
     },
-    // Greedy wrap on spaces; returns the y after the last line.
-    wrap(text, x, y, width, lineHeight, align = 'center', maxLines = 99) {
-      g.textAlign = align;
+    // Greedy wrap on spaces, at the current font.
+    lines(text, width) {
       const words = String(text).split(/\s+/);
-      const lines = [];
+      const out = [];
       let line = '';
       for (const w of words) {
         const next = line ? line + ' ' + w : w;
-        if (g.measureText(next).width > width && line) { lines.push(line); line = w; } else line = next;
+        if (g.measureText(next).width > width && line) { out.push(line); line = w; } else line = next;
       }
-      if (line) lines.push(line);
+      if (line) out.push(line);
+      return out;
+    },
+    // Wrap and draw; returns the y after the last line.
+    wrap(text, x, y, width, lineHeight, align = 'center', maxLines = 99) {
+      g.textAlign = align;
+      const lines = this.lines(text, width);
       if (lines.length > maxLines) { lines.length = maxLines; lines[maxLines - 1] = lines[maxLines - 1].replace(/.{0,3}$/, '…'); }
       const ax = align === 'center' ? x + width / 2 : align === 'right' ? x + width : x;
       lines.forEach((l, i) => g.fillText(l, ax, y + i * lineHeight));
@@ -144,7 +149,18 @@ function brand(g, P, W, Hh) {
 }
 
 async function drawDay(ctx, day, meta) {
-  const W = 1080, Hh = 1350;
+  const W = 1080;
+  // The image is 4:5, made taller (up to 9:16) when the day's festivals need the room.
+  const fests = allFests(ctx, day);
+  await ready(fests.join(''));
+  let Hh = 1350;
+  if (fests.length) {
+    const probe = pen(document.createElement('canvas').getContext('2d'));
+    probe.set(31, C.blue);
+    const need = probe.lines(fests.join('  ✹  '), W - 180).length * 45;
+    // Below the angas (about y = 920) and above the footer block (the last 330 px).
+    Hh = Math.min(1920, Math.max(1350, 920 + 44 + need + 20 + 330));
+  }
   const cv = document.createElement('canvas');
   cv.width = W; cv.height = Hh;
   const g = cv.getContext('2d');
@@ -186,13 +202,6 @@ async function drawDay(ctx, day, meta) {
     y = P.wrap(angaText(ctx, day, key), 70, y, W - 140, 60, 'left', 2) + 6;
   }
 
-  // Observances.
-  const fests = allFests(ctx, day);
-  if (fests.length) {
-    P.set(38, C.blue);
-    y = P.wrap(fests.join('  ✹  '), 90, y + 44, W - 180, 56, 'center', 5);
-  }
-
   // Footer lines, pinned above the brand line.
   const { L, T } = ctx;
   const r = ([a, b]) => `${T(a)}–${T(b)}`;
@@ -200,7 +209,30 @@ async function drawDay(ctx, day, meta) {
     `${L('s_raahu')} ${r(day.raahu)}   ${L('s_yama')} ${r(day.yama)}   ${L('s_gulika')} ${r(day.gulika)}`,
     `${L('durmuhurtaah')} ${day.durmuhurta.map(r).join('  ')}` + (day.amrta.length ? `   ${L('amrtakaalah')} ${day.amrta.map(r).join('  ')}` : ''),
   ];
-  const fy = Math.max(y + 60, Hh - 96 - 40 - foot.length * 52);
+  const fy = Hh - 96 - 40 - foot.length * 52;
+
+  // Observances, in the space between the angas and the footer: the largest size at which they
+  // all fit, and if even the smallest is not enough, as many as fit and a count of the rest.
+  if (fests.length) {
+    const top = y + 44;
+    const room = fy - 90 - top;
+    const fit = (items, size) => {
+      P.set(size, C.blue);
+      return P.lines(items.join('  ✹  '), W - 180).length * Math.round(size * 1.45) <= room;
+    };
+    let size = [38, 34, 31, 28, 25].find((s) => fit(fests, s));
+    let shown = fests;
+    if (!size) {
+      size = 25;
+      for (let n = fests.length - 1; n > 0; n--) {
+        shown = [...fests.slice(0, n), `+${ctx.num(fests.length - n)}`];
+        if (fit(shown, size)) break;
+      }
+    }
+    P.set(size, C.blue);
+    y = P.wrap(shown.join('  ✹  '), 90, top, W - 180, Math.round(size * 1.45), 'center');
+  }
+
   P.rule(70, fy - 50, W - 70);
   P.set(32);
   foot.forEach((line, i) => P.wrap(line, 70, fy + i * 52, W - 140, 46, 'center', 1));
@@ -250,20 +282,99 @@ async function drawFest(ctx, day, entry, desc, meta) {
   return cv;
 }
 
+// A page of verses (pathanam, varjya-vishayas): title, date, then sections of a heading, lines of
+// verse and a note. The canvas is as tall as the verses need, at least the usual 4:5.
+async function drawVerses(ctx, day, meta, title, sections) {
+  const W = 1080;
+  const H = headLines(ctx, day, meta);
+  await ready(title + sections.map((s) => s.head).join(''));
+  const probe = document.createElement('canvas').getContext('2d');
+  const P0 = pen(probe);
+  const inner = W - 200;
+  const layout = (size) => {
+    let height = 330;
+    for (const s of sections) {
+      if (s.head) { P0.set(Math.round(size * 1.05)); height += P0.lines(s.head, inner).length * size * 1.5 + 10; }
+      P0.set(size);
+      for (const l of s.lines) height += P0.lines(l, inner).length * size * 1.55;
+      if (s.note) height += size * 1.4;
+      height += size * 1.95;
+    }
+    return height + 150;
+  };
+  let size = 40;
+  while (size > 26 && layout(size) > 2400) size -= 2;
+  const Hh = Math.max(1350, Math.ceil(layout(size)));
+  const cv = document.createElement('canvas');
+  cv.width = W; cv.height = Hh;
+  const g = cv.getContext('2d');
+  const P = pen(g);
+  g.fillStyle = C.paper; g.fillRect(0, 0, W, Hh);
+  g.strokeStyle = C.red; g.lineWidth = 3; g.strokeRect(40, 40, W - 80, Hh - 80);
+  P.set(54, C.red); g.textAlign = 'center'; g.fillText(`॥ ${title} ॥`, W / 2, 150);
+  P.set(36, C.ink, true); g.fillText(dateLine(day) + ' · ' + ctx.cityName, W / 2, 215);
+  P.set(30, C.ink2); g.fillText(`${H.year} · ${H.saura} · ${H.masa}`, W / 2, 265);
+  let y = 340;
+  sections.forEach((s, i) => {
+    if (i > 0) {
+      // In the gap between two sections, clear of the heading below it.
+      P.set(Math.round(size * 0.6), C.red); g.textAlign = 'center'; g.fillText('✺', W / 2, y - size * 1.05);
+      y += size * 0.35;
+    }
+    if (s.head) { P.set(Math.round(size * 1.05), C.ink); y = P.wrap(s.head, 100, y, inner, size * 1.5, 'center') + 10; }
+    P.set(size, C.ink);
+    for (const l of s.lines) y = P.wrap(l, 100, y, inner, size * 1.55, 'center');
+    if (s.note) { P.set(Math.round(size * 0.75), C.ink2); g.textAlign = 'center'; g.fillText(s.note, W / 2, y + size * 0.2); y += size * 1.4; }
+    y += size * 1.6;
+  });
+  brand(g, P, W, Hh);
+  return cv;
+}
+
+function plainVerse(text) {
+  return String(text).replace(/\*/g, '').split('\n').map((l) => l.trim()).filter((l) => l && l !== '✺');
+}
+
+function pathanaSections(ctx, blocks) {
+  return blocks.map((b) => ({
+    head: `${b.label} — ${b.name}${b.end != null ? ' ▸' + ctx.T(b.end) : ''}`,
+    lines: plainVerse(b.shloka),
+    note: b.devata ? `${ctx.L('devataa')} — ${b.devata}` : '',
+  }));
+}
+
+function versesText(ctx, day, title, sections, view) {
+  const out = [`*॥ ${title} ॥*`, `${dateLine(day)} · ${ctx.cityName}`, ''];
+  for (const s of sections) {
+    if (s.head) out.push(`*${s.head}*`);
+    out.push(...s.lines);
+    if (s.note) out.push(`(${s.note})`);
+    out.push('');
+  }
+  out.push(linkFor(ctx, day, view));
+  return out.join('\n');
+}
+
 // ---------- the sheet ----------
 
 function toBlob(canvas) {
   return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
 }
 
-export async function openShare(ctx, sheet, { day, meta, entry }) {
+export async function openShare(ctx, sheet, { day, meta, entry, mode, blocks, verses }) {
   const { L } = ctx;
   let desc = null;
   if (entry && entry.x) desc = await data.loadDescription(ctx.settings.script, entry.x).catch(() => null);
-  const text = entry ? festText(ctx, day, entry, desc) : dayText(ctx, day, meta);
-  const link = linkFor(ctx, day);
-  const title = entry ? ctx.festName(entry) : `${dateLine(day)} · ${ctx.cityName}`;
-  const fileName = `adyatithi-${ctx.city.id}-${day.date}${entry ? '-' + (entry.id || '').replace(/[^A-Za-z0-9]+/g, '-').slice(0, 40) : ''}.png`;
+  // What is shared follows the page it is shared from.
+  let sections = null;
+  let pageTitle = null;
+  if (mode === 'pathana') { pageTitle = L('pathanam'); sections = pathanaSections(ctx, blocks); }
+  if (mode === 'varjya') { pageTitle = L('varjayitum'); sections = [{ head: '', lines: verses.map((v) => v.replace(/\*/g, '')), note: '' }]; }
+  const text = sections ? versesText(ctx, day, pageTitle, sections, mode)
+    : entry ? festText(ctx, day, entry, desc) : dayText(ctx, day, meta);
+  const link = linkFor(ctx, day, sections ? mode : undefined);
+  const title = sections ? `${pageTitle} · ${dateLine(day)}` : entry ? ctx.festName(entry) : `${dateLine(day)} · ${ctx.cityName}`;
+  const fileName = `adyatithi-${ctx.city.id}-${day.date}${mode ? '-' + mode : ''}${entry ? '-' + (entry.id || '').replace(/[^A-Za-z0-9]+/g, '-').slice(0, 40) : ''}.png`;
 
   const preview = h('img', { class: 'share-preview', alt: title });
   const toast = h('p', { class: 'toast', role: 'status' });
@@ -274,7 +385,8 @@ export async function openShare(ctx, sheet, { day, meta, entry }) {
   };
 
   let blob = null;
-  const canvasReady = (entry ? drawFest(ctx, day, entry, desc, meta) : drawDay(ctx, day, meta))
+  const canvasReady = (sections ? drawVerses(ctx, day, meta, pageTitle, sections)
+    : entry ? drawFest(ctx, day, entry, desc, meta) : drawDay(ctx, day, meta))
     .then(async (cv) => { blob = await toBlob(cv); preview.src = URL.createObjectURL(blob); })
     .catch(() => { preview.hidden = true; });
 

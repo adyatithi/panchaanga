@@ -4,6 +4,7 @@ import * as data from './data.js';
 import { descriptionBody } from './view-vistara.js';
 import { names } from './parts.js';
 import { shareButton } from './share.js';
+import { LANGUAGES } from './i18n.js';
 
 const SCRIPT_NAMES = { devanagari: 'देवनागरी', tamil: 'தமிழ்', grantha: '𑌗𑍍𑌰𑌨𑍍𑌥', telugu: 'తెలుగు', kannada: 'ಕನ್ನಡ', iso: 'Roman (ISO)' };
 
@@ -52,17 +53,19 @@ function repoChooser(ctx) {
 
 export function openSettings(ctx) {
   const { L, settings } = ctx;
+  const current = { ...settings, lang: ctx.lang };
   let dlg;
   const group = (label, key, options, onpick) => h('fieldset', { class: 'opt-group' },
     h('legend', null, label),
     h('div', { class: 'opts' }, options.map(([value, text, sub]) => h('button', {
-      type: 'button', class: 'opt' + (String(settings[key]) === String(value) ? ' active' : ''),
-      'aria-pressed': String(settings[key]) === String(value),
+      type: 'button', class: 'opt' + (String(current[key]) === String(value) ? ' active' : ''),
+      'aria-pressed': String(current[key]) === String(value),
       onclick: () => { dlg.close(); onpick ? onpick(value) : ctx.saveSettings({ [key]: value }); },
     }, h('span', null, text), sub && h('span', { class: 'opt-sub' }, sub)))));
   dlg = sheet(L('vinyaasah'), [
     group(L('nagaram'), 'city', ctx.index.cities.map((c) => [c.id, c.name[settings.script] || c.label, c.label]),
       (id) => { ctx.saveSettings({ city: id }); ctx.go({ city: id }); }),
+    group(L('bhaashaa'), 'lang', LANGUAGES),
     group(L('lipih'), 'script', ctx.index.scripts.map((s) => [s, SCRIPT_NAMES[s] || s])),
     settings.script === 'devanagari' && group(L('akshararupam'), 'face', [['noto', 'नोटो सेरिफ्', 'Noto Serif'], ['siddhanta', 'सिद्धान्त', 'Siddhanta (PDF)']]),
     group(L('samayarupam'), 'time', [['24', '25:30*', L('horaa24')], ['12', '1:30am*', L('horaa12')]]),

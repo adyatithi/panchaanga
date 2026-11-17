@@ -9,17 +9,32 @@ import { renderParva } from './view-parva.js';
 import { openSettings, renderAbout, openFestival, sheet } from './view-misc.js';
 import { dayIcons } from './parts.js';
 import { renderSaptaha } from './view-saptaha.js';
+import { renderMore, renderVarjya, renderNava } from './view-more.js';
+import { renderGuide } from './view-guide.js';
+import { makeU, LANGUAGE_FOR_SCRIPT } from './i18n.js';
+
+// Words that belong to the app rather than to the pañcāṅga.
+const CHROME = new Set(['dinam', 'kaalaah', 'vistarah', 'maasah', 'saptaahah', 'parvaani', 'anyat', 'vinyaasah',
+  'anveshanam', 'preshanam', 'chitram', 'lekhah', 'sanketah', 'pratilipih', 'pratiikshasva', 'nopalabhyate', 'nagaram',
+  'lipih', 'bhaashaa', 'akshararupam', 'samayarupam', 'horaa24', 'horaa12', 'varnah', 'svatah', 'shuklam', 'shyaamam',
+  'parichayah', 'margadarshika', 'adya', 'idaaniim', 'anantaram', 'sheshah', 'parvasrotaamsi', 'atiriktaani',
+  'sarvaani', 'dinavibhaagaah', 'sandhyaa', 'shubham', 'ashubham', 'kaalakramah']);
 import { openShare } from './share.js';
 import { renderPathana } from './view-pathana.js';
 
-const VIEWS = ['dina', 'kala', 'vistara', 'masa', 'parva', 'about', 'pathana', 'saptaha'];
+const VIEWS = ['dina', 'kala', 'vistara', 'masa', 'parva', 'anyat', 'about', 'pathana', 'saptaha', 'varjya', 'nava', 'guide'];
 const TABS = [
   ['dina', 'dinam', 'M4 5h16v15H4zM4 9h16M8 3v4M16 3v4'],
   ['kala', 'kaalaah', 'M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18zM12 7v5l3 2'],
   ['vistara', 'vistarah', 'M5 6h14M5 10h14M5 14h14M5 18h9'],
   ['masa', 'maasah', 'M4 5h16v15H4zM4 10h16M9 10v10M15 10v10M4 15h16'],
   ['parva', 'parvaani', 'M12 3l2.6 5.6 6 .7-4.5 4.1 1.3 6-5.4-3.1-5.4 3.1 1.3-6L3.4 9.3l6-.7z'],
+  ['anyat', 'anyat', 'M5 12h.01M12 12h.01M19 12h.01'],
 ];
+// Pages reached from a tab other than their own.
+const TAB_OF = { pathana: 'anyat', varjya: 'anyat', nava: 'anyat', guide: 'anyat', about: 'anyat', saptaha: 'masa' };
+// Pages that show a year rather than a day, so the top bar has no day arrows.
+const NO_DAY_NAV = ['parva', 'about', 'anyat', 'guide', 'nava'];
 
 const settings = Object.assign(
   { city: 'Chennai', script: 'devanagari', time: '24', theme: 'auto', face: 'noto', repos: {} },
@@ -110,10 +125,15 @@ async function buildContext(route) {
     if (anadhyayana) out.anadhyayana = anadhyayana; else delete out.anadhyayana;
     return out;
   };
+  const lang = settings.lang || LANGUAGE_FOR_SCRIPT[settings.script] || 'en';
+  const U = makeU(lang, S.labels);
   const digits = S.digits;
   const ctx = {
     index, settings, route: { ...route, date }, city, date, S, F, P, now,
-    L: (k) => S.labels[k] ?? k,
+    // Interface words follow the interface language; pañcāṅga words are always Sanskrit.
+    L: (k) => (CHROME.has(k) ? U(k) : S.labels[k] ?? U(k)),
+    U,
+    lang,
     T: (m) => fmtTime(m, settings.time),
     num: (n) => String(n).replace(/\d/g, (d) => digits[+d]),
     cityName: city.name[settings.script] || city.label,
@@ -128,6 +148,7 @@ async function buildContext(route) {
     },
     openFestival: (entry, day) => openFestival(ctx, entry, day),
     openShare: (what) => openShare(ctx, sheet, what),
+    openSettings: () => openSettings(ctx),
     // Minutes after the shown date's midnight, if "now" falls on this page (a page runs to the next sunrise).
     nowOn(day) {
       if (now.date === day.date) return now.minutes;
@@ -150,7 +171,7 @@ function renderTopbar(ctx) {
   const dt = parseDate(date);
   const monthView = ctx.route.view === 'masa';
   const weekView = ctx.route.view === 'saptaha';
-  const yearView = ctx.route.view === 'parva' || ctx.route.view === 'about';
+  const yearView = NO_DAY_NAV.includes(ctx.route.view);
   const step = (n) => go({ date: clampDate(city, monthView ? addMonths(date, n) : addDays(date, weekView ? 7 * n : n)) });
   const label = monthView
     ? `${MONTHS[dt.getUTCMonth()]} ${dt.getUTCFullYear()}`
@@ -179,7 +200,7 @@ function renderTopbar(ctx) {
 function renderTabbar(ctx) {
   tabbar.replaceChildren(...TABS.map(([view, label, path]) =>
     h('button', {
-      type: 'button', class: 'tab' + (({ pathana: 'dina', saptaha: 'masa' }[ctx.route.view] || ctx.route.view) === view ? ' active' : ''),
+      type: 'button', class: 'tab' + ((TAB_OF[ctx.route.view] || ctx.route.view) === view ? ' active' : ''),
       'aria-current': ctx.route.view === view ? 'page' : null,
       onclick: () => go({ view }),
     },
@@ -187,7 +208,8 @@ function renderTabbar(ctx) {
     h('span', { class: 'tab-label' }, ctx.L(label)))));
 }
 
-const RENDERERS = { dina: renderDina, vistara: renderVistara, kala: renderKala, masa: renderMasa, parva: renderParva, about: renderAbout, pathana: renderPathana, saptaha: renderSaptaha };
+const RENDERERS = { dina: renderDina, vistara: renderVistara, kala: renderKala, masa: renderMasa, parva: renderParva, about: renderAbout, pathana: renderPathana, saptaha: renderSaptaha,
+  anyat: renderMore, varjya: renderVarjya, nava: renderNava, guide: renderGuide };
 
 async function render() {
   const token = ++renderToken;
@@ -235,7 +257,7 @@ main.addEventListener('touchend', (e) => {
   const dy = e.changedTouches[0].clientY - touch.y;
   touch = null;
   const r = parseRoute();
-  if (!['dina', 'vistara', 'kala', 'pathana'].includes(r.view) || e.target.closest('.no-swipe')) return;
+  if (!['dina', 'vistara', 'kala', 'pathana', 'varjya'].includes(r.view) || e.target.closest('.no-swipe')) return;
   if (Math.abs(dx) > 70 && Math.abs(dx) > 2.2 * Math.abs(dy)) {
     const city = cityRec(r.city);
     const base = r.date || clampDate(city, nowIn(city.tz).date);
