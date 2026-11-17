@@ -6,7 +6,7 @@ import { acknowledgements } from './view-misc.js';
 
 // Each entry: the Sanskrit term (a label key, or text in Harvard-Kyoto to be shown as is in the
 // reader's script via the label tables where one exists) and its explanation.
-function sections(ctx) {
+export function sections(ctx) {
   const L = ctx.L;
   return [
     {
@@ -52,6 +52,7 @@ function sections(ctx) {
         [L('praatahsandhyaa'), 'The three sandhyāvandana periods: morning, from the last muhūrta of the night through the fourth of the day; midday (mādhyāhnika), the sixth to the thirteenth muhūrtas of the day; evening, the last muhūrta of the day and the first of the night. On the Detail page the time in brackets is the earlier, secondary (gauṇa) start.'],
         [L('shayanam'), 'The time for going to sleep: from the end of the first quarter of the night to three-eighths of the way through it.'],
         [L('dinaantah'), 'Five-eighths of the way from sunset to the next sunrise.'],
+        [L('ghatikaah'), 'On today\'s Kālas page, a live clock gives the time since sunrise in ghaṭikās, vighaṭīs and tatparas (each sixty of the next), from the pañcāṅga\'s own sunrise and sunset, after the ghaṭikā clock at ghatika-clock.web.app. On the dial sunrise is at the top, the day on the right half and the night on the left.'],
         [L('muhurtaah'), 'Day and night are each divided into fifteen named muhūrtas; the Detail page gives the time each ends.'],
         [L('horaah'), 'Day and night are each divided into twelve horās, each ruled by a graha, the first by the lord of the weekday.'],
       ],
@@ -96,6 +97,7 @@ function sections(ctx) {
       title: 'Festivals',
       items: [
         [L('parvaani'), 'Festivals and observances from the adyatithi rule collection. The Festivals tab opens on every festival of the year, at the next one; the chips select a single group, as listed at the start of the PDFs.'],
+        [L('muhurtadinaani'), 'Days suited to an oil bath (abhyaṅga), a haircut or shave (kṣaura) and beginning study (vidyārambha), each with the window on that day. They follow the rules in the muhūrta configurations: which tithis, nakṣatras and weekdays are allowed, which solar months and festivals to avoid, and which part of the day. A star means the window was shortened because the tithi or nakṣatra changes within it. For kṣaura, choosing your janma nakṣatra keeps only days with a favourable tārā, and marks days that touch your own nakṣatra.'],
         [L('anadhyaayah'), 'Days on which Vedic study is suspended. Off by default; switch it on under Settings → Festival sources.'],
         [L('parvasrotaamsi'), 'The festivals come from separate collections (by deity, region, tradition, temple). By default the app shows the same collections as the PDFs, without anadhyayana; others can be switched on, and any switched off, in settings.'],
       ],
@@ -105,7 +107,7 @@ function sections(ctx) {
       title: 'How it is computed',
       items: [
         ['jyotisha', 'All times are computed with the open-source jyotisha library, which uses the Swiss Ephemeris, with the Citrā ayanāṁśa (Spica at 180°). Festivals are assigned by the rules in the adyatithi repository. This is the same code that produces the printed Adyatithi pañcāṅga, and a test checks that the app shows what the PDFs print.'],
-        [L('nagaram'), 'Each city\'s data is computed in advance for three years. Other places will come later.'],
+        [L('nagaram'), 'Each city\'s data is computed in advance for three years, and rebuilt every week. Other places will come later.'],
       ],
     },
   ];

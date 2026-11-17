@@ -59,6 +59,16 @@ export function nowIn(tz) {
 
 // Minutes after local midnight -> the PDF's notation. Times past midnight keep counting (24:39*),
 // exactly as printed, unless the reader has chosen the 12-hour clock.
+// Seconds since local midnight, now, in a timezone; and that date.
+export function nowSecondsIn(tz) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit',
+    second: '2-digit', hourCycle: 'h23',
+  }).formatToParts(new Date());
+  const p = Object.fromEntries(parts.map((x) => [x.type, x.value]));
+  return { date: `${p.year}-${p.month}-${p.day}`, seconds: Number(p.hour) * 3600 + Number(p.minute) * 60 + Number(p.second) };
+}
+
 export function fmtTime(m, mode = '24') {
   if (m == null) return '—';
   const star = m >= 1440 ? '*' : '';

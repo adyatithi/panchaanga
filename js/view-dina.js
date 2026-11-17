@@ -2,6 +2,7 @@
 import { h } from './util.js';
 import * as data from './data.js';
 import { shareButton } from './share.js';
+import { renderVistara } from './view-vistara.js';
 import { hero, sunMoon, angaLine, festivalList, footerLines, missing, kalaIntervals, names } from './parts.js';
 
 function nowStrip(ctx, day) {
@@ -34,7 +35,22 @@ function nowStrip(ctx, day) {
       upcoming.map((k) => chip(k, false))));
 }
 
+// Mock-up: one day page with a Brief | Full switch. Full is the Detail page, in place.
+function depthSwitch(ctx) {
+  const full = ctx.settings.dayFull === true;
+  return h('div', { class: 'seg seg-day no-swipe', role: 'tablist' },
+    [[false, ctx.U('sankshepah')], [true, ctx.U('vistarah')]].map(([value, label]) => h('button', {
+      type: 'button', role: 'tab', class: 'seg-btn' + (full === value ? ' active' : ''), 'aria-selected': full === value,
+      onclick: () => ctx.saveSettings({ dayFull: value }),
+    }, label)));
+}
+
 export async function renderDina(ctx, root) {
+  if (ctx.settings.dayFull === true) {
+    root.append(depthSwitch(ctx));
+    return renderVistara(ctx, root);
+  }
+  root.append(depthSwitch(ctx));
   const got = await ctx.loadDay(ctx.date);
   if (!got) return root.append(missing(ctx));
   const { day, meta } = got;

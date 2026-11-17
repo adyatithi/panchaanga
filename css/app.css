@@ -539,3 +539,28 @@ dialog.sheet::backdrop { background: rgb(0 0 0 / .45); }
 .colophon-box .anga-tab-name { font-family: var(--font-latin); font-size: 1rem; letter-spacing: .04em; }
 .colophon-build { color: var(--ink-3); font-size: .8125rem; margin: .5rem 0 0; }
 .colophon-build a { color: var(--ink-3); }
+
+/* Muhurta lists */
+.pchip-muhurta { border-style: dashed; }
+.janma-pick { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; font-size: .9375rem; margin: 0 0 .4rem; }
+.janma-pick select { font: inherit; padding: .25rem .4rem; border: 1px solid var(--ink-3); background: var(--paper); color: var(--ink); border-radius: 3px; }
+.muhurta-row { color: var(--ink); }
+
+/* Mock-up: the day page's Brief | Full switch. */
+.seg-day { margin: .55rem 0 .2rem; }
+.seg-day .seg-btn { padding: .2rem 0; font-size: .9375rem; }
+
+/* The ghatika clock in the Kaalas tab. */
+.gh-clock { display: flex; align-items: center; gap: 1rem; padding: .2rem 0 .5rem; }
+.gh-dial { flex: none; }
+.dial-day { fill: var(--paper); }
+.dial-night { fill: var(--night); }
+.dial-rim { fill: none; stroke: var(--rule); stroke-width: 1.5; }
+.gh-dial .tick { stroke: var(--ink-3); stroke-width: 1; }
+.gh-dial .tick-l { stroke: var(--ink); stroke-width: 1.5; }
+.dial-n { font: 400 11px var(--font-latin); fill: var(--ink-2); text-anchor: middle; }
+.dial-hand { stroke: var(--red); stroke-width: 2.5; stroke-linecap: round; }
+.dial-hub { fill: var(--red); }
+.gh-read { display: flex; flex-direction: column; gap: .2rem; min-width: 0; }
+.gh-value { font-size: 2.1rem; line-height: 1.1; letter-spacing: .02em; }
+.gh-label { font-size: .875rem; color: var(--ink-2); }

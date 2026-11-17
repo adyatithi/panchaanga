@@ -11,11 +11,12 @@ folder is the site.
 | Tab | What it shows |
 |---|---|
 | दिनम् (Dina) | The simplified day: the PDF's two-panel head, sun and moon, the five angas with what follows each, observances, and the kaalas to keep clear of. When the page is today's, a strip shows what is running now. |
-| कालाः (Kaala) | On today's page, how much of each anga has run and what is left. Then the day drawn to scale from the brāhma muhūrta to the next sunrise: divisions of the day, sandhyā windows, rāhu/yama/gulika, durmuhūrta, tyājya and amṛta kāla, with each anga's change marked and "now" as a line. The same in list form below, then the lagnas. |
+| कालाः (Kaala) | On today's page, a live ghaṭikā clock (after ghatika-clock.web.app) and how much of each anga has run. Then the day drawn to scale from the brāhma muhūrta to the next sunrise: divisions of the day, sandhyā windows, rāhu/yama/gulika, durmuhūrta, tyājya and amṛta kāla, with each anga's change marked and "now" as a line. The same in list form below, then the lagnas. |
 | विस्तरः (Vistara) | Everything the PDF page prints, in its order, then the grahas at sunrise in a rāśi box and the hyperlinked edition's detail: sandhyāvandana and śrāddha kālas, horās, tārābala (the PDF's 9 × 3 table), muhūrtas, and the festival notes. |
 | मासः (Maasa) | A month grid with the moon's phase, solar day and nakshatra per cell, and the month's observances listed below. A switch at the top gives the week instead (a mock-up). |
 | पञ्चाङ्ग-पठनम् (Pathanam) | Reached from Dina. The day set for reading aloud: each anga with its śloka and devatā in large type, then the nishiddha lines. |
-| पर्वाणि (Parva) | The year's lists from the PDF front matter (ekādaśī, pradoṣa, saṅkramaṇa, eclipses, anadhyayana …), the nava-nāyakas, the ūna-śrāddha days, and search across every observance. |
+| पर्वाणि (Parva) | Every festival of the year, opening at the next one; the PDF front matter's lists (ekādaśī, pradoṣa, saṅkramaṇa, eclipses …); the ūna-śrāddha days; the abhyanga, kṣaura and vidyārambha days from the muhūrta rules (kṣaura with a janma-nakṣatra filter); and search. |
+| अन्यत् (More) | The Guide, Pañcāṅga-paṭhanam, varjya-viṣayas, Navanāyakas, Settings, About. |
 
 Settings (city, script, typeface, clock, theme, festival repositories) and the About page are behind the icon at the top right.
 
@@ -77,6 +78,33 @@ layout and conventions. In short:
 In that repository, `pytest adyatithi_panchaanga/tests/test_app_data_matches_golden_tex.py`
 re-renders every day's TeX lines from this JSON and compares them with the golden TeX of the
 PDF pipeline. The app is developed there under `app/` and copied here.
+
+## Weekly data build
+
+`.github/workflows/data.yml` rebuilds `data/` every Saturday night (UTC), and can be started by hand
+from the Actions tab. It computes the current Kali year and one either side, for the exporter's
+default cities, with the jyotisha and adyatithi commits pinned in `data-build.toml`, and commits
+only when the data changed. To move to newer rules, change the commits in `data-build.toml`.
+
+It needs one secret, because the exporter is in a private repository:
+
+1. Create a fine-grained personal access token at github.com → Settings → Developer settings →
+   Personal access tokens → Fine-grained tokens, with access to the repository
+   `karthikraman/adyatithi-panchaanga` and the permission *Contents: Read-only*.
+2. In `adyatithi/panchaanga` → Settings → Secrets and variables → Actions, add it as a repository
+   secret named `ADYATITHI_PANCHAANGA_TOKEN`.
+
+A full build of fifty cities takes about two hours; Actions minutes are free for public
+repositories.
+
+## Translations
+
+The interface words and the Guide, for reviewers: see `translations/README.md`.
+
+## Licence
+
+MIT for the code and the icons (see `LICENSE`); the data, fonts and verses carry their own terms,
+listed there and in `fonts/README.md`.
 
 ## Layout
 

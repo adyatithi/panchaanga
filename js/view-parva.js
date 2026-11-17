@@ -15,6 +15,8 @@ export async function renderParva(ctx, root) {
     .filter(([g, items]) => items.length || g !== 'anadhyayana'));
   const groups = Object.keys(lists);
   const special = meta.uuna ? ['uunashraaddha'] : [];
+  // Muhurta days (abhyanga, kshaura, vidyarambha) from the muhurta configs, as chips after the lists.
+  const muhurtas = Object.keys(meta.muhurta || {});
   // Every festival of the year, in date order: what the tab opens on.
   const all = Object.entries(meta.fests).flatMap(([date, keys]) => keys.filter(ctx.showKey).map((key) => [date, key]));
   let current = 'all';
@@ -48,6 +50,33 @@ export async function renderParva(ctx, root) {
 
   // Open a list at what comes next, not at the start of the year.
   // Open a list at what comes next, not at the start of the year.
+  // A muhurta list: the days and the window on each. Where the rule includes taaraabala (kshaura),
+  // a janma nakshatra can be chosen: days whose window has a favourable taaraa for it are kept,
+  // and days when the window touches that nakshatra itself are marked, as the muhurta command does.
+  function muhurtaList(key) {
+    const m = meta.muhurta[key];
+    const janma = Number(ctx.settings.janma) || 0;
+    const good = (nak) => [2, 4, 6, 8, 0].includes(((nak - janma + 1) % 9 + 9) % 9);
+    let items = m.list;
+    if (m.taarabala && janma) items = items.filter(([, , , , a, b]) => good(a) || good(b));
+    const picker = m.taarabala && h('label', { class: 'janma-pick', for: 'janma-nakshatra' }, ctx.L('janmanakshatram'),
+      h('select', {
+        id: 'janma-nakshatra',
+        onchange: (e) => { ctx.saveSettings({ janma: Number(e.target.value) || 0 }); },
+      }, h('option', { value: 0, selected: !janma }, '—'),
+      Array.from({ length: 27 }, (_, i) => h('option', { value: i + 1, selected: janma === i + 1 }, N.nakshatra(i + 1)))));
+    const list = h('ul', { class: 'rows' }, items.map(([date, a, b, adjusted, na, nb]) => {
+      const own = janma && (na === janma || nb === janma);
+      return h('li', { class: date < ctx.now.date ? 'past' : '' }, dateCell(date),
+        h('div', { class: 'row-names muhurta-row' },
+          h('span', { class: 'time' }, `${ctx.T(a)}–${ctx.T(b)}`), adjusted && h('span', { class: 'muted' }, ' *'),
+          h('span', { class: 'muted' }, ` · ${N.nakshatra(na)}${nb !== na ? '/' + N.nakshatra(nb) : ''}`),
+          own && h('span', { class: 'bad-text' }, ` (! ${N.nakshatra(janma)})`)));
+    }));
+    return [h('h2', { class: 'block-title' }, `${S.muhurta_names?.[key] || key} (${ctx.num(items.length)})`),
+      picker, list];
+  }
+
   function upcomingFirst() {
     const next = body.querySelector('li:not(.past)');
     if (!next || next === body.querySelector('li')) return;
@@ -70,6 +99,10 @@ export async function renderParva(ctx, root) {
         onclick: () => { current = g; query = ''; search.value = ''; draw(); },
       }, icon(GROUP_ICONS[g], 18), h('span', null, (S.festgroup[g] || g).replace(/-[^-]*$/, '')),
       h('span', { class: 'pchip-count' }, ctx.num(new Set(lists[g].map((i) => i[0])).size)))),
+      ...muhurtas.map((m) => h('button', {
+        type: 'button', class: 'pchip pchip-muhurta' + (m === current && !query ? ' active' : ''),
+        onclick: () => { current = m; query = ''; search.value = ''; draw(); },
+      }, h('span', null, S.muhurta_names?.[m] || m))),
       ...special.map((g) => h('button', {
         type: 'button', class: 'pchip' + (g === current && !query ? ' active' : ''),
         onclick: () => { current = g; query = ''; search.value = ''; draw(); },
@@ -83,6 +116,9 @@ export async function renderParva(ctx, root) {
       body.replaceChildren(h('h2', { class: 'block-title' }, `${L('anveshanam')} (${ctx.num(hits.length)})`), rows(hits));
     } else if (current === 'all') {
       body.replaceChildren(rows(all));
+      upcomingFirst();
+    } else if (muhurtas.includes(current)) {
+      body.replaceChildren(...muhurtaList(current).filter(Boolean));
       upcomingFirst();
     } else if (current === 'uunashraaddha') {
       body.replaceChildren(h('h2', { class: 'block-title' }, L('uunashraaddha')),
