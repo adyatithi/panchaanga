@@ -2,6 +2,7 @@
 // English for now; the terms they explain appear in the reader's script.
 import { h } from './util.js';
 import { icon, GROUP_ICONS } from './parts.js';
+import { acknowledgements } from './view-misc.js';
 
 // Each entry: the Sanskrit term (a label key, or text in Harvard-Kyoto to be shown as is in the
 // reader's script via the label tables where one exists) and its explanation.
@@ -122,5 +123,6 @@ export async function renderGuide(ctx, root) {
       h('h2', { class: 'guide-title' }, h('span', null, s.title)),
       h('dl', { class: 'guide-list' }, s.items.map(([term, text]) => [h('dt', null, term), h('dd', null, text)])),
       s.icons && h('div', { class: 'icon-legend' }, Object.entries(GROUP_ICONS).map(([g, id]) =>
-        h('div', { class: 'legend-item' }, icon(id, 26), h('span', null, (S.festgroup[g] || g).replace(/-[^-]*$/, ''))))))));
+        h('div', { class: 'legend-item' }, icon(id, 26), h('span', null, (S.festgroup[g] || g).replace(/-[^-]*$/, ''))))))),
+    acknowledgements(ctx));
 }

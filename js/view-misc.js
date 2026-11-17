@@ -99,6 +99,24 @@ export async function openFestival(ctx, entry, day) {
   body.replaceChildren(d ? descriptionBody(d) : h('p', { class: 'muted' }, '—'));
 }
 
+// The acknowledgements box from the PDFs' front page, with the build the data came from.
+export function acknowledgements(ctx) {
+  const b = ctx.index.build || {};
+  const a = (href, text) => h('a', { href, target: '_blank', rel: 'noopener' }, text);
+  const commit = (repo, id) => (id ? a(`https://github.com/jyotisham/${repo}/commits/${id}`, `${repo}@${id}`) : null);
+  return h('section', { class: 'colophon-box' },
+    h('div', { class: 'anga-box' },
+      h('div', { class: 'anga-tab' }, h('span', { class: 'anga-tab-name' }, 'Acknowledgements')),
+      h('p', null, 'Code base: ', a('https://github.com/jyotisham/jyotisha', 'jyotisha'), ' • ', a('https://github.com/jyotisham/adyatithi', 'adyatithi')),
+      h('p', null, 'Developers: ', a('https://github.com/karthikraman', 'Karthik Raman'), ' • ', a('https://github.com/vvasuki', 'Vishvas Vasuki')),
+      h('p', null, 'With inputs from: ', a('https://github.com/jamadagni', 'Brahmashri Shriramana Sharma'), ' & Saketha Nath'),
+      h('p', null, 'Ślokas for pañcāṅga-paṭhanam: Śānti Kusumākara')),
+    h('p', { class: 'colophon-build' },
+      b.date ? `Data generated on ${b.date}` : null, h('br'),
+      '(', [commit('adyatithi', b.adyatithi), commit('jyotisha', b.jyotisha)].filter(Boolean).map((x, i) => [i ? ', ' : '', x]),
+      b.adyatithi_panchaanga ? `, adyatithi-panchaanga@${b.adyatithi_panchaanga}` : '', ')'));
+}
+
 export async function renderAbout(ctx, root) {
   const { L, index } = ctx;
   const N = names(ctx);
@@ -134,9 +152,10 @@ export async function renderAbout(ctx, root) {
         ' festival rules, using the same code that produces the printed Adyatithi pañchāṅga PDFs. Times are local to each city; ' +
         'a time marked * falls after midnight, on the next civil date.'),
       h('p', null, 'Read more at ', h('a', { href: 'https://adyatithi.substack.com/', target: '_blank', rel: 'noopener' }, 'adyatithi.substack.com'), '.'),
-      h('p', { class: 'muted colophon' }, 'Typefaces: Alegreya Sans, Noto Serif Devanagari, Noto Sans Tamil, Noto Sans Kannada and Mandali, ',
+      h('p', { class: 'muted colophon' }, 'Typefaces: Alegreya Sans, Noto Serif Devanagari, Noto Sans Tamil, Noto Serif Grantha, Noto Sans Kannada and Mandali, ',
         'under the SIL Open Font License; Siddhanta by Mihail Bayaryn, under ',
         h('a', { href: 'https://creativecommons.org/licenses/by-nc-nd/3.0/', target: '_blank', rel: 'noopener' }, 'CC BY-NC-ND 3.0'), ', served unmodified.'),
-      h('p', { class: 'muted colophon' }, `jyotisha ${b.jyotisha || '—'} · adyatithi ${b.adyatithi || '—'} · adyatithi-panchaanga ${b.adyatithi_panchaanga || '—'}`)),
+    ),
+    acknowledgements(ctx),
   );
 }

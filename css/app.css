@@ -532,3 +532,10 @@ dialog.sheet::backdrop { background: rgb(0 0 0 / .45); }
 .guide { padding-top: 1.4rem; }
 .guide-list dt { display: inline-block; font-size: 1.0625rem; margin-top: .9rem; padding: 0 .1rem .05rem; border-bottom: 2px solid var(--red); }
 .guide-list dt:first-child { margin-top: .2rem; }
+
+/* Acknowledgements, as on the PDFs' front page. */
+.colophon-box { padding: 1.8rem 0 .5rem; text-align: center; font-family: var(--font-latin), var(--font); }
+.colophon-box .anga-box p { margin: .25rem 0; color: var(--ink); font-size: .9375rem; }
+.colophon-box .anga-tab-name { font-family: var(--font-latin); font-size: 1rem; letter-spacing: .04em; }
+.colophon-build { color: var(--ink-3); font-size: .8125rem; margin: .5rem 0 0; }
+.colophon-build a { color: var(--ink-3); }
