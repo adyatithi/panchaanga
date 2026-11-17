@@ -59,3 +59,53 @@ export async function loadMonthDays(cityRec, ym) {
   }
   return [...out.values()].sort((a, b) => (a.date < b.date ? -1 : 1));
 }
+
+// Offline: once the page is up, quietly fetch the whole Kali year for this city and the text
+// for this script, so the service worker has them. Done once per city, year, script and data build.
+const prefetched = new Set();
+export function prefetchYear(cityRec, date, script, build) {
+  const yr = yearFor(cityRec, date);
+  if (!yr || !('serviceWorker' in navigator) || !navigator.serviceWorker.controller || navigator.onLine === false) return;
+  const key = `pf.${cityRec.id}.${yr.kali}.${script}.${Object.values(build || {}).join('-')}`;
+  if (prefetched.has(key)) return;
+  prefetched.add(key);
+  try { if (localStorage.getItem(key)) return; } catch (e) { /* ignore */ }
+  const run = async () => {
+    try {
+      const meta = await loadMeta(cityRec.id, yr.kali);
+      const files = [
+        ...meta.months.map((ym) => `c/${cityRec.id}/${yr.kali}/${ym}.json`),
+        `text/${script}/lines.json`,
+        ...'0123456789abcdef'.split('').map((b) => `text/${script}/desc-${b}.json`),
+      ];
+      for (const f of files) {
+        if (!cache.has(f)) await fetch('data/' + f).then((r) => r.ok || Promise.reject(new Error(f)));
+      }
+      try { localStorage.setItem(key, '1'); } catch (e) { /* ignore */ }
+    } catch (e) { prefetched.delete(key); }
+  };
+  (window.requestIdleCallback || ((fn) => setTimeout(fn, 2500)))(run);
+}
+
+// When the anga running at minute `now` of `day` began and when it ends, looking a day or two
+// either side where it started before this page or runs beyond it.
+export async function spanBounds(cityRec, day, key, now, addDays) {
+  const spans = day[key];
+  let i = spans.findIndex(([, end]) => end == null || now < end);
+  if (i < 0) i = spans.length - 1;
+  let start = i > 0 ? spans[i - 1][1] : null;
+  let end = spans[i][1];
+  for (let back = 1; start == null && back <= 2; back++) {
+    const got = await loadDay(cityRec, addDays(day.date, -back)).catch(() => null);
+    if (!got) break;
+    const ended = got.day[key].filter(([, e]) => e != null);
+    if (ended.length) start = ended[ended.length - 1][1] - 1440 * back;
+  }
+  for (let fwd = 1; end == null && fwd <= 2; fwd++) {
+    const got = await loadDay(cityRec, addDays(day.date, fwd)).catch(() => null);
+    if (!got) break;
+    const first = got.day[key].find(([, e]) => e != null);
+    if (first) end = first[1] + 1440 * fwd;
+  }
+  return { id: spans[i][0], start, end };
+}

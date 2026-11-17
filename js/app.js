@@ -6,9 +6,11 @@ import { renderVistara } from './view-vistara.js';
 import { renderKala } from './view-kala.js';
 import { renderMasa } from './view-masa.js';
 import { renderParva } from './view-parva.js';
-import { openSettings, renderAbout, openFestival } from './view-misc.js';
+import { openSettings, renderAbout, openFestival, sheet } from './view-misc.js';
+import { openShare } from './share.js';
+import { renderPathana } from './view-pathana.js';
 
-const VIEWS = ['dina', 'kala', 'vistara', 'masa', 'parva', 'about'];
+const VIEWS = ['dina', 'kala', 'vistara', 'masa', 'parva', 'about', 'pathana'];
 const TABS = [
   ['dina', 'dinam', 'M4 5h16v15H4zM4 9h16M8 3v4M16 3v4'],
   ['kala', 'kaalaah', 'M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18zM12 7v5l3 2'],
@@ -18,7 +20,7 @@ const TABS = [
 ];
 
 const settings = Object.assign(
-  { city: 'Chennai', script: 'devanagari', time: '24', theme: 'auto', face: 'noto' },
+  { city: 'Chennai', script: 'devanagari', time: '24', theme: 'auto', face: 'noto', cue: 'off' },
   store('settings') || {},
 );
 
@@ -97,6 +99,7 @@ async function buildContext(route) {
     range: data.rangeOf(city),
     go, saveSettings,
     openFestival: (entry, day) => openFestival(ctx, entry, day),
+    openShare: (what) => openShare(ctx, sheet, what),
     // Minutes after the shown date's midnight, if "now" falls on this page (a page runs to the next sunrise).
     nowOn(day) {
       if (now.date === day.date) return now.minutes;
@@ -147,7 +150,7 @@ function renderTopbar(ctx) {
 function renderTabbar(ctx) {
   tabbar.replaceChildren(...TABS.map(([view, label, path]) =>
     h('button', {
-      type: 'button', class: 'tab' + (ctx.route.view === view ? ' active' : ''),
+      type: 'button', class: 'tab' + ((ctx.route.view === 'pathana' ? 'dina' : ctx.route.view) === view ? ' active' : ''),
       'aria-current': ctx.route.view === view ? 'page' : null,
       onclick: () => go({ view }),
     },
@@ -155,7 +158,7 @@ function renderTabbar(ctx) {
     h('span', { class: 'tab-label' }, ctx.L(label)))));
 }
 
-const RENDERERS = { dina: renderDina, vistara: renderVistara, kala: renderKala, masa: renderMasa, parva: renderParva, about: renderAbout };
+const RENDERERS = { dina: renderDina, vistara: renderVistara, kala: renderKala, masa: renderMasa, parva: renderParva, about: renderAbout, pathana: renderPathana };
 
 async function render() {
   const token = ++renderToken;
@@ -187,6 +190,7 @@ async function render() {
   if (token !== renderToken) return;
   main.replaceChildren(view);
   main.dataset.view = route.view + '|' + ctx.date + '|' + settings.script;
+  data.prefetchYear(ctx.city, ctx.date, settings.script, index.build);
   window.scrollTo(0, keepScroll);
   document.title = `${ctx.cityName} · ${ctx.date} · Adyatithi Panchaanga`;
 }
@@ -202,7 +206,7 @@ main.addEventListener('touchend', (e) => {
   const dy = e.changedTouches[0].clientY - touch.y;
   touch = null;
   const r = parseRoute();
-  if (!['dina', 'vistara', 'kala'].includes(r.view) || e.target.closest('.no-swipe')) return;
+  if (!['dina', 'vistara', 'kala', 'pathana'].includes(r.view) || e.target.closest('.no-swipe')) return;
   if (Math.abs(dx) > 70 && Math.abs(dx) > 2.2 * Math.abs(dy)) {
     const city = cityRec(r.city);
     const base = r.date || clampDate(city, nowIn(city.tz).date);

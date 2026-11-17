@@ -91,6 +91,14 @@ export async function renderParva(ctx, root) {
         rows(items));
       const next = body.querySelector('li:not(.past)');
       if (next && next !== body.querySelector('li')) next.classList.add('upcoming');
+      // Open the list at what comes next, not at the start of the year.
+      if (next && next.classList.contains('upcoming')) {
+        requestAnimationFrame(() => {
+          const prevRow = next.previousElementSibling || next;
+          const top = prevRow.getBoundingClientRect().top + window.scrollY - 170;
+          if (top > window.innerHeight * 0.4) window.scrollTo(0, top);
+        });
+      }
     }
   }
 

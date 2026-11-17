@@ -14,10 +14,17 @@ folder is the site.
 | कालाः (Kaala) | The day drawn to scale from the brāhma muhūrta to the next sunrise: divisions of the day, sandhyā windows, rāhu/yama/gulika, durmuhūrta, tyājya and amṛta kāla, with each anga's change marked and "now" as a line. The same in list form below, then the lagnas. |
 | विस्तरः (Vistara) | Everything the PDF page prints, in its order, then the hyperlinked edition's detail: sandhyāvandana and śrāddha kālas, horās, tārābala, muhūrtas, the anga ślokas and devatās, what to avoid, and the festival notes. |
 | मासः (Maasa) | A month grid with the moon's phase, solar day and nakshatra per cell, and the month's observances listed below. |
+| पञ्चाङ्ग-पठनम् (Pathanam) | Reached from Dina. The day set for reading aloud: each anga with its śloka and devatā in large type, then the nishiddha lines. |
 | पर्वाणि (Parva) | The year's lists from the PDF front matter (ekādaśī, pradoṣa, saṅkramaṇa, eclipses, anadhyayana …), the nava-nāyakas, the ūna-śrāddha days, and search across every observance. |
 
 Settings (city, script, clock, theme) and the About page are behind the icon at the top right.
-Labels are in Sanskrit, in the chosen script: Devanagari, Tamil, Telugu, Kannada or Roman (ISO).
+Labels are in Sanskrit, in the chosen script: Devanagari, Tamil, Grantha, Telugu, Kannada or Roman (ISO).
+
+**Sharing.** The day page, the paṭhanam page and every observance have a प्रेषणम् button: an image
+drawn in the browser from the same data, the day as text (for WhatsApp and the like), or the link.
+
+**Offline.** After the first visit the whole Kali year for the chosen city, and the text for the
+chosen script, are fetched in the background and kept.
 
 Every day has an address: `#/Chennai/2026-05-19`, `#/Chennai/2026-05-19/kala`, and so on.
 Swipe, or use the arrow keys, to change the day.
@@ -76,6 +83,7 @@ js/app.js             settings, routing, the context each view renders from
 js/data.js            loading of data/ (cached in memory; the service worker keeps it offline)
 js/parts.js           pieces shared by views: the head, sun/moon, anga lines, observances
 js/view-*.js          one file per view
+js/share.js           sharing: text, link, and the image drawn on a canvas
 sw.js                 offline cache (stale-while-revalidate)
 fonts/, icons/        typefaces (see fonts/README.md for licences) and the PDFs' icons
 data/                 generated; do not edit by hand

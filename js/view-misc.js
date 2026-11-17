@@ -3,10 +3,11 @@ import { h } from './util.js';
 import * as data from './data.js';
 import { descriptionBody } from './view-vistara.js';
 import { names } from './parts.js';
+import { shareButton } from './share.js';
 
-const SCRIPT_NAMES = { devanagari: 'देवनागरी', tamil: 'தமிழ்', telugu: 'తెలుగు', kannada: 'ಕನ್ನಡ', iso: 'Roman (ISO)' };
+const SCRIPT_NAMES = { devanagari: 'देवनागरी', tamil: 'தமிழ்', grantha: '𑌗𑍍𑌰𑌨𑍍𑌥', telugu: 'తెలుగు', kannada: 'ಕನ್ನಡ', iso: 'Roman (ISO)' };
 
-function sheet(title, body) {
+export function sheet(title, body) {
   document.querySelectorAll('dialog.sheet').forEach((d) => d.remove());
   const dlg = h('dialog', { class: 'sheet no-swipe' },
     h('div', { class: 'sheet-head' },
@@ -36,6 +37,7 @@ export function openSettings(ctx) {
     group(L('lipih'), 'script', ctx.index.scripts.map((s) => [s, SCRIPT_NAMES[s] || s])),
     settings.script === 'devanagari' && group(L('akshararupam'), 'face', [['noto', 'नोटो सेरिफ्', 'Noto Serif'], ['siddhanta', 'सिद्धान्त', 'Siddhanta (PDF)']]),
     group(L('samayarupam'), 'time', [['24', '25:30*', L('horaa24')], ['12', '1:30am*', L('horaa12')]]),
+    group(L('sheshadarshanam'), 'cue', [['off', L('naasti')], ['on', L('asti')]]),
     group(L('varnah'), 'theme', [['auto', L('svatah')], ['light', L('shuklam')], ['dark', L('shyaamam')]]),
     h('p', { class: 'hint' }, '* ', ctx.S.kaala.madhyaraatri || '', ' ▸'),
     h('button', { type: 'button', class: 'more-btn wide', onclick: () => { dlg.close(); ctx.go({ view: 'about' }); } }, L('parichayah'), ' ›'),
@@ -58,6 +60,7 @@ export async function openFestival(ctx, entry, day) {
   const body = h('div', null, h('p', { class: 'muted' }, ctx.L('pratiikshasva')));
   sheet(ctx.festName(entry), [
     h('p', { class: 'sheet-meta' }, h('span', { class: 'time' }, day.date), entry.t && h('span', { class: 'time' }, '  ' + ctx.festTimes(entry))),
+    shareButton(ctx, async () => ctx.openShare({ day, meta: (await data.loadDay(ctx.city, day.date)).meta, entry })),
     body,
   ]);
   const d = entry.x ? await data.loadDescription(script, entry.x).catch(() => null) : null;

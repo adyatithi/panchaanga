@@ -7,7 +7,9 @@
 @font-face { font-family: "Alegreya Sans"; src: url("../fonts/AlegreyaSans-Bold.woff2") format("woff2"); font-weight: 700; font-display: swap; }
 @font-face { font-family: "Siddhanta"; src: url("../fonts/siddhanta.ttf") format("truetype"); font-display: swap; unicode-range: U+0900-097F, U+1CD0-1CFF, U+A8E0-A8FF, U+200C-200D, U+25CC; }
 @font-face { font-family: "Noto Serif Devanagari Local"; src: url("../fonts/NotoSerifDevanagari-Regular.woff2") format("woff2"); font-display: swap; unicode-range: U+0900-097F, U+1CD0-1CFF, U+A8E0-A8FF, U+200C-200D, U+25CC; }
-@font-face { font-family: "Noto Sans Tamil Local"; src: url("../fonts/NotoSansTamil-Regular.woff2") format("woff2"); font-display: swap; unicode-range: U+0B80-0BFF, U+200C-200D, U+25CC; }
+/* Tamil and Grantha letterforms are wide; the PDFs set them well below the Devanagari size. */
+@font-face { font-family: "Noto Serif Grantha Local"; src: url("../fonts/NotoSerifGrantha-Regular.woff2") format("woff2"); font-display: swap; size-adjust: 80%; unicode-range: U+11300-1137F, U+1CD0-1CFF, U+0964-0965, U+200C-200D, U+25CC; }
+@font-face { font-family: "Noto Sans Tamil Local"; src: url("../fonts/NotoSansTamil-Regular.woff2") format("woff2"); font-display: swap; size-adjust: 78%; unicode-range: U+0B80-0BFF, U+200C-200D, U+25CC; }
 @font-face { font-family: "Mandali"; src: url("../fonts/Mandali.woff2") format("woff2"); font-display: swap; unicode-range: U+0C00-0C7F, U+200C-200D, U+25CC; }
 @font-face { font-family: "Noto Sans Kannada Local"; src: url("../fonts/NotoSansKannada-Regular.woff2") format("woff2"); font-display: swap; unicode-range: U+0C80-0CFF, U+200C-200D, U+25CC; }
 
@@ -28,7 +30,8 @@
   --moon-lit: #ffffff;
   --font-latin: "Alegreya Sans", "Noto Sans", system-ui, sans-serif;
   --font-indic: "Noto Serif Devanagari Local", "Noto Serif Devanagari", "Siddhanta", serif;
-  --font: "Alegreya Sans", "Noto Serif Devanagari Local", "Noto Serif Devanagari", "Noto Sans Tamil Local", system-ui, serif;
+  --others: "Noto Serif Devanagari Local", "Noto Sans Tamil Local", "Noto Serif Grantha Local", "Mandali", "Noto Sans Kannada Local";
+  --font: "Alegreya Sans", "Noto Serif Devanagari Local", "Noto Serif Devanagari", var(--others), system-ui, serif;
   --col: 34rem;
   --gutter-l: max(16px, env(safe-area-inset-left, 0px));
   --gutter-r: max(16px, env(safe-area-inset-right, 0px));
@@ -49,12 +52,15 @@
 }
 :root[data-face="siddhanta"] {
   --font-indic: "Siddhanta", "Noto Serif Devanagari Local", serif;
-  --font: "Alegreya Sans", "Siddhanta", "Noto Sans Tamil Local", "Noto Sans Devanagari", system-ui, sans-serif;
+  --font: "Alegreya Sans", "Siddhanta", var(--others), system-ui, sans-serif;
 }
-:root[data-script="tamil"] { --font: "Alegreya Sans", "Noto Sans Tamil Local", "Noto Sans Tamil", system-ui, sans-serif; }
-:root[data-script="telugu"] { --font: "Alegreya Sans", "Mandali", "Noto Sans Telugu", system-ui, sans-serif; }
-:root[data-script="kannada"] { --font: "Alegreya Sans", "Noto Sans Kannada Local", "Noto Sans Kannada", system-ui, sans-serif; }
-:root[data-script="iso"] { --font: "Alegreya Sans", "Noto Sans", system-ui, sans-serif; }
+:root[data-script="tamil"] { --font: "Alegreya Sans", "Noto Sans Tamil Local", "Noto Sans Tamil", var(--others), system-ui, sans-serif; }
+:root[data-script="grantha"] body { line-height: 1.7; }
+:root[data-script="grantha"] .hero-samvatsara, :root[data-script="grantha"] .anga-line { line-height: 1.8; }
+:root[data-script="grantha"] { --font: "Alegreya Sans", "Noto Serif Grantha Local", "Noto Serif Grantha", var(--others), system-ui, serif; }
+:root[data-script="telugu"] { --font: "Alegreya Sans", "Mandali", "Noto Sans Telugu", var(--others), system-ui, sans-serif; }
+:root[data-script="kannada"] { --font: "Alegreya Sans", "Noto Sans Kannada Local", "Noto Sans Kannada", var(--others), system-ui, sans-serif; }
+:root[data-script="iso"] { --font: "Alegreya Sans", "Noto Sans", var(--others), system-ui, sans-serif; }
 
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
@@ -135,7 +141,7 @@ a { color: var(--blue); }
 .hero-icons.two { display: grid; grid-template-columns: 1fr 1fr; gap: .15rem; }
 .hero-icons.two .fest-icon, .hero-icons.two .moon-wrap svg { width: 16px; height: 16px; }
 .hero-sauradate { font-size: clamp(4.25rem, 23vw, 6.25rem); line-height: 1.02; }
-:root[data-script="tamil"] .hero-sauradate, :root[data-script="iso"] .hero-sauradate { font-family: var(--font-latin); }
+:root[data-script="tamil"] .hero-sauradate, :root[data-script="grantha"] .hero-sauradate, :root[data-script="iso"] .hero-sauradate { font-family: var(--font-latin); }
 .hero-masas { font-size: 1.0625rem; display: flex; flex-wrap: wrap; justify-content: center; gap: 0 .9rem; margin-top: .15rem; }
 .glyph { display: inline-grid; }
 .zod { vertical-align: middle; }
@@ -367,3 +373,39 @@ dialog.sheet::backdrop { background: rgb(0 0 0 / .45); }
   body { font-size: 1.125rem; }
   .topbar, .tabbar { border-color: var(--hair); }
 }
+
+/* ---------- remaining-anga cue (optional) ---------- */
+.cues { display: grid; gap: .45rem; }
+.cue { display: grid; grid-template-columns: 1fr auto; gap: .1rem .75rem; align-items: baseline; }
+.cue-name { font-size: 1.125rem; min-width: 0; }
+.cue-rest { font-size: .8125rem; color: var(--ink-2); white-space: nowrap; }
+.cue-bar { grid-column: 1 / -1; height: 3px; background: var(--hair); position: relative; }
+.cue-bar > span { position: absolute; inset: 0 auto 0 0; background: var(--ink); }
+.cue-bar > i { position: absolute; top: -3px; width: 1px; height: 9px; background: var(--red); }
+
+/* ---------- more row, share ---------- */
+.more { flex-wrap: wrap; }
+.more-btn { flex: 1 1 8rem; }
+.share-btn { display: inline-flex; align-items: center; gap: .35rem; color: var(--blue); font-size: .9375rem; padding: .3rem 0; }
+.share-row { display: flex; justify-content: center; padding: .6rem 0 0; }
+.share-preview { display: block; width: 100%; max-width: 20rem; margin: .5rem auto; border: 1px solid var(--hair); }
+.share-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; font-family: var(--font); }
+.share-actions .more-btn { padding: .5rem .25rem; font-size: 1rem; }
+.share-text { width: 100%; min-height: 9rem; font: inherit; font-size: .875rem; line-height: 1.5; border: 1px solid var(--hair); background: var(--wash); color: var(--ink); padding: .5rem; margin-top: .6rem; resize: vertical; font-family: var(--font); }
+.toast { text-align: center; color: var(--blue); font-size: .875rem; min-height: 1.4rem; margin: .4rem 0 0; font-family: var(--font); }
+
+/* ---------- pathanam ---------- */
+.view-pathana { font-size: 1.1875rem; }
+.pathana-head { text-align: center; padding: 1.1rem 0 .6rem; border-bottom: 1px solid var(--rule); }
+.pathana-title { color: var(--red); font-size: 1.5rem; }
+.pathana-date { font-size: 1.0625rem; color: var(--ink-2); line-height: 1.7; }
+.pathana-date .time { color: var(--ink); }
+.view-pathana .shloka-card { padding: .9rem 0 1rem; border-top: 1px solid var(--hair); text-align: center; }
+.view-pathana .shloka-card:first-of-type { border-top: 0; }
+.view-pathana .shloka-head { font-size: 1.3125rem; }
+.view-pathana .shloka-head .time { font-size: 1rem; color: var(--ink-2); }
+.view-pathana .shloka { font-size: 1.3125rem; line-height: 1.9; margin-top: .4rem; }
+.view-pathana .devata { font-size: 1rem; }
+.view-pathana .nishiddha { text-align: center; }
+.view-pathana .nishiddha p { font-size: 1.1875rem; line-height: 1.85; margin-bottom: .5rem; }
+.view-pathana .block-title { justify-content: center; font-size: 1.3125rem; }

@@ -5,6 +5,7 @@
 | `AlegreyaSans-*.woff2` | Alegreya Sans, © The Alegreya Sans Project Authors | SIL Open Font License 1.1 |
 | `NotoSerifDevanagari-Regular.woff2` | Noto Serif Devanagari, © Google | SIL Open Font License 1.1 |
 | `NotoSansTamil-Regular.woff2` | Noto Sans Tamil, © Google | SIL Open Font License 1.1 |
+| `NotoSerifGrantha-Regular.woff2` | Noto Serif Grantha, © Google | SIL Open Font License 1.1 |
 | `NotoSansKannada-Regular.woff2` | Noto Sans Kannada, © Google | SIL Open Font License 1.1 |
 | `Mandali.woff2` | Mandali, © Silicon Andhra | SIL Open Font License 1.1 |
 | `siddhanta.ttf` | Siddhanta, © 2011 Mihail Bayaryn | CC BY-NC-ND 3.0 |
