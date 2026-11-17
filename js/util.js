@@ -101,28 +101,63 @@ export function store(key, value) {
   return value ?? null;
 }
 
-// Minimal, safe rendering of the festival descriptions' markdown-ish text.
+// The rule files' text is Markdown with some TeX habits. This renders the subset that occurs
+// (paragraphs, bullet and numbered lists, bold, links, bare URLs) and tidies the rest.
+function tidy(text) {
+  return String(text)
+    .replace(/\{\}/g, '')
+    .replace(/\{(\[[^\]{}]*\])\}/g, '$1')
+    .replace(/``/g, '“').replace(/''/g, '”')
+    .replace(/\s*---\s*/g, ' — ').replace(/ — (\n|$)/g, ' —$1')
+    .replace(/\+\+\+\(([^)]*)\)\+\+\+/g, '($1)');
+}
+
+function inline(target, text) {
+  const parts = text.split(/(\[[^\]]+\]\(https?:\/\/[^)\s]+\)|\*\*[^*]+\*\*|\*[^*\n]+\*|`[^`]+`|https?:\/\/[^\s)]+)/);
+  for (const part of parts) {
+    if (!part) continue;
+    const link = part.match(/^\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)$/);
+    if (link) target.append(h('a', { href: link[2], target: '_blank', rel: 'noopener' }, link[1]));
+    else if (/^\*\*.*\*\*$/.test(part)) target.append(h('strong', null, part.slice(2, -2)));
+    else if (/^\*.*\*$/.test(part)) target.append(h('strong', null, part.slice(1, -1)));
+    else if (/^`.*`$/.test(part)) target.append(h('em', null, part.slice(1, -1)));
+    else if (/^https?:\/\//.test(part)) target.append(h('a', { href: part, target: '_blank', rel: 'noopener' }, decodeURIComponent(part.replace(/^https?:\/\//, '')).slice(0, 48)));
+    else target.append(part.replace(/~/g, ' '));
+  }
+}
+
 export function richText(text) {
   const frag = document.createDocumentFragment();
-  for (const para of String(text).split(/\n\s*\n/)) {
-    const lines = para.split('\n').map((l) => l.replace(/\s+$/, ''));
-    const isList = lines.every((l) => /^\s*[-*] /.test(l));
-    const block = h(isList ? 'ul' : 'p');
+  const bullet = /^\s*[-*] /;
+  const numbered = /^\s*\d+\. /;
+  for (const para of tidy(text).split(/\n\s*\n/)) {
+    const lines = para.split('\n').map((l) => l.replace(/\s+$/, '')).filter((l) => l.trim());
+    if (!lines.length) continue;
+    const kind = lines.every((l) => bullet.test(l)) ? 'ul' : lines.every((l) => numbered.test(l)) ? 'ol' : 'p';
+    const block = h(kind);
     lines.forEach((line, i) => {
-      const target = isList ? block.appendChild(h('li')) : block;
-      const clean = isList ? line.replace(/^\s*[-*] /, '') : line;
-      const parts = clean.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`|https?:\/\/[^\s)]+)/);
-      for (const part of parts) {
-        if (!part) continue;
-        if (/^\*\*.*\*\*$/.test(part)) target.append(h('strong', null, part.slice(2, -2)));
-        else if (/^\*.*\*$/.test(part)) target.append(h('strong', null, part.slice(1, -1)));
-        else if (/^`.*`$/.test(part)) target.append(h('em', null, part.slice(1, -1)));
-        else if (/^https?:\/\//.test(part)) target.append(h('a', { href: part, target: '_blank', rel: 'noopener' }, part.replace(/^https?:\/\//, '').slice(0, 48)));
-        else target.append(part);
+      if (kind === 'p') {
+        inline(block, line);
+        if (i < lines.length - 1) block.append(h('br'));
+      } else {
+        inline(block.appendChild(h('li')), line.replace(kind === 'ul' ? bullet : numbered, ''));
       }
-      if (!isList && i < lines.length - 1) target.append(h('br'));
     });
     frag.append(block);
   }
   return frag;
+}
+
+// A verse: one line per line, bold where marked, and an ornament between two verses.
+export function verseLines(text) {
+  const out = [];
+  tidy(text).replace(/\*\*/g, '*').split('\n').map((l) => l.trim()).filter(Boolean).forEach((line, i) => {
+    if (i > 0) out.push(h('br'));
+    if (line === '✺') return out.push(h('span', { class: 'verse-break', 'aria-hidden': 'true' }, '✺'));
+    for (const part of line.split(/(\*[^*]+\*)/)) {
+      if (!part) continue;
+      out.push(/^\*.*\*$/.test(part) ? h('strong', null, part.slice(1, -1).replace(/~/g, ' ')) : part.replace(/~/g, ' '));
+    }
+  });
+  return out;
 }

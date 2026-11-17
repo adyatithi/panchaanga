@@ -1,5 +1,5 @@
 // Parva: the year's lists, as in the PDF's front matter, plus search across every observance.
-import { h, parseDate, WDAYS, store } from './util.js';
+import { h, parseDate, WDAYS, store, verseLines } from './util.js';
 import * as data from './data.js';
 import { icon, GROUP_ICONS, names, missing } from './parts.js';
 
@@ -50,10 +50,10 @@ export async function renderParva(ctx, root) {
       const g = meta.nava[s];
       out.push(h('div', { class: 'shloka-card' },
         h('div', { class: 'shloka-head' }, `${T.graha6[g]} ${T.sthaana_tvasya[s]}${T.tvasya_phalam}`),
-        h('p', { class: 'shloka' }, (T.phala[s]?.[{ bhAnuH: 'sUryaH', sOmaH: 'candraH' }[g] || g] || '').split('\n').map((l, i) => [i > 0 && h('br'), l]))));
+        h('p', { class: 'shloka' }, verseLines(T.phala[s]?.[{ bhAnuH: 'sUryaH', sOmaH: 'candraH' }[g] || g] || ''))));
       if (s === 'mantrI' && meta.nava.rAjA === meta.nava.mantrI) {
         out.push(h('div', { class: 'shloka-card' }, h('div', { class: 'shloka-head' }, T.rajamantri_title),
-          h('p', { class: 'shloka' }, T.rajamantri.split('\n').map((l, i) => [i > 0 && h('br'), l]))));
+          h('p', { class: 'shloka' }, verseLines(T.rajamantri))));
       }
     }
     return out;

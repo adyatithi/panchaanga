@@ -1,7 +1,7 @@
 // Vistara: everything the PDF prints for the day, in the PDF's order, followed by the
 // material from the hyperlinked edition (sandhya and shraaddha kaalas, horas, tarabala,
 // muhurtas, the anga shlokas, what to avoid, and the festival notes).
-import { h, richText } from './util.js';
+import { h, richText, verseLines } from './util.js';
 import * as data from './data.js';
 import { hero, sunMoon, angaLine, festivalList, footerLines, missing, names } from './parts.js';
 
@@ -18,7 +18,7 @@ function pairs(rows) {
 function shlokaCard(heading, shloka, devata) {
   return h('div', { class: 'shloka-card' },
     h('div', { class: 'shloka-head' }, heading),
-    shloka && h('p', { class: 'shloka' }, shloka.split('\n').map((l, i) => [i > 0 && h('br'), l])),
+    shloka && h('p', { class: 'shloka' }, verseLines(shloka)),
     devata && h('div', { class: 'devata' }, devata));
 }
 
@@ -135,7 +135,7 @@ export async function renderVistara(ctx, root) {
   if (day.nishiddha.length) {
     root.append(section(L('varjayitum'), h('div', { class: 'nishiddha' },
       day.nishiddha.map((id) => lines[id]).filter(Boolean).map((line) =>
-        h('p', null, line.split(/(\*[^*]+\*)/).map((part) => (/^\*.*\*$/.test(part) ? h('strong', null, part.slice(1, -1)) : part)))))));
+        h('p', null, verseLines(line))))));
   }
 
   // Festival notes, loaded as they are opened.
@@ -160,6 +160,6 @@ export function descriptionBody(d) {
   return h('div', null,
     d.b && h('div', { class: 'desc-blurb' }, richText(d.b)),
     d.d && h('div', { class: 'desc-detail' }, richText(d.d)),
-    d.s && h('p', { class: 'shloka' }, d.s.split('\n').map((l, i) => [i > 0 && h('br'), l.trim()])),
+    d.s && h('p', { class: 'shloka' }, verseLines(d.s)),
     d.r && h('div', { class: 'desc-refs' }, richText(d.r)));
 }

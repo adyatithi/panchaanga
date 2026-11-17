@@ -238,6 +238,8 @@ a { color: var(--blue); }
 .shloka-card:first-of-type { border-top: 0; }
 .shloka-head { color: var(--ink); font-size: 1.0625rem; }
 .shloka { margin: .25rem 0 0; font-size: 1.0625rem; line-height: 1.75; color: var(--ink); }
+.verse-break { display: inline-block; color: var(--red); font-size: .8em; padding: .1rem 0; }
+.shloka strong { font-weight: 400; color: var(--red); }
 .devata { font-size: .875rem; color: var(--ink-2); margin-top: .2rem; }
 .nishiddha p { margin: 0 0 .35rem; line-height: 1.7; }
 .nishiddha strong { font-weight: 400; color: var(--red); }
