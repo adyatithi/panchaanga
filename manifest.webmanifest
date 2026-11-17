@@ -1,0 +1,13 @@
+{
+  "name": "Adyatithi Panchaanga",
+  "short_name": "Panchaanga",
+  "description": "Daily panchaanga with tithi, nakshatra, yoga, karana, kaalas and observances.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    { "src": "icons/adyatithi.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
