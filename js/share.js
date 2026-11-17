@@ -337,7 +337,7 @@ function plainVerse(text) {
 
 function pathanaSections(ctx, blocks) {
   return blocks.map((b) => ({
-    head: `${b.label} — ${b.name}${b.end != null ? ' ▸' + ctx.T(b.end) : ''}`,
+    head: b.name ? `${b.label} — ${b.name}${b.end != null ? ' ▸' + ctx.T(b.end) : ''}` : b.label,
     lines: plainVerse(b.shloka),
     note: b.devata ? `${ctx.L('devataa')} — ${b.devata}` : '',
   }));

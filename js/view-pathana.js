@@ -26,6 +26,11 @@ export function pathanaBlocks(ctx, day) {
   return blocks;
 }
 
+// The phalashruti, as the PDFs print it after the shlokas.
+export function phalashrutiBlock(ctx) {
+  return { key: 'phala', label: ctx.L('phalashrutih'), name: '', end: null, shloka: ctx.S.phalashruti || '', devata: '' };
+}
+
 export async function renderPathana(ctx, root) {
   const got = await ctx.loadDay(ctx.date);
   if (!got) return root.append(missing(ctx));
@@ -35,11 +40,14 @@ export async function renderPathana(ctx, root) {
   const dt = parseDate(day.date);
   const blocks = pathanaBlocks(ctx, day);
 
-  const cards = blocks.map((b) => h('div', { class: 'shloka-card' },
-    h('div', { class: 'shloka-head' }, b.key === 'tithi' && [moonSvg(b.id, 18), ' '], `${b.label} — ${b.name}`,
-      b.end != null && h('span', { class: 'time' }, ` ▸${T(b.end)}`)),
+  // As the PDF's anga boxes: the anga's name in a red tab on a red rule, the verse in red on a
+  // faint ground, the devata in a small red tag.
+  const cards = blocks.map((b) => h('div', { class: 'anga-box' },
+    h('div', { class: 'anga-tab' }, h('span', { class: 'anga-tab-label' }, b.label),
+      h('span', { class: 'anga-tab-name' }, b.key === 'tithi' && [moonSvg(b.id, 16), ' '], b.name)),
+    b.end != null && h('div', { class: 'anga-box-end' }, '▸', h('span', { class: 'time' }, T(b.end))),
     b.shloka && h('p', { class: 'shloka' }, verseLines(b.shloka)),
-    b.devata && h('div', { class: 'devata' }, `${L('devataa')} — ${b.devata}`)));
+    b.devata && h('div', { class: 'devata-tag' }, h('span', { class: 'devata-tag-label' }, L('devataa')), h('span', null, b.devata))));
 
   root.append(
     h('header', { class: 'pathana-head' },
@@ -48,6 +56,10 @@ export async function renderPathana(ctx, root) {
         h('span', { class: 'time' }, `${WDAYS[day.wd]} ${dt.getUTCDate()} ${MONTHS[dt.getUTCMonth()]} ${dt.getUTCFullYear()}`), h('br'),
         `${N.samvatsara(meta.samvatsara)} · ${N.ayana(day.ayana)} · ${N.rtu(day.rtu)}`, h('br'),
         `${N.rashi(day.saura.m)} ${ctx.num(day.saura.d)} · ${N.chandramasa(day.chandra)}`),
-      h('div', { class: 'share-row' }, shareButton(ctx, () => ctx.openShare({ day, meta, mode: 'pathana', blocks })))),
-    h('section', { class: 'pathana-cards' }, cards));
+      h('div', { class: 'share-row' }, shareButton(ctx, () => ctx.openShare({ day, meta, mode: 'pathana', blocks: [...blocks, phalashrutiBlock(ctx)] })))),
+    h('section', { class: 'pathana-cards' }, cards),
+    ctx.S.phalashruti && h('section', { class: 'anga-box phala' },
+      h('div', { class: 'anga-tab' }, h('span', { class: 'anga-tab-name' }, L('phalashrutih'))),
+      h('p', { class: 'shloka' }, verseLines(ctx.S.phalashruti))),
+    h('p', { class: 'source-note' }, `${L('aakarah')} — ${L('shaantikusumaakarah')}`));
 }

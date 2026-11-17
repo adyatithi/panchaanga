@@ -500,3 +500,35 @@ dialog.sheet::backdrop { background: rgb(0 0 0 / .45); }
 .guide-list dd { margin: .15rem 0 0; font-family: var(--font-latin), var(--font); color: var(--ink-2); line-height: 1.55; }
 .icon-legend { display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: .4rem .8rem; margin-top: .9rem; }
 .legend-item { display: flex; align-items: center; gap: .5rem; font-size: .9375rem; }
+
+/* Pathanam: the PDF's anga boxes. A red tab on a red rule carries the anga and its name; the
+   verse is red on a faint ground; the devata hangs in a red tag at the side. */
+.pathana-cards { display: flex; flex-direction: column; gap: 1.6rem; padding-top: 1.4rem; }
+.anga-box { position: relative; border-top: 2px solid var(--red); background: var(--wash); padding: 0 1rem 1rem; text-align: center; }
+.anga-tab { display: inline-flex; align-items: baseline; gap: .55rem; background: var(--red); color: #fff; padding: .15rem .9rem .2rem;
+  transform: translateY(-55%); margin-bottom: -.4rem; max-width: 100%; }
+.anga-tab-label { font-size: .8125rem; opacity: .85; letter-spacing: .02em; }
+.anga-tab-name { font-size: 1.1875rem; }
+.anga-tab .moon-wrap { vertical-align: -.15em; }
+.anga-tab .moon-rim { stroke: #fff; }
+.anga-tab .moon-dark { fill: var(--red); }
+.anga-tab .moon-lit { fill: #fff; }
+.anga-box-end { font-size: .875rem; color: var(--ink-2); margin-bottom: .2rem; }
+.anga-box .shloka { color: var(--red); font-size: 1.25rem; line-height: 1.85; margin: .3rem 0 0; }
+.devata-tag { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.2; margin-top: .7rem;
+  background: var(--red); color: #fff; padding: .2rem .7rem .3rem; font-size: .9375rem; }
+.devata-tag-label { font-size: .6875rem; opacity: .85; }
+@media (min-width: 30rem) {
+  .devata-tag { position: absolute; right: -.5rem; top: 1.6rem; margin: 0; }
+  .anga-box:has(.devata-tag) .shloka { padding-right: 3.5rem; padding-left: 3.5rem; }
+}
+.anga-box.phala { margin-top: 1.8rem; }
+.source-note { text-align: center; font-size: .8125rem; color: var(--ink-3); margin: .9rem 0 0; }
+
+/* Guide headings: the same red tab on a red rule. */
+.guide-title { margin: .4rem 0 .6rem; border-top: 2px solid var(--red); text-align: center; font-weight: 400; line-height: 1; }
+.guide-title span { display: inline-block; background: var(--red); color: #fff; font: 400 1.0625rem/1.4 var(--font-latin), var(--font);
+  padding: .15rem 1rem .2rem; transform: translateY(-55%); letter-spacing: .02em; }
+.guide { padding-top: 1.4rem; }
+.guide-list dt { display: inline-block; font-size: 1.0625rem; margin-top: .9rem; padding: 0 .1rem .05rem; border-bottom: 2px solid var(--red); }
+.guide-list dt:first-child { margin-top: .2rem; }

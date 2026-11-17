@@ -86,7 +86,7 @@ function sections(ctx) {
     {
       title: 'Pages under More',
       items: [
-        [L('pathanam'), 'The day set out for reading aloud: each anga with its śloka and devatā.'],
+        [L('pathanam'), 'The day set out for reading aloud: each anga with its śloka and devatā, and the phalaśruti. The ślokas are from Śānti Kusumākara.'],
         [L('varjayitum'), 'The verses on what is better avoided today (oil bath, bathing, cleaning the teeth, shaving, certain foods and so on), selected by the day\'s angas, as in the PDFs.'],
         [L('navanaayakaah'), 'The nine "officers" of the year (rājā, mantrī …), the graha holding each, and the traditional verse on what it portends.'],
       ],
@@ -119,7 +119,7 @@ export async function renderGuide(ctx, root) {
       e.preventDefault(); document.getElementById('g' + i)?.scrollIntoView({ behavior: 'smooth' });
     } }, s.title))),
     secs.map((s, i) => h('section', { class: 'block guide', id: 'g' + i },
-      h('h2', { class: 'block-title' }, s.title),
+      h('h2', { class: 'guide-title' }, h('span', null, s.title)),
       h('dl', { class: 'guide-list' }, s.items.map(([term, text]) => [h('dt', null, term), h('dd', null, text)])),
       s.icons && h('div', { class: 'icon-legend' }, Object.entries(GROUP_ICONS).map(([g, id]) =>
         h('div', { class: 'legend-item' }, icon(id, 26), h('span', null, (S.festgroup[g] || g).replace(/-[^-]*$/, ''))))))));
