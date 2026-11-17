@@ -86,7 +86,7 @@ function dial(size) {
     <circle cx="${c}" cy="${c}" r="3.5" class="dial-hub"/>
   </svg>`;
 }
-function ghatikaClock(ctx, day) {
+function ghatikaClock(ctx, day, prev) {
   const read = h('div', { class: 'gh-read' },
     h('div', { class: 'gh-value time', id: 'gh-value' }, '—'),
     h('div', { class: 'gh-label' }, ctx.L('ghatikaah'), ' · ', h('span', { class: 'time', id: 'gh-clock' }, '')));
@@ -95,7 +95,9 @@ function ghatikaClock(ctx, day) {
     const now = nowSecondsIn(ctx.city.tz);
     let s = now.seconds;
     if (now.date !== day.date) s += 86400;
-    const g = ghatikaAt(day, s);
+    // Before sunrise the night ghatikas still belong to the previous day.
+    let g = ghatikaAt(day, s);
+    if (g == null && prev) g = ghatikaAt(prev, s + 86400);
     const v = document.getElementById('gh-value');
     const hand = document.getElementById('gh-hand');
     if (!v || g == null) return;
@@ -207,11 +209,12 @@ export async function renderKala(ctx, root) {
   ].sort((a, b) => a.t - b.t || (a.end || 0) - (b.end || 0));
 
   const progress = now != null ? await cues(ctx, day, now).catch(() => null) : null;
+  const prev = now != null ? (await ctx.loadDay(addDays(day.date, -1)).catch(() => null))?.day : null;
   root.append(
     sunMoon(ctx, day),
     now != null && h('section', { class: 'now kala-now' }, h('div', { class: 'now-head' },
       h('span', { class: 'now-dot', 'aria-hidden': 'true' }), h('span', { class: 'label' }, ctx.L('idaaniim')),
-      h('span', { class: 'time now-clock' }, ctx.T(now))), ghatikaClock(ctx, day), progress),
+      h('span', { class: 'time now-clock' }, ctx.T(now))), ghatikaClock(ctx, day, prev), progress),
     h('div', { class: 'tl-heads', 'aria-hidden': 'true' },
       h('span', null, ''), h('span', null, L('dinavibhaagaah')), h('span', null, L('sandhyaa')),
       h('span', null, h('span', { class: 'bad-text' }, L('ashubham')), ' · ', h('span', { class: 'good-text' }, L('shubham'))),
