@@ -1,6 +1,6 @@
 // Offline support. The shell is cached on install; data files are cached as they are read.
 // Everything is served stale-while-revalidate, so a visit online refreshes what a later visit offline will see.
-const CACHE = 'adyatithi-v4';
+const CACHE = 'adyatithi-v5';
 const SHELL = ['./', 'index.html', 'css/app.css', 'js/app.js', 'js/util.js', 'js/data.js', 'js/parts.js',
   'js/view-dina.js', 'js/view-vistara.js', 'js/view-kala.js', 'js/view-masa.js', 'js/view-parva.js', 'js/view-misc.js', 'js/view-pathana.js', 'js/share.js', 'js/view-saptaha.js',
   'manifest.webmanifest', 'icons/adyatithi.png', 'data/index.json'];

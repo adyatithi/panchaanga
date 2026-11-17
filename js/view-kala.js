@@ -166,6 +166,16 @@ export async function renderKala(ctx, root) {
           h('span', null, N.rashi(id)), h('span', { class: 'time' }, '▸' + T(end)));
       }))),
   );
+  // Labels for anga changes are placed by time, then pushed down where a wrapped label would
+  // run into the next one; this needs their rendered heights, so it runs after layout.
+  requestAnimationFrame(() => {
+    let bottom = -Infinity;
+    root.querySelectorAll('.tl-mark').forEach((el) => {
+      const top = Math.max(parseFloat(el.style.top), bottom + 3);
+      el.style.top = `${top}px`;
+      bottom = top + el.offsetHeight;
+    });
+  });
   if (nowLine) requestAnimationFrame(() => {
     const el = document.getElementById('tl-now');
     if (el && window.scrollY < 10) window.scrollTo(0, Math.max(0, el.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.4));
