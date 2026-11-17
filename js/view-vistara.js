@@ -3,7 +3,7 @@
 // muhurtas, the anga shlokas, what to avoid, and the festival notes).
 import { h, richText, verseLines } from './util.js';
 import * as data from './data.js';
-import { hero, sunMoon, angaLine, festivalList, footerLines, missing, names } from './parts.js';
+import { hero, sunMoon, angaLine, festivalList, footerLines, missing, names, rashiBox } from './parts.js';
 
 const mod = (n, m) => ((n % m) + m) % m;
 
@@ -15,31 +15,35 @@ function pairs(rows) {
   return h('dl', { class: 'pairs' }, rows.filter(Boolean).map(([k, v]) => [h('dt', null, k), h('dd', null, v)]));
 }
 
-function shlokaCard(heading, shloka, devata) {
-  return h('div', { class: 'shloka-card' },
-    h('div', { class: 'shloka-head' }, heading),
-    shloka && h('p', { class: 'shloka' }, verseLines(shloka)),
-    devata && h('div', { class: 'devata' }, devata));
-}
-
+// Taaraabala, as the PDF's table: nakshatras in a fixed 9 x 3 grid (1, 10, 19 in the first row,
+// and so on), so that the three in a row are nine apart and share one taaraa. The taaraa is that
+// of the day's nakshatra counted from each janma nakshatra; the row's colour and label show it.
+// The day's own nakshatra is janma; the other two in its row are anujanma and trijanma.
 function taraGrid(ctx, N, nakId) {
-  const cells = [];
-  for (let janma = 1; janma <= 27; janma++) {
-    const tara = mod(nakId - janma, 9) + 1; // 1 janma … 9 paramamitra
-    const idx = tara % 9;                   // table is [paramamitra, janma, sampat, …, mitra]
-    cells.push(h('div', { class: `tara tara-${idx}`, title: ctx.S.tara[idx] },
-      h('span', { class: 'tara-nak' }, N.nakshatra(janma)), h('span', { class: 'tara-name' }, ctx.S.tara[idx])));
+  const rows = [];
+  for (let r = 1; r <= 9; r++) {
+    const count = (j) => mod(nakId - j, 27) + 1;       // 1 .. 27, from janma nakshatra j to today's
+    const tara = mod(count(r) - 1, 9) + 1;             // 1 janma … 9 paramamitra
+    const idx = tara % 9;                              // S.tara is [paramamitra, janma, …, mitra]
+    const cells = [r, r + 9, r + 18].map((j) => {
+      const c = count(j);
+      const sub = c === 1 ? ctx.S.tara[1] : c === 10 ? ctx.L('anujanma') : c === 19 ? ctx.L('trijanma') : null;
+      return h('div', { class: `tara-n tara-${idx}${c === 1 ? ' is-day' : ''}` },
+        h('span', { class: 'tara-nak' }, N.nakshatra(j)), sub && h('span', { class: 'tara-sub' }, sub));
+    });
+    rows.push(...cells, h('div', { class: `tara-t tara-${idx}` }, `[${ctx.num(tara)}] ${ctx.S.tara[idx]}`));
   }
-  return h('div', { class: 'tara-grid' }, cells);
+  return h('div', { class: 'tara-grid' },
+    h('div', { class: 'tara-head' }, ctx.L('janmanakshatram')), h('div', { class: 'tara-head tara-head-t' }, ctx.L('taaraabalam')),
+    rows);
 }
 
 export async function renderVistara(ctx, root) {
-  const got = await data.loadDay(ctx.city, ctx.date);
+  const got = await ctx.loadDay(ctx.date);
   if (!got) return root.append(missing(ctx));
   const { day, meta } = got;
   const { L, S, T } = ctx;
   const N = names(ctx);
-  const lines = await data.loadLines(ctx.settings.script).catch(() => ({}));
 
   const k = day.kala;
   const step = (label, t) => h('span', { class: 'kala-step' }, label, ' ', h('span', { class: 'time' }, T(t)), '▸');
@@ -82,6 +86,9 @@ export async function renderVistara(ctx, root) {
         rashi && h('span', { class: 'ft-item' }, L('chandraashtamaraashih'), '—', N.rashi(mod(rashi[0] - 8, 12) + 1), rashi[1] != null && ['▸', tm(rashi[1])]),
         h('span', { class: 'ft-item' }, L('shuulam'), '—', S.shula[day.wd][0], ' (▸', tm(day.shula), ') ', L('parihaarah'), '—', S.shula[day.wd][1])))));
 
+  // --- the grahas at sunrise, as the PDF's raashi-box edition prints them ---
+  if (day.graha) root.append(h('section', { class: 'block' }, h('h2', { class: 'block-title' }, L('grahasthitih')), rashiBox(ctx, day)));
+
   // --- the hyperlinked edition's detail ---
   const sandhya = ['praatas_sandhyaa', 'maadhyaahnika_sandhyaa', 'saayam_sandhyaa'];
   root.append(section(L('sandhyaavandanakaalaah'), pairs(sandhya.map((key, i) => [
@@ -111,7 +118,7 @@ export async function renderVistara(ctx, root) {
     root.append(section([L('taaraabalam'), ' — ', N.nakshatra(id),
       from != null && h('span', { class: 'time muted' }, ` ${T(from)}▸`),
       end != null && h('span', { class: 'time muted' }, ` ▸${T(end)}`)],
-    h('p', { class: 'hint' }, L('janmanakshatram')), taraGrid(ctx, N, id)));
+    taraGrid(ctx, N, id)));
   });
 
   const muh = (list, ends) => h('div', { class: 'grid-cells' }, list.map((name, i) =>
@@ -120,23 +127,10 @@ export async function renderVistara(ctx, root) {
     h('h3', { class: 'sub' }, L('ahah')), muh(S.muhurta_day, day.muhurta[0]),
     h('h3', { class: 'sub' }, L('raatrih')), muh(S.muhurta_night, day.muhurta[1])));
 
-  // Shlokas and presiding deities of the day's angas.
-  const cards = [];
-  const each = (key, table, label, nameOf) => day[key].filter(([, end], i) => end != null || i === 0)
-    .forEach(([id]) => cards.push(shlokaCard(`${L(label)} — ${nameOf(id)}`, S.shloka[table]?.[id], S.devata[table]?.[id])));
-  each('tithi', 'TITHI', 'tithih', N.tithi);
-  cards.push(shlokaCard(`${L('vaasarah')} — ${N.vara(day.wd)}`, S.shloka.VARA?.[day.wd], S.devata.VARA?.[day.wd]));
-  each('nakshatra', 'NAKSHATRA', 'nakshatram', N.nakshatra);
-  each('yoga', 'YOGA', 'yogah', N.yoga);
-  day.karana.filter(([, end]) => end != null).forEach(([id]) =>
-    cards.push(shlokaCard(`${L('karanam')} — ${N.karana(id)}`, S.shloka.KARANA?.[id], null)));
-  root.append(section(L('panchaangam'), cards));
-
-  if (day.nishiddha.length) {
-    root.append(section(L('varjayitum'), h('div', { class: 'nishiddha' },
-      day.nishiddha.map((id) => lines[id]).filter(Boolean).map((line) =>
-        h('p', null, verseLines(line))))));
-  }
+  // The anga shlokas and what to avoid are read on their own page.
+  root.append(h('section', { class: 'block' },
+    h('button', { type: 'button', class: 'more-btn wide', onclick: () => ctx.go({ view: 'pathana' }) },
+      ctx.L('pathanam'), h('span', { 'aria-hidden': 'true' }, ' ›'))));
 
   // Festival notes, loaded as they are opened.
   const noted = [...day.fest, ...((day.anadhyayana && day.anadhyayana.list) || [])].filter((e) => e.x);

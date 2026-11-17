@@ -9,7 +9,11 @@ export async function renderParva(ctx, root) {
   const meta = await data.loadMeta(ctx.city.id, yr.kali);
   const { L, S, F } = ctx;
   const N = names(ctx);
-  const groups = Object.keys(meta.lists);
+  // Only what the reader's chosen festival repositories hold; a group left empty is not offered.
+  const lists = Object.fromEntries(Object.entries(meta.lists)
+    .map(([g, items]) => [g, items.filter(([, key]) => ctx.showKey(key))])
+    .filter(([g, items]) => items.length || g !== 'anadhyayana'));
+  const groups = Object.keys(lists);
   const special = ['navanaayakaah', ...(meta.uuna ? ['uunashraaddha'] : [])];
   let current = store('parva') || 'EkAdazI-vrata';
   if (![...groups, ...special].includes(current)) current = groups[0];
@@ -65,7 +69,7 @@ export async function renderParva(ctx, root) {
         type: 'button', class: 'pchip' + (g === current && !query ? ' active' : ''),
         onclick: () => { current = g; store('parva', g); query = ''; search.value = ''; draw(); },
       }, icon(GROUP_ICONS[g], 18), h('span', null, (S.festgroup[g] || g).replace(/-[^-]*$/, '')),
-      h('span', { class: 'pchip-count' }, ctx.num(new Set(meta.lists[g].map((i) => i[0])).size)))),
+      h('span', { class: 'pchip-count' }, ctx.num(new Set(lists[g].map((i) => i[0])).size)))),
       ...special.map((g) => h('button', {
         type: 'button', class: 'pchip' + (g === current && !query ? ' active' : ''),
         onclick: () => { current = g; store('parva', g); query = ''; search.value = ''; draw(); },
@@ -74,7 +78,7 @@ export async function renderParva(ctx, root) {
       const q = query.toLowerCase();
       const hits = [];
       for (const [date, keys] of Object.entries(meta.fests)) {
-        for (const key of keys) if ((F[key] || '').toLowerCase().includes(q) || key.toLowerCase().includes(q)) hits.push([date, key]);
+        for (const key of keys) if (ctx.showKey(key) && (F[key] || '').toLowerCase().includes(q) || key.toLowerCase().includes(q)) hits.push([date, key]);
       }
       body.replaceChildren(h('h2', { class: 'block-title' }, `${L('anveshanam')} (${ctx.num(hits.length)})`), rows(hits));
     } else if (current === 'navanaayakaah') {
@@ -84,7 +88,7 @@ export async function renderParva(ctx, root) {
         h('ul', { class: 'rows' }, meta.uuna.map(([date, naks]) => h('li', { class: date < ctx.now.date ? 'past' : '' },
           dateCell(date), h('div', { class: 'row-names' }, naks.map((n) => N.nakshatra(n)).join('/'))))));
     } else {
-      const items = meta.lists[current];
+      const items = lists[current];
       body.replaceChildren(
         h('h2', { class: 'block-title' }, icon(GROUP_ICONS[current], 22), ' ',
           `${S.festgroup[current] || current} (${ctx.num(new Set(items.map((i) => i[0])).size)})`),

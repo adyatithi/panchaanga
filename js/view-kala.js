@@ -1,5 +1,5 @@
 // Kala: the day drawn to scale, from the brahma muhurta to the next sunrise, with "now" marked.
-import { h } from './util.js';
+import { h, addDays, moonSvg } from './util.js';
 import * as data from './data.js';
 import { missing, kalaIntervals, names, sunMoon } from './parts.js';
 
@@ -28,8 +28,29 @@ function layout(items) {
   return items;
 }
 
+// How far each anga has run: a bar from the moment it began to the moment it ends, filled up
+// to now, with the time left. Shown on today's page only.
+async function cues(ctx, day, now) {
+  const N = names(ctx);
+  const nameOf = { tithi: N.tithi, nakshatra: N.nakshatra, yoga: N.yoga, karana: N.karana };
+  const rows = [];
+  for (const key of ['tithi', 'nakshatra', 'yoga', 'karana']) {
+    const b = await data.spanBounds(ctx.city, day, key, now, addDays);
+    if (b.start == null || b.end == null || b.end <= b.start) continue;
+    const done = Math.min(1, Math.max(0, (now - b.start) / (b.end - b.start)));
+    const left = Math.max(0, b.end - now);
+    rows.push(h('div', { class: 'cue' },
+      h('span', { class: 'cue-name' }, key === 'tithi' && [moonSvg(b.id, 14), ' '], nameOf[key](b.id),
+        h('span', { class: 'time muted' }, ` ▸${ctx.T(b.end)}`)),
+      h('span', { class: 'cue-rest' }, `${ctx.L('sheshah')} `, h('span', { class: 'time' }, `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`)),
+      h('div', { class: 'cue-bar', role: 'img', 'aria-label': `${Math.round(done * 100)}%` },
+        h('span', { style: `width:${(done * 100).toFixed(1)}%` }), h('i', { style: `left:${(done * 100).toFixed(1)}%` }))));
+  }
+  return rows.length ? h('div', { class: 'cues' }, rows) : null;
+}
+
 export async function renderKala(ctx, root) {
-  const got = await data.loadDay(ctx.city, ctx.date);
+  const got = await ctx.loadDay(ctx.date);
   if (!got) return root.append(missing(ctx));
   const { day } = got;
   const { L, T, S } = ctx;
@@ -123,8 +144,12 @@ export async function renderKala(ctx, root) {
     { t: k.braahma, text: S.kaala.braahma }, { t: k.dinaanta, text: L('dinaantah') },
   ].sort((a, b) => a.t - b.t || (a.end || 0) - (b.end || 0));
 
+  const progress = now != null ? await cues(ctx, day, now).catch(() => null) : null;
   root.append(
     sunMoon(ctx, day),
+    progress && h('section', { class: 'now kala-now' }, h('div', { class: 'now-head' },
+      h('span', { class: 'now-dot', 'aria-hidden': 'true' }), h('span', { class: 'label' }, ctx.L('idaaniim')),
+      h('span', { class: 'time now-clock' }, ctx.T(now))), progress),
     h('div', { class: 'tl-heads', 'aria-hidden': 'true' },
       h('span', null, ''), h('span', null, L('dinavibhaagaah')), h('span', null, L('sandhyaa')),
       h('span', null, h('span', { class: 'bad-text' }, L('ashubham')), ' · ', h('span', { class: 'good-text' }, L('shubham'))),

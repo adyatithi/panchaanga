@@ -52,9 +52,25 @@ export function names(ctx) {
   };
 }
 
-// The PDF's two-panel head: Gregorian date on the left, the Indian calendar on the right,
-// in the PDF's order: samvatsara, ayana and rtu, solar month, lunar and tropical months,
-// the solar date with the day's icons beside it, and the weekday.
+// The day's icons from the festivals shown, replaying the TeX writer's rules (kept in step
+// with _replay_icons in app_json_writer.py): festivals in the PDF's order, each contributing its
+// tokens; a whole-day anadhyayana replaces the half-day ones, and so do both halves together.
+export function dayIcons(entries) {
+  let icons = [];
+  [...entries].filter((e) => e.ic).sort((a, b) => a.n - b.n).forEach((e) => e.ic.forEach((t) => {
+    if (t === 'anadhyayana') icons = icons.filter((i) => i !== 'anadhyayanar' && i !== 'anadhyayanaa');
+    icons.push(t);
+  }));
+  if (icons.includes('anadhyayanaa') && icons.includes('anadhyayanar')) {
+    icons = icons.filter((i) => i !== 'anadhyayanar' && i !== 'anadhyayanaa');
+    icons.push('anadhyayana');
+  }
+  return [...new Set(icons)].sort();
+}
+
+// The PDF's two-panel head, as one grid so that the two panels share their rows: year with
+// samvatsara, month with the solar and lunar months, the date with the solar date, the weekday
+// with the vaasara. The festival icons sit beside the solar date.
 export function hero(ctx, day, meta) {
   const N = names(ctx);
   const dt = parseDate(day.date);
@@ -63,34 +79,52 @@ export function hero(ctx, day, meta) {
     type: 'button', class: 'tri ' + dir, 'aria-label': label, onclick: () => ctx.go({ date: clamp(target) }),
   });
   const saura = day.saura;
-  // Up to three icons stack; more go two to a row, as in the PDF.
   const icons = [...day.icons].sort((a, b) => (iconOrder(a) < iconOrder(b) ? -1 : 1)).map((i) => icon(i, 26)).filter(Boolean);
+  const L = (cls, ...c) => h('div', { class: 'hl ' + cls }, c);
+  const R = (cls, ...c) => h('div', { class: 'hr ' + cls }, c);
   return h('section', { class: 'hero' },
-    h('div', { class: 'hero-left' },
-      h('div', { class: 'hero-year' }, dt.getUTCFullYear()),
-      h('div', { class: 'hero-step' },
-        arrow('back', addMonths(day.date, -1), 'previous month'),
-        h('span', { class: 'hero-month' }, MONTHS[dt.getUTCMonth()]),
-        arrow('fwd', addMonths(day.date, 1), 'next month')),
-      h('div', { class: 'hero-date' }, dt.getUTCDate()),
-      h('div', { class: 'hero-step' },
-        arrow('back', addDays(day.date, -7), 'previous week'),
-        h('span', { class: 'hero-wday' }, WDAYS[day.wd]),
-        arrow('fwd', addDays(day.date, 7), 'next week'))),
-    h('div', { class: 'hero-right' },
-      h('div', { class: 'hero-samvatsara' }, `${N.samvatsara(meta.samvatsara)} – ${meta.vatsara[ctx.settings.script]}`),
-      h('div', { class: 'hero-ayana' }, h('span', null, N.ayana(day.ayana)), h('span', null, N.rtu(day.rtu))),
-      h('div', { class: 'hero-sauramasa' }, N.rashi(saura.m)),
+    L('r1 hero-year', dt.getUTCFullYear()),
+    R('r1', h('div', { class: 'hero-samvatsara' }, `${N.samvatsara(meta.samvatsara)} – ${meta.vatsara[ctx.settings.script]}`),
+      h('div', { class: 'hero-ayana' }, h('span', null, N.ayana(day.ayana)), h('span', null, N.rtu(day.rtu)))),
+    L('r2 hero-step', arrow('back', addMonths(day.date, -1), 'previous month'),
+      h('span', { class: 'hero-month' }, MONTHS[dt.getUTCMonth()]),
+      arrow('fwd', addMonths(day.date, 1), 'next month')),
+    R('r2', h('div', { class: 'hero-sauramasa' }, N.rashi(saura.m)),
       saura.end && h('div', { class: 'hero-transition' }, N.rashi(saura.end[0]), '▸',
         h('span', { class: 'time' }, `${ctx.T(saura.end[1])} (${saura.end[2]})`)),
       h('div', { class: 'hero-masas' },
         h('span', null, h('span', { class: 'glyph', html: CRESCENT }), N.chandramasa(day.chandra)),
-        h('span', null, h('img', { class: 'fest-icon zod', src: 'icons/zodiac.svg', alt: '', width: 15, height: 15 }), N.rtumasa(day.rtu))),
-      h('div', { class: 'hero-daterow' },
-        h('span', { class: 'hero-side' }),
-        h('div', { class: 'hero-sauradate' }, ctx.num(saura.d)),
-        h('div', { class: 'hero-side hero-icons' + (icons.length > 3 ? ' two' : '') }, icons)),
-      h('div', { class: 'hero-vara' }, N.vara(day.wd))));
+        h('span', null, h('img', { class: 'fest-icon zod', src: 'icons/zodiac.svg', alt: '', width: 15, height: 15 }), N.rtumasa(day.rtu)))),
+    L('r3 hero-date', dt.getUTCDate()),
+    R('r3 hero-daterow',
+      h('span', { class: 'hero-side' }),
+      h('div', { class: 'hero-sauradate' }, ctx.num(saura.d)),
+      h('div', { class: 'hero-side hero-icons' + (icons.length > 3 ? ' two' : '') }, icons)),
+    L('r4 hero-step', arrow('back', addDays(day.date, -7), 'previous week'),
+      h('span', { class: 'hero-wday' }, WDAYS[day.wd]),
+      arrow('fwd', addDays(day.date, 7), 'next week')),
+    R('r4 hero-vara', N.vara(day.wd)));
+}
+
+// The South Indian chart: rashis fixed in the outer ring, Meena at top left, running clockwise.
+const BOX_CELLS = { 12: [1, 1], 1: [1, 2], 2: [1, 3], 3: [1, 4], 4: [2, 4], 5: [3, 4], 6: [4, 4], 7: [4, 3], 8: [4, 2], 9: [4, 1], 10: [3, 1], 11: [2, 1] };
+export function rashiBox(ctx, day) {
+  const N = names(ctx);
+  const S = ctx.S;
+  const cells = [];
+  for (let r = 1; r <= 12; r++) {
+    const [row, col] = BOX_CELLS[r];
+    const here = Object.entries(day.graha).filter(([, [rr]]) => rr === r);
+    const lagna = day.lagna.length && r === day.lagna[0][0] ? true : false;
+    cells.push(h('div', { class: 'rb-cell', style: `grid-row:${row};grid-column:${col}` },
+      h('span', { class: 'rb-rashi' }, N.rashi(r)),
+      h('span', { class: 'rb-grahas' }, here.map(([g, [, deg]]) => h('span', { class: 'rb-graha', title: `${deg}°` },
+        (S.graha_box && S.graha_box[g]) || g, h('span', { class: 'rb-deg time' }, ` ${Math.floor(deg)}°`))))));
+  }
+  cells.push(h('div', { class: 'rb-centre', style: 'grid-row:2 / 4;grid-column:2 / 4' },
+    h('span', { class: 'rb-title time' }, `${parseDate(day.date).getUTCDate()} ${MONTHS[parseDate(day.date).getUTCMonth()].slice(0, 3)} ${parseDate(day.date).getUTCFullYear()}`),
+    h('span', { class: 'rb-when' }, ctx.L('suryodaye'), ' ', h('span', { class: 'time' }, ctx.T(day.sun[0])))));
+  return h('div', { class: 'rashi-box', role: 'img', 'aria-label': ctx.L('grahasthitih') }, cells);
 }
 
 const SUN = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg>';

@@ -6,7 +6,7 @@ import { missing, names } from './parts.js';
 import { shareButton } from './share.js';
 
 export async function renderPathana(ctx, root) {
-  const got = await data.loadDay(ctx.city, ctx.date);
+  const got = await ctx.loadDay(ctx.date);
   if (!got) return root.append(missing(ctx));
   const { day, meta } = got;
   const { L, S, T } = ctx;

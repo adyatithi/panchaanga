@@ -11,13 +11,17 @@ folder is the site.
 | Tab | What it shows |
 |---|---|
 | दिनम् (Dina) | The simplified day: the PDF's two-panel head, sun and moon, the five angas with what follows each, observances, and the kaalas to keep clear of. When the page is today's, a strip shows what is running now. |
-| कालाः (Kaala) | The day drawn to scale from the brāhma muhūrta to the next sunrise: divisions of the day, sandhyā windows, rāhu/yama/gulika, durmuhūrta, tyājya and amṛta kāla, with each anga's change marked and "now" as a line. The same in list form below, then the lagnas. |
-| विस्तरः (Vistara) | Everything the PDF page prints, in its order, then the hyperlinked edition's detail: sandhyāvandana and śrāddha kālas, horās, tārābala, muhūrtas, the anga ślokas and devatās, what to avoid, and the festival notes. |
-| मासः (Maasa) | A month grid with the moon's phase, solar day and nakshatra per cell, and the month's observances listed below. |
+| कालाः (Kaala) | On today's page, how much of each anga has run and what is left. Then the day drawn to scale from the brāhma muhūrta to the next sunrise: divisions of the day, sandhyā windows, rāhu/yama/gulika, durmuhūrta, tyājya and amṛta kāla, with each anga's change marked and "now" as a line. The same in list form below, then the lagnas. |
+| विस्तरः (Vistara) | Everything the PDF page prints, in its order, then the grahas at sunrise in a rāśi box and the hyperlinked edition's detail: sandhyāvandana and śrāddha kālas, horās, tārābala (the PDF's 9 × 3 table), muhūrtas, and the festival notes. |
+| मासः (Maasa) | A month grid with the moon's phase, solar day and nakshatra per cell, and the month's observances listed below. A switch at the top gives the week instead (a mock-up). |
 | पञ्चाङ्ग-पठनम् (Pathanam) | Reached from Dina. The day set for reading aloud: each anga with its śloka and devatā in large type, then the nishiddha lines. |
 | पर्वाणि (Parva) | The year's lists from the PDF front matter (ekādaśī, pradoṣa, saṅkramaṇa, eclipses, anadhyayana …), the nava-nāyakas, the ūna-śrāddha days, and search across every observance. |
 
-Settings (city, script, clock, theme) and the About page are behind the icon at the top right.
+Settings (city, script, typeface, clock, theme, festival repositories) and the About page are behind the icon at the top right.
+
+**Festival repositories.** Festivals come from the adyatithi rule repositories. By default the app
+shows what the PDFs show, without anadhyayana; anadhyayana and the repositories the PDFs leave
+out can be switched on in settings, and any other can be switched off there.
 Labels are in Sanskrit, in the chosen script: Devanagari, Tamil, Grantha, Telugu, Kannada or Roman (ISO).
 
 **Sharing.** The day page, the paṭhanam page and every observance have a प्रेषणम् button: an image

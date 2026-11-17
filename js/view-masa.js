@@ -2,10 +2,11 @@
 import { h, parseDate, moonSvg, WDAYS } from './util.js';
 import * as data from './data.js';
 import { names, icon, missing } from './parts.js';
+import { switcher } from './view-saptaha.js';
 
 export async function renderMasa(ctx, root) {
   const ym = ctx.date.slice(0, 7);
-  const days = await data.loadMonthDays(ctx.city, ym);
+  const days = await ctx.loadMonthDays(ym);
   if (!days.length) return root.append(missing(ctx));
   const N = names(ctx);
   const byDate = new Map(days.map((d) => [d.date, d]));
@@ -43,6 +44,7 @@ export async function renderMasa(ctx, root) {
   const sauras = uniq(days.map((d) => N.rashi(d.saura.m))).join(' · ');
 
   root.append(
+    switcher(ctx, 'masa'),
     h('div', { class: 'cal-head' },
       h('div', null, h('span', { class: 'label' }, ctx.L('chaandramaasah')), ' ', masas),
       h('div', null, h('span', { class: 'label' }, ctx.L('sauramaasah')), ' ', sauras)),

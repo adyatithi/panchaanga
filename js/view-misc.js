@@ -21,6 +21,35 @@ export function sheet(title, body) {
   return dlg;
 }
 
+// Festival repositories. The additional ones (off by default) are listed openly; the rest sit
+// behind a disclosure, since few readers will want to remove any.
+function repoChooser(ctx) {
+  const { L } = ctx;
+  const extra = ctx.repos.repos.filter((r) => !r.on);
+  const base = ctx.repos.repos.filter((r) => r.on);
+  const LABEL = { 'time_focus/adhyayana': L('anadhyaayaah') };
+  const toggle = (r) => {
+    const id = 'repo-' + r.id.replace(/[^A-Za-z0-9]+/g, '-');
+    return h('label', { class: 'repo', for: id },
+      h('input', {
+        type: 'checkbox', id, checked: ctx.enabled.has(r.id),
+        onchange: (e) => {
+          const repos = { ...(ctx.settings.repos || {}) };
+          if (e.target.checked === r.on) delete repos[r.id]; else repos[r.id] = e.target.checked;
+          ctx.saveSettings({ repos });
+        },
+      }),
+      h('span', { class: 'repo-name' }, LABEL[r.id] || r.id.replace(/_/g, ' ')),
+      LABEL[r.id] && h('span', { class: 'repo-id' }, r.id));
+  };
+  return h('fieldset', { class: 'opt-group repos' },
+    h('legend', null, L('parvasrotaamsi')),
+    h('div', { class: 'repo-sub' }, L('atiriktaani')),
+    h('div', { class: 'repo-list' }, extra.map(toggle)),
+    h('details', { class: 'repo-more' }, h('summary', null, L('sarvaani'), ` (${ctx.num(base.length)})`),
+      h('div', { class: 'repo-list' }, base.map(toggle))));
+}
+
 export function openSettings(ctx) {
   const { L, settings } = ctx;
   let dlg;
@@ -37,9 +66,9 @@ export function openSettings(ctx) {
     group(L('lipih'), 'script', ctx.index.scripts.map((s) => [s, SCRIPT_NAMES[s] || s])),
     settings.script === 'devanagari' && group(L('akshararupam'), 'face', [['noto', 'नोटो सेरिफ्', 'Noto Serif'], ['siddhanta', 'सिद्धान्त', 'Siddhanta (PDF)']]),
     group(L('samayarupam'), 'time', [['24', '25:30*', L('horaa24')], ['12', '1:30am*', L('horaa12')]]),
-    group(L('sheshadarshanam'), 'cue', [['off', L('naasti')], ['on', L('asti')]]),
     group(L('varnah'), 'theme', [['auto', L('svatah')], ['light', L('shuklam')], ['dark', L('shyaamam')]]),
     h('p', { class: 'hint' }, '* ', ctx.S.kaala.madhyaraatri || '', ' ▸'),
+    repoChooser(ctx),
     h('button', { type: 'button', class: 'more-btn wide', onclick: () => { dlg.close(); ctx.go({ view: 'about' }); } }, L('parichayah'), ' ›'),
   ]);
 }
@@ -60,7 +89,7 @@ export async function openFestival(ctx, entry, day) {
   const body = h('div', null, h('p', { class: 'muted' }, ctx.L('pratiikshasva')));
   sheet(ctx.festName(entry), [
     h('p', { class: 'sheet-meta' }, h('span', { class: 'time' }, day.date), entry.t && h('span', { class: 'time' }, '  ' + ctx.festTimes(entry))),
-    shareButton(ctx, async () => ctx.openShare({ day, meta: (await data.loadDay(ctx.city, day.date)).meta, entry })),
+    shareButton(ctx, async () => ctx.openShare({ day, meta: (await ctx.loadDay(day.date)).meta, entry })),
     body,
   ]);
   const d = entry.x ? await data.loadDescription(script, entry.x).catch(() => null) : null;

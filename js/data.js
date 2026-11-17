@@ -21,6 +21,7 @@ export const loadFestNames = (script) => get(`text/${script}/fest.json`);
 export const loadPhrases = (script) => get(`text/${script}/phr.json`);
 export const loadLines = (script) => get(`text/${script}/lines.json`);
 export const loadDescription = (script, id) => get(`text/${script}/desc-${id[0]}.json`).then((b) => b[id] || null);
+export const loadRepos = () => get('repos.json').catch(() => ({ repos: [], fest: {} }));
 export const loadMeta = (city, kali) => get(`c/${city}/${kali}/meta.json`);
 export const loadMonth = (city, kali, ym) => get(`c/${city}/${kali}/${ym}.json`);
 

@@ -7,10 +7,12 @@ import { renderKala } from './view-kala.js';
 import { renderMasa } from './view-masa.js';
 import { renderParva } from './view-parva.js';
 import { openSettings, renderAbout, openFestival, sheet } from './view-misc.js';
+import { dayIcons } from './parts.js';
+import { renderSaptaha } from './view-saptaha.js';
 import { openShare } from './share.js';
 import { renderPathana } from './view-pathana.js';
 
-const VIEWS = ['dina', 'kala', 'vistara', 'masa', 'parva', 'about', 'pathana'];
+const VIEWS = ['dina', 'kala', 'vistara', 'masa', 'parva', 'about', 'pathana', 'saptaha'];
 const TABS = [
   ['dina', 'dinam', 'M4 5h16v15H4zM4 9h16M8 3v4M16 3v4'],
   ['kala', 'kaalaah', 'M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18zM12 7v5l3 2'],
@@ -20,7 +22,7 @@ const TABS = [
 ];
 
 const settings = Object.assign(
-  { city: 'Chennai', script: 'devanagari', time: '24', theme: 'auto', face: 'noto', cue: 'off' },
+  { city: 'Chennai', script: 'devanagari', time: '24', theme: 'auto', face: 'noto', repos: {} },
   store('settings') || {},
 );
 
@@ -84,11 +86,30 @@ async function buildContext(route) {
   const city = cityRec(route.city);
   const now = nowIn(city.tz);
   const date = route.date || clampDate(city, now.date);
-  const [S, F, P] = await Promise.all([
+  const [S, F, P, R] = await Promise.all([
     data.loadStatic(settings.script),
     data.loadFestNames(settings.script),
     data.loadPhrases(settings.script),
+    data.loadRepos(),
   ]);
+  // Festival repositories: each one's default, overridden by what the reader has chosen.
+  const chosen = settings.repos || {};
+  const enabled = new Set(R.repos.filter((r) => (r.id in chosen ? chosen[r.id] : r.on)).map((r) => r.id));
+  const showKey = (key) => { const repo = R.fest[key]; return !repo || enabled.has(repo); };
+  const showEntry = (e) => showKey(e.k || e.id);
+  // A day as the reader has chosen to see it: only festivals from enabled repositories, and the
+  // icons those festivals call for.
+  const filterDay = (day) => {
+    const fest = day.fest.filter(showEntry);
+    let anadhyayana = null;
+    if (day.anadhyayana) {
+      const list = day.anadhyayana.list.filter(showEntry);
+      if (list.length) anadhyayana = { ...day.anadhyayana, list };
+    }
+    const out = { ...day, fest, icons: dayIcons([...fest, ...(anadhyayana ? anadhyayana.list : [])]) };
+    if (anadhyayana) out.anadhyayana = anadhyayana; else delete out.anadhyayana;
+    return out;
+  };
   const digits = S.digits;
   const ctx = {
     index, settings, route: { ...route, date }, city, date, S, F, P, now,
@@ -97,7 +118,14 @@ async function buildContext(route) {
     num: (n) => String(n).replace(/\d/g, (d) => digits[+d]),
     cityName: city.name[settings.script] || city.label,
     range: data.rangeOf(city),
-    go, saveSettings,
+    go, saveSettings, repos: R, enabled, showKey,
+    async loadDay(date) {
+      const got = await data.loadDay(city, date);
+      return got && { ...got, day: filterDay(got.day) };
+    },
+    async loadMonthDays(ym) {
+      return (await data.loadMonthDays(city, ym)).map(filterDay);
+    },
     openFestival: (entry, day) => openFestival(ctx, entry, day),
     openShare: (what) => openShare(ctx, sheet, what),
     // Minutes after the shown date's midnight, if "now" falls on this page (a page runs to the next sunrise).
@@ -121,8 +149,9 @@ function renderTopbar(ctx) {
   const { date, city } = ctx;
   const dt = parseDate(date);
   const monthView = ctx.route.view === 'masa';
+  const weekView = ctx.route.view === 'saptaha';
   const yearView = ctx.route.view === 'parva' || ctx.route.view === 'about';
-  const step = (n) => go({ date: clampDate(city, monthView ? addMonths(date, n) : addDays(date, n)) });
+  const step = (n) => go({ date: clampDate(city, monthView ? addMonths(date, n) : addDays(date, weekView ? 7 * n : n)) });
   const label = monthView
     ? `${MONTHS[dt.getUTCMonth()]} ${dt.getUTCFullYear()}`
     : `${WDAYS[dt.getUTCDay()]} ${dt.getUTCDate()} ${MONTHS[dt.getUTCMonth()].slice(0, 3)}`;
@@ -150,7 +179,7 @@ function renderTopbar(ctx) {
 function renderTabbar(ctx) {
   tabbar.replaceChildren(...TABS.map(([view, label, path]) =>
     h('button', {
-      type: 'button', class: 'tab' + ((ctx.route.view === 'pathana' ? 'dina' : ctx.route.view) === view ? ' active' : ''),
+      type: 'button', class: 'tab' + (({ pathana: 'dina', saptaha: 'masa' }[ctx.route.view] || ctx.route.view) === view ? ' active' : ''),
       'aria-current': ctx.route.view === view ? 'page' : null,
       onclick: () => go({ view }),
     },
@@ -158,7 +187,7 @@ function renderTabbar(ctx) {
     h('span', { class: 'tab-label' }, ctx.L(label)))));
 }
 
-const RENDERERS = { dina: renderDina, vistara: renderVistara, kala: renderKala, masa: renderMasa, parva: renderParva, about: renderAbout, pathana: renderPathana };
+const RENDERERS = { dina: renderDina, vistara: renderVistara, kala: renderKala, masa: renderMasa, parva: renderParva, about: renderAbout, pathana: renderPathana, saptaha: renderSaptaha };
 
 async function render() {
   const token = ++renderToken;
@@ -221,7 +250,7 @@ document.addEventListener('keydown', (e) => {
   const city = cityRec(r.city);
   const base = r.date || clampDate(city, nowIn(city.tz).date);
   const n = e.key === 'ArrowLeft' ? -1 : 1;
-  go({ date: clampDate(city, r.view === 'masa' ? addMonths(base, n) : addDays(base, n)) });
+  go({ date: clampDate(city, r.view === 'masa' ? addMonths(base, n) : addDays(base, r.view === 'saptaha' ? 7 * n : n)) });
 });
 
 async function boot() {
@@ -233,7 +262,8 @@ async function boot() {
     return;
   }
   if (!index.cities.some((c) => c.id === settings.city)) settings.city = index.cities[0].id;
-  window.addEventListener('hashchange', render);
+  // Going to another page (a tap, or the phone's back button) closes any open sheet.
+  window.addEventListener('hashchange', () => { document.querySelectorAll('dialog[open]').forEach((d) => d.close()); render(); });
   await render();
   // Keep "now" honest while the page stays open.
   setInterval(() => {
