@@ -36,16 +36,23 @@ export async function renderMore(ctx, root) {
       () => ctx.go({ view: k, date: null }))),
     meta.uuna?.length && item('uuna', L('uunashraaddha'), nextSub(nextOf(meta.uuna)), () => ctx.go({ view: 'uuna', date: null })),
   ].filter(Boolean) : [];
+  // Guide, settings and About first; then what belongs to the year, to the day, and the lists
+  // of days for an undertaking.
+  const S = ctx.S.labels;
+  const head = (key) => h('h2', { class: 'menu-head' }, S[key] ?? L(key));
   root.append(
-    h('ul', { class: 'menu' }, item('guide', L('margadarshika'), ctx.U('guidelead'), () => ctx.go({ view: 'guide' }))),
-    lists.length && h('h2', { class: 'menu-head' }, L('muhurtadinaani')),
-    lists.length && h('ul', { class: 'menu' }, lists),
-    h('ul', { class: 'menu menu-gap' },
-    item('pathana', L('pathanam'), null, () => ctx.go({ view: 'pathana' })),
-    item('varjya', L('varjayitum'), null, () => ctx.go({ view: 'varjya' })),
-    item('nava', L('navanaayakaah'), null, () => ctx.go({ view: 'nava' })),
-    item('settings', L('vinyaasah'), null, () => ctx.openSettings()),
-    item('about', L('parichayah'), null, () => ctx.go({ view: 'about' }))));
+    h('ul', { class: 'menu' },
+      item('guide', L('margadarshika'), ctx.U('guidelead'), () => ctx.go({ view: 'guide' })),
+      item('settings', L('vinyaasah'), null, () => ctx.openSettings()),
+      item('about', L('parichayah'), null, () => ctx.go({ view: 'about' }))),
+    head('samvatsaravishayaah'),
+    h('ul', { class: 'menu' }, item('nava', L('navanaayakaah'), null, () => ctx.go({ view: 'nava' }))),
+    head('dinavishayaah'),
+    h('ul', { class: 'menu' },
+      item('pathana', L('pathanam'), null, () => ctx.go({ view: 'pathana' })),
+      item('varjya', L('varjayitum'), null, () => ctx.go({ view: 'varjya' }))),
+    lists.length && head('muhurtadinaani'),
+    lists.length && h('ul', { class: 'menu' }, lists));
 }
 
 function dayHead(ctx, day, meta, title) {
@@ -86,11 +93,14 @@ export async function renderNava(ctx, root) {
   const cards = [];
   for (const s of sthaanas) {
     const g = meta.nava[s];
-    cards.push(h('div', { class: 'shloka-card' },
-      h('div', { class: 'shloka-head' }, `${T.graha6[g]} ${T.sthaana_tvasya[s]}${T.tvasya_phalam}`),
+    // As on the pathanam page: a tab with the office and its graha, then what it portends.
+    cards.push(h('div', { class: 'anga-box' },
+      h('div', { class: 'anga-tab' }, h('span', { class: 'anga-tab-label' }, T.sthaana[s]), h('span', { class: 'anga-tab-name' }, T.graha1[g])),
+      h('div', { class: 'anga-box-end' }, `${T.graha6[g]} ${T.sthaana_tvasya[s]}${T.tvasya_phalam}`),
       h('p', { class: 'shloka' }, verseLines(T.phala[s]?.[{ bhAnuH: 'sUryaH', sOmaH: 'candraH' }[g] || g] || ''))));
     if (s === 'mantrI' && meta.nava.rAjA === meta.nava.mantrI) {
-      cards.push(h('div', { class: 'shloka-card' }, h('div', { class: 'shloka-head' }, T.rajamantri_title),
+      cards.push(h('div', { class: 'anga-box' },
+        h('div', { class: 'anga-tab' }, h('span', { class: 'anga-tab-name' }, T.rajamantri_title)),
         h('p', { class: 'shloka' }, verseLines(T.rajamantri))));
     }
   }
@@ -100,5 +110,5 @@ export async function renderNava(ctx, root) {
       h('div', { class: 'pathana-date' }, `${N.samvatsara(meta.samvatsara)} – ${meta.vatsara[ctx.settings.script]}`),
       h('p', { class: 'nava-line' }, `${L('asminsamvatsare')} ` +
         sthaanas.map((s) => `${T.sthaana[s]} ${T.graha1[meta.nava[s]]}`).join(', ') + '।')),
-    h('section', { class: 'reading' }, cards));
+    h('section', { class: 'pathana-cards' }, cards));
 }

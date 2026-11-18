@@ -8,11 +8,13 @@ import { acknowledgements } from './view-misc.js';
 // reader's script via the label tables where one exists) and its explanation.
 export function sections(ctx) {
   const L = ctx.L;
+  // The Sanskrit word for a tab or setting, whatever the interface language.
+  const SL = (k) => ctx.S.labels[k] ?? L(k);
   return [
     {
       title: 'Reading the times',
       items: [
-        ['24:39*', 'Times are local clock time for the city, including summer time where the city has it, on a 24-hour clock. A pañcāṅga day runs from sunrise to the next sunrise, so times after midnight keep counting: 24:39* is 00:39 on the next calendar date, still within this pañcāṅga day. In settings you can switch to a 12-hour clock.'],
+        ['24:39*', 'Times are local clock time for the city, including summer time where the city has it, on a 24-hour clock. A pañcāṅga day runs from sunrise to the next sunrise, so times after midnight keep counting: 24:39* is 00:39 on the next calendar date, still within this pañcāṅga day. In settings you can switch to a 12-hour clock, or show times after midnight as +0:39*.'],
         ['▸ 14:18', 'A time after a name is the time it ends. "शुक्ल-तृतीया ▸14:18" means the tithi runs until 14:18; what follows it is shown next, often in grey.'],
         ['▸▸', 'Two arrows: it is still running at the next sunrise.'],
         [`▸${L('puurnadinam')}`, 'It lasts the whole pañcāṅga day, from sunrise to the next sunrise.'],
@@ -21,6 +23,17 @@ export function sections(ctx) {
         [L('avamaa'), 'Marked when a tithi or nakṣatra begins and ends between two sunrises, so that it is never the one at sunrise (a "lost" tithi).'],
         [L('tridinasprk'), 'Marked when a tithi touches three days: it is running at three successive sunrises.'],
         ['12:05–13:40', 'A range is a period, from the first time to the second.'],
+      ],
+    },
+    {
+      title: 'The tabs',
+      items: [
+        [SL('dinam'), 'The day: the head of the page, sun and moon, the five angas and the day\'s festivals. A switch at the top shows it brief or in detail; the detail is the full PDF page.'],
+        [SL('kaalaah'), 'On today\'s page, the ghaṭikā clock and how much of each anga is left; then every kāla of the day with its times, and the day drawn to scale from the brāhma muhūrta to the next sunrise. Only the drawing scrolls; the clock and the list of kālas fold away.'],
+        [SL('vistarah'), 'The full PDF page for the day, followed by the detail of the hyperlinked edition.'],
+        [SL('maasah'), 'The month as a calendar, with the tithi, nakṣatra and festival icons on each day and the festivals listed below it; a switch shows the week instead.'],
+        [SL('parvaani'), 'Every festival of the year, and the year\'s lists, with search.'],
+        [SL('anyat'), 'This guide, settings and the acknowledgements; the year\'s nava-nāyakas; the day\'s paṭhanam and what to avoid; and the lists of days for an oil bath, a haircut, beginning study and the ūna-śrāddhas.'],
       ],
     },
     {
@@ -52,7 +65,7 @@ export function sections(ctx) {
         [L('praatahsandhyaa'), 'The three sandhyāvandana periods: morning, from the last muhūrta of the night through the fourth of the day; midday (mādhyāhnika), the sixth to the thirteenth muhūrtas of the day; evening, the last muhūrta of the day and the first of the night. On the Detail page the time in brackets is the earlier, secondary (gauṇa) start.'],
         [L('shayanam'), 'The time for going to sleep: from the end of the first quarter of the night to three-eighths of the way through it.'],
         [L('dinaantah'), 'Five-eighths of the way from sunset to the next sunrise.'],
-        [L('ghatikaah'), 'On today\'s Kālas page, a live clock gives the time since sunrise in ghaṭikās, vighaṭīs and tatparas (each sixty of the next), from the pañcāṅga\'s own sunrise and sunset, after the ghaṭikā clock at ghatika-clock.web.app. On the dial sunrise is at the top, the day on the right half and the night on the left.'],
+        [L('ghatikaah'), 'On today\'s Kālas page, a live clock gives the time since sunrise in ghaṭikās, vighaṭīs and tatparas (each sixty of the next; a tatpara is about 0.4 seconds, and the reading moves with each one), from the pañcāṅga\'s own sunrise and sunset, after the ghaṭikā clock at ghatika-clock.web.app. On the dial sunrise is at the top, the day on the right half and the night on the left. Before sunrise the reading continues the previous day\'s night.'],
         [L('muhurtaah'), 'Day and night are each divided into fifteen named muhūrtas; the Detail page gives the time each ends.'],
         [L('horaah'), 'Day and night are each divided into twelve horās, each ruled by a graha, the first by the lord of the weekday.'],
       ],
@@ -75,33 +88,47 @@ export function sections(ctx) {
       items: [
         [L('shraaddhatithih'), 'The tithi whose śrāddha falls on this day, by the solar (saura) month. When two fall on one day, "tithidvayam"; when the lunar (cāndra) reckoning differs, it is shown too. Given for places in India only, as in the PDFs.'],
         [L('shraaddhakaalaah'), 'The śrāddha period, the eighth to the twelfth muhūrtas of the day; the main time to begin (mukhya, the eighth muhūrta, kutapa) and the secondary one (gauṇa, the seventh).'],
-        [L('uunashraaddha'), 'Days suitable for the ūna-māsika śrāddhas, with the nakṣatra in the afternoon. A page of its own under More, for places in India.'],
+        [L('uunashraaddha'), 'Days suitable for the ūna-māsika śrāddhas, with the nakṣatra in the afternoon: a page of its own under More, for places in India. Choose a nakṣatra to see only its days.'],
       ],
     },
     {
       title: 'On the Detail page',
       items: [
-        [L('taaraabalam'), 'Count from a person\'s janma nakṣatra to the day\'s nakṣatra: the count falls on one of nine tārās — janma, sampat, vipat, kṣema, pratyari, sādhaka, vadha, mitra, paramamitra. The table has the nakṣatras in three columns, nine apart, so each row shares a tārā and a colour: blues are favourable, greys unfavourable. The day\'s nakṣatra is janma; the other two in its row are anujanma (10th) and trijanma (19th).'],
+        [L('pathanam'), 'Right after the day\'s page: the day set out for reading aloud (see Pages under More).'],
+        ['▾', 'Each section below the page (graha-sthiti, sandhyā and śrāddha kālas, horās, tārābala, muhūrtas, festival notes) folds. A folded section stays folded, on every day, until it is opened again.'],
+        [L('taaraabalam'), 'Count from a person\'s janma nakṣatra to the day\'s nakṣatra: the count falls on one of nine tārās — janma, sampat, vipat, kṣemam, pratyariḥ, sādhakaḥ, vadhaḥ, mitram, paramamitram. The table has the nakṣatras in three columns, nine apart, so each row shares a tārā and a colour: blues are favourable, greys unfavourable. The day\'s nakṣatra is janma; the other two in its row are anujanma (10th) and trijanma (19th). Your own janma nakṣatra, if chosen in settings, is starred.'],
         [L('grahasthitih'), 'Where each graha is at sunrise, by sidereal rāśi, with degrees within the rāśi, set out in the South Indian chart (Mīna at top left, running clockwise).'],
       ],
     },
     {
       title: 'Pages under More',
       items: [
+        [SL('samvatsaravishayaah'), 'For the year: the nava-nāyakas.'],
+        [L('navanaayakaah'), 'The nine "officers" of the year (rājā, mantrī …), the graha holding each, and the traditional verse on what it portends.'],
+        [SL('dinavishayaah'), 'For the day: paṭhanam and what to avoid.'],
         [L('pathanam'), 'The day set out for reading aloud: each anga with its śloka and devatā, and the phalaśruti. The ślokas are from Śānti Kusumākara.'],
         [L('varjayitum'), 'The verses on what is better avoided today (oil bath, bathing, cleaning the teeth, shaving, certain foods and so on), selected by the day\'s angas, as in the PDFs.'],
-        [L('navanaayakaah'), 'The nine "officers" of the year (rājā, mantrī …), the graha holding each, and the traditional verse on what it portends.'],
+        [L('muhurtadinaani'), 'Days suited to an oil bath (abhyaṅga), a haircut or shave (kṣaura) and beginning study (vidyārambha), each a page of its own with the next date shown on the More page, and the window on each day. They follow the rules in the muhūrta configurations: which tithis, nakṣatras and weekdays are allowed, which solar months and festivals to avoid, and which part of the day. A star means the window was shortened by those rules. Months before the current one are folded; only the months scroll.'],
+        [ctx.S.muhurta_names?.kshaura || 'kSauram', 'Choosing your janma-nakṣatra tags each nakṣatra with its tārā and greys out days whose whole window has an unfavourable one; the tārābala chip turns the greying off. Days on which chaturthī, ṣaṣṭhī or chaturdaśī falls are marked !mātā, !bhrātā or !bhaginī, as they are avoided by one whose mother, brother or sister is living. Every chip starts selected; turning a weekday or a mark off drops those days.'],
       ],
     },
     {
       title: 'Festivals',
       items: [
-        [L('parvaani'), 'Festivals and observances from the adyatithi rule collection. The Festivals tab opens on every festival of the year, at the next one; the chips select a single group, as listed at the start of the PDFs.'],
-        [L('muhurtadinaani'), 'Days suited to an oil bath (abhyaṅga), a haircut or shave (kṣaura) and beginning study (vidyārambha), each a page of its own under More, with the window on each day. They follow the rules in the muhūrta configurations: which tithis, nakṣatras and weekdays are allowed, which solar months and festivals to avoid, and which part of the day. A star means the window was shortened by those rules. For kṣaura, choosing your janma-nakṣatra tags each nakṣatra with its tārā and greys out days whose whole window has an unfavourable one (the tārābala chip turns the greying off); days on which chaturthī, ṣaṣṭhī or chaturdaśī falls are marked !mātā, !bhrātā or !bhaginī, as they are avoided by one whose mother, brother or sister is living. Every chip at the top starts selected; turning a weekday or a mark off drops those days. Months before the current one are folded.'],
+        [L('parvaani'), 'Festivals and observances from the adyatithi rule collection. The Festivals tab opens on every festival of the year, at the next one; the chips select a single group, as listed at the start of the PDFs. Tapping a festival opens its notes, as on the day page.'],
         [L('anadhyaayah'), 'Days on which Vedic study is suspended. Off by default; switch it on under Settings → Festival sources.'],
         [L('parvasrotaamsi'), 'The festivals come from separate collections (by deity, region, tradition, temple). By default the app shows the same collections as the PDFs, without anadhyayana; others can be switched on, and any switched off, in settings.'],
       ],
       icons: true,
+    },
+    {
+      title: 'Settings',
+      items: [
+        [SL('nagaram'), 'Fifty cities, your own first; the rest open under "All".'],
+        [`${SL('bhaashaa')} · ${SL('lipih')}`, 'The language of the app\'s own words (tabs, buttons, this guide), and the script for the pañcāṅga, which is always in Sanskrit.'],
+        [SL('samayarupam'), 'Three ways to write times after midnight: 25:30* as printed in the PDFs, +1:30*, or 1:30am*.'],
+        [L('janmanakshatram'), 'Your janma nakṣatra: used for tārābala in the kṣaura list, and starred in the Detail page\'s tārābala tables.'],
+      ],
     },
     {
       title: 'How it is computed',
@@ -116,15 +143,20 @@ export function sections(ctx) {
 export async function renderGuide(ctx, root) {
   const { S } = ctx;
   const secs = sections(ctx);
+  // The guide's text is English for now, so its section numbers are 1, 2, 3.
+  const num = (i) => String(i + 1);
   root.append(
     h('header', { class: 'guide-head' }, h('h1', null, ctx.U('margadarshika')), h('p', { class: 'muted' }, ctx.U('guidelead'))),
-    h('nav', { class: 'guide-toc no-swipe' }, secs.map((s, i) => h('a', { href: `#g${i}`, onclick: (e) => {
-      e.preventDefault(); document.getElementById('g' + i)?.scrollIntoView({ behavior: 'smooth' });
-    } }, s.title))),
+    // Contents: numbered, each a link to its section.
+    h('nav', { class: 'guide-contents no-swipe', 'aria-label': ctx.U('vishayasuuchii') },
+      h('h2', { class: 'guide-contents-title' }, ctx.U('vishayasuuchii')),
+      h('ol', null, secs.map((s, i) => h('li', null, h('a', { href: `#g${i}`, onclick: (e) => {
+        e.preventDefault(); document.getElementById('g' + i)?.scrollIntoView({ behavior: 'smooth' });
+      } }, h('span', { class: 'gc-num' }, num(i)), h('span', null, s.title)))))),
     secs.map((s, i) => h('section', { class: 'block guide', id: 'g' + i },
-      h('h2', { class: 'guide-title' }, h('span', null, s.title)),
+      h('h2', { class: 'guide-title' }, h('span', null, `${num(i)}. ${s.title}`)),
       h('dl', { class: 'guide-list' }, s.items.map(([term, text]) => [h('dt', null, term), h('dd', null, text)])),
       s.icons && h('div', { class: 'icon-legend' }, Object.entries(GROUP_ICONS).map(([g, id]) =>
-        h('div', { class: 'legend-item' }, icon(id, 26), h('span', null, (S.festgroup[g] || g).replace(/-[^-]*$/, ''))))))),
+        h('div', { class: 'legend-item' }, icon(id, 26), h('span', null, S.festgroup_name?.[g] || (S.festgroup[g] || g).replace(/-[^-]*$/, ''))))))),
     acknowledgements(ctx));
 }

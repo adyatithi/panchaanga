@@ -11,6 +11,7 @@ export const LANGUAGE_FOR_SCRIPT = { tamil: 'ta', telugu: 'te', kannada: 'kn', d
 
 export const T = {
   en: {
+    vishayasuuchii: 'Contents',
     dinam: 'Day', sankshepah: 'Brief', kaalaah: 'Kālas', vistarah: 'Detail', maasah: 'Month', saptaahah: 'Week', parvaani: 'Festivals',
     anyat: 'More', vinyaasah: 'Settings', anveshanam: 'Search festivals', preshanam: 'Share', chitram: 'Image',
     lekhah: 'Text', sanketah: 'Link', pratilipih: 'Copied', pratiikshasva: 'Loading…',
@@ -33,6 +34,7 @@ export const T = {
     mataani: 'Also on this page', guidelead: 'What each part of the pañcāṅga means, and how to read the times.',
   },
   hi: {
+    vishayasuuchii: 'विषय-सूची',
     dinam: 'दिन', sankshepah: 'संक्षेप', kaalaah: 'काल', vistarah: 'विस्तार', maasah: 'माह', saptaahah: 'सप्ताह', parvaani: 'पर्व',
     anyat: 'और', vinyaasah: 'सेटिंग्स', anveshanam: 'पर्व खोजें', preshanam: 'साझा करें', chitram: 'चित्र',
     lekhah: 'पाठ', sanketah: 'लिंक', pratilipih: 'कॉपी हो गया', pratiikshasva: 'लोड हो रहा है…',
@@ -44,6 +46,7 @@ export const T = {
     sandhyaa: 'संध्या', shubham: 'शुभ', ashubham: 'वर्ज्य', kaalakramah: 'समय के क्रम में',
   },
   ta: {
+    vishayasuuchii: 'உள்ளடக்கம்',
     dinam: 'நாள்', sankshepah: 'சுருக்கம்', kaalaah: 'காலம்', vistarah: 'விவரம்', maasah: 'மாதம்', saptaahah: 'வாரம்', parvaani: 'பண்டிகை',
     anyat: 'மேலும்', vinyaasah: 'அமைப்புகள்', anveshanam: 'பண்டிகை தேடல்', preshanam: 'பகிர்', chitram: 'படம்',
     lekhah: 'உரை', sanketah: 'இணைப்பு', pratilipih: 'நகலெடுக்கப்பட்டது', pratiikshasva: 'ஏற்றுகிறது…',
@@ -55,6 +58,7 @@ export const T = {
     sandhyaa: 'சந்தியா', shubham: 'சுபம்', ashubham: 'தவிர்க்க', kaalakramah: 'நேர வரிசையில்',
   },
   te: {
+    vishayasuuchii: 'విషయ సూచిక',
     dinam: 'రోజు', sankshepah: 'సంక్షిప్తం', kaalaah: 'కాలాలు', vistarah: 'వివరం', maasah: 'నెల', saptaahah: 'వారం', parvaani: 'పండుగలు',
     anyat: 'మరిన్ని', vinyaasah: 'అమరికలు', anveshanam: 'పండుగ వెతుకు', preshanam: 'పంచుకో', chitram: 'చిత్రం',
     lekhah: 'పాఠ్యం', sanketah: 'లింక్', pratilipih: 'కాపీ అయింది', pratiikshasva: 'లోడ్ అవుతోంది…',
@@ -66,6 +70,7 @@ export const T = {
     sandhyaa: 'సంధ్య', shubham: 'శుభం', ashubham: 'వర్జ్యం', kaalakramah: 'కాలక్రమంలో',
   },
   kn: {
+    vishayasuuchii: 'ಪರಿವಿಡಿ',
     dinam: 'ದಿನ', sankshepah: 'ಸಂಕ್ಷಿಪ್ತ', kaalaah: 'ಕಾಲಗಳು', vistarah: 'ವಿವರ', maasah: 'ತಿಂಗಳು', saptaahah: 'ವಾರ', parvaani: 'ಹಬ್ಬಗಳು',
     anyat: 'ಇನ್ನಷ್ಟು', vinyaasah: 'ಸೆಟ್ಟಿಂಗ್‌ಗಳು', anveshanam: 'ಹಬ್ಬ ಹುಡುಕಿ', preshanam: 'ಹಂಚಿಕೊಳ್ಳಿ', chitram: 'ಚಿತ್ರ',
     lekhah: 'ಪಠ್ಯ', sanketah: 'ಕೊಂಡಿ', pratilipih: 'ನಕಲಿಸಲಾಗಿದೆ', pratiikshasva: 'ಲೋಡ್ ಆಗುತ್ತಿದೆ…',

@@ -14,7 +14,7 @@ import { renderGuide } from './view-guide.js';
 import { makeU, LANGUAGE_FOR_SCRIPT } from './i18n.js';
 
 // Words that belong to the app rather than to the pañcāṅga.
-const CHROME = new Set(['horaaplus', 'sankshepah', 'dinam', 'kaalaah', 'vistarah', 'maasah', 'saptaahah', 'parvaani', 'anyat', 'vinyaasah',
+const CHROME = new Set(['vishayasuuchii', 'horaaplus', 'sankshepah', 'dinam', 'kaalaah', 'vistarah', 'maasah', 'saptaahah', 'parvaani', 'anyat', 'vinyaasah',
   'anveshanam', 'preshanam', 'chitram', 'lekhah', 'sanketah', 'pratilipih', 'pratiikshasva', 'nopalabhyate', 'nagaram',
   'lipih', 'bhaashaa', 'akshararupam', 'samayarupam', 'horaa24', 'horaa12', 'varnah', 'svatah', 'shuklam', 'shyaamam',
   'parichayah', 'margadarshika', 'adya', 'idaaniim', 'anantaram', 'sheshah', 'parvasrotaamsi', 'atiriktaani',

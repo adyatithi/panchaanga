@@ -52,7 +52,7 @@ async function cues(ctx, day, now) {
 // The ghatika clock (after karthikraman/ghatika-clock): the time since sunrise in ghatikas,
 // vighatis and tatparas. Daylight is thirty ghatikas from sunrise to sunset, night thirty from
 // sunset to the next sunrise; each ghatika is sixty vighatis, each vighati sixty tatparas.
-let clockTimer = null;
+const clockTimers = [];
 function ghatikaAt(day, s) {
   const [rise, set, next] = day.sun_s || [day.sun[0] * 60, day.sun[1] * 60, day.next_sunrise * 60];
   if (s < rise || s >= next) return null;
@@ -91,8 +91,11 @@ function ghatikaClock(ctx, day, prev) {
     h('div', { class: 'gh-value time', id: 'gh-value' }, '—'),
     h('div', { class: 'gh-label' }, ctx.L('ghatikaah'), ' · ', h('span', { class: 'time', id: 'gh-clock' }, '')));
   const box = h('div', { class: 'gh-clock' }, h('span', { html: dial(88) }), read);
+  // Two clocks: the ghatika reading moves with each tatpara (about 0.4 s), so it is read every
+  // 0.4 s from the exact time; the local clock beside it changes once a second, so it is read
+  // every second, in whole seconds.
   const tick = () => {
-    const now = nowSecondsIn(ctx.city.tz);
+    const now = nowSecondsIn(ctx.city.tz, true);
     let s = now.seconds;
     if (now.date !== day.date) s += 86400;
     // Before sunrise the night ghatikas still belong to the previous day.
@@ -103,13 +106,23 @@ function ghatikaClock(ctx, day, prev) {
     if (!v || g == null) return;
     const [a, b, c] = ghatikaParts(g);
     v.textContent = `${ctx.num(a)}-${ctx.num(String(b).padStart(2, '0'))}-${ctx.num(String(c).padStart(2, '0'))}`;
-    const hh = Math.floor(now.seconds / 3600), mm = Math.floor(now.seconds / 60) % 60, ss = Math.floor(now.seconds) % 60;
-    document.getElementById('gh-clock').textContent = [hh, mm, ss].map((x) => String(x).padStart(2, '0')).join(':');
     hand.setAttribute('transform', `rotate(${(g / 60) * 360} 44 44)`);
   };
-  if (clockTimer) clearInterval(clockTimer);
-  clockTimer = setInterval(() => { if (!document.getElementById('gh-value')) { clearInterval(clockTimer); clockTimer = null; } else tick(); }, 400);
-  requestAnimationFrame(tick);
+  const clock = () => {
+    const el = document.getElementById('gh-clock');
+    if (!el) return;
+    const { seconds } = nowSecondsIn(ctx.city.tz);
+    el.textContent = [Math.floor(seconds / 3600), Math.floor(seconds / 60) % 60, seconds % 60]
+      .map((x) => String(x).padStart(2, '0')).join(':');
+  };
+  for (const t of clockTimers) clearInterval(t);
+  const every = (fn, ms) => clockTimers.push(setInterval(() => {
+    if (!document.getElementById('gh-value')) { for (const t of clockTimers) clearInterval(t); clockTimers.length = 0; } else fn();
+  }, ms));
+  clockTimers.length = 0;
+  every(tick, 400);
+  every(clock, 1000);
+  requestAnimationFrame(() => { tick(); clock(); });
   return box;
 }
 

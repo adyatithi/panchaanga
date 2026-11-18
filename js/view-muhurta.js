@@ -166,14 +166,26 @@ export async function renderUuna(ctx, root) {
   if (!yr) return root.append(missing(ctx));
   const meta = await data.loadMeta(ctx.city.id, yr.kali);
   const N = names(ctx);
+  const all = meta.uuna || [];
+  // A nakshatra can be chosen (a dropdown: 27 pills would be too many) to see only its days.
+  const present = [...new Set(all.flatMap(([, naks]) => naks))].sort((a, b) => a - b);
+  const chosen = Number(ctx.settings.uunaNak) || 0;
+  const list = chosen ? all.filter(([, naks]) => naks.includes(chosen)) : all;
+  const picker = present.length > 1 && h('label', { class: 'janma-pick', for: 'uuna-nakshatra' },
+    h('span', { class: 'janma-label' }, ctx.L('nakshatram')),
+    h('select', { id: 'uuna-nakshatra', onchange: (e) => ctx.saveSettings({ uunaNak: Number(e.target.value) || 0 }) },
+      h('option', { value: 0, selected: !chosen }, `${ctx.L('sarvaani')} (${ctx.num(all.length)})`),
+      present.map((n) => h('option', { value: n, selected: chosen === n },
+        `${N.nakshatra(n)} (${ctx.num(all.filter(([, naks]) => naks.includes(n)).length)})`))));
   const scroll = h('div', { class: 'pane-scroll parva-body' },
-    meta.uuna?.length
-      ? h('ul', { class: 'rows' }, meta.uuna.map(([date, naks]) => h('li', { class: date < ctx.now.date ? 'past' : '' },
-        dateCell(ctx, date), h('div', { class: 'row-names' }, naks.map((n) => N.nakshatra(n)).join('/')))))
+    list.length
+      ? h('ul', { class: 'rows' }, list.map(([date, naks]) => h('li', { class: date < ctx.now.date ? 'past' : '' },
+        dateCell(ctx, date), h('div', { class: 'row-names' }, naks.map((n) => h('span', { class: n === chosen ? 'uuna-chosen' : '' }, N.nakshatra(n)))
+          .flatMap((el, i) => (i ? ['/', el] : [el]))))))
       : h('p', { class: 'empty' }, '—'));
   root.classList.add('pane-view');
   root.append(h('div', { class: 'pane-top' }, yearHead(ctx, meta, yr, true),
-    h('h2', { class: 'block-title' }, ctx.L('uunashraaddha'))), scroll);
+    h('h2', { class: 'block-title' }, ctx.L('uunashraaddha')), picker), scroll);
   const next = scroll.querySelector('li:not(.past)');
   if (next && next !== scroll.querySelector('li')) next.classList.add('upcoming');
   root.paneStart = (pane) => {
