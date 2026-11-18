@@ -5,6 +5,7 @@ import { h, parseDate, WDAYS, MONTHS } from './util.js';
 import * as data from './data.js';
 import { names, missing } from './parts.js';
 import { yearHead } from './view-parva.js';
+import { calButton, subscribeSheet } from './calendar.js';
 
 export const MUHURTA_VIEWS = ['abhyanga', 'kshaura', 'vidyarambha'];
 
@@ -155,7 +156,9 @@ export async function renderMuhurta(ctx, root) {
   root.classList.add('pane-view');
   root.append(
     h('div', { class: 'pane-top' }, yearHead(ctx, meta, yr, true),
-      h('h2', { class: 'block-title mu-title' }, S.muhurta_names?.[key] || key, h('span', { class: 'mu-count' }, countLine)),
+      h('div', { class: 'title-row' },
+        h('h2', { class: 'block-title mu-title' }, S.muhurta_names?.[key] || key, h('span', { class: 'mu-count' }, countLine)),
+        calButton(ctx, () => subscribeSheet(ctx, key, S.muhurta_names?.[key] || key))),
       picker, filters, notes),
     scroll);
   root.paneStart = startAt(scroll);
@@ -185,7 +188,8 @@ export async function renderUuna(ctx, root) {
       : h('p', { class: 'empty' }, '—'));
   root.classList.add('pane-view');
   root.append(h('div', { class: 'pane-top' }, yearHead(ctx, meta, yr, true),
-    h('h2', { class: 'block-title' }, ctx.L('uunashraaddha')), picker), scroll);
+    h('div', { class: 'title-row' }, h('h2', { class: 'block-title' }, ctx.L('uunashraaddha')),
+      calButton(ctx, () => subscribeSheet(ctx, 'uuna', ctx.L('uunashraaddha')))), picker), scroll);
   const next = scroll.querySelector('li:not(.past)');
   if (next && next !== scroll.querySelector('li')) next.classList.add('upcoming');
   root.paneStart = (pane) => {

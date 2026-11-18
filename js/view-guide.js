@@ -115,6 +115,7 @@ export function sections(ctx) {
       title: 'Festivals',
       items: [
         [L('parvaani'), 'Festivals and observances from the adyatithi rule collection. The Festivals tab opens on every festival of the year, at the next one; the chips select a single group, as listed at the start of the PDFs. Tapping a festival opens its notes, as on the day page.'],
+        ['📅', 'Add to calendar: each festival group, each muhūrta list and the ūna-śrāddha days can be subscribed to in a calendar app (Apple, Google, Outlook, Android). The subscribed calendar keeps itself current as the pañcāṅga is rebuilt each week; events with a window (kṣaura, pradoṣa …) are timed to it. Every festival of a year, from the sources chosen in settings, can be downloaded as a file to import.'],
         [L('anadhyaayah'), 'Days on which Vedic study is suspended. Off by default; switch it on under Settings → Festival sources.'],
         [L('parvasrotaamsi'), 'The festivals come from separate collections (by deity, region, tradition, temple). By default the app shows the same collections as the PDFs, without anadhyayana; others can be switched on, and any switched off, in settings.'],
       ],

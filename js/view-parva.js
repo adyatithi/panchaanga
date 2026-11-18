@@ -2,6 +2,8 @@
 import { h, parseDate, WDAYS } from './util.js';
 import * as data from './data.js';
 import { icon, GROUP_ICONS, names, missing } from './parts.js';
+import { calButton, subscribeSheet, downloadYear } from './calendar.js';
+import { sheet } from './view-misc.js';
 
 export async function renderParva(ctx, root) {
   const yr = data.yearFor(ctx.city, ctx.date);
@@ -98,7 +100,16 @@ export async function renderParva(ctx, root) {
   }
 
   root.classList.add('pane-view');
-  root.append(h('div', { class: 'pane-top' }, yearHead(ctx, meta, yr, true), search, chips), body);
+  // Add to a calendar: a group is a feed to subscribe to; every festival is a file built here.
+  const cal = calButton(ctx, () => {
+    if (current !== 'all' && !query) return subscribeSheet(ctx, current, S.festgroup_name?.[current] || S.festgroup[current] || current);
+    sheet(L('parvaani'), [
+      h('p', { class: 'cal-note' }, ctx.U('cal_all')),
+      h('div', { class: 'cal-opts' }, h('button', { type: 'button', class: 'cal-opt', onclick: () => downloadYear(ctx, yr) },
+        h('span', { class: 'cal-opt-label' }, ctx.U('cal_all_btn').replace('{year}', `${N.samvatsara(meta.samvatsara)} ${meta.start.slice(0, 4)}–${meta.end.slice(2, 4)}`)))),
+    ]);
+  });
+  root.append(h('div', { class: 'pane-top' }, yearHead(ctx, meta, yr, true), h('div', { class: 'search-row' }, search, cal), chips), body);
   draw();
   root.paneStart = (pane) => { const next = pane.querySelector('li.upcoming'); if (next) scrollToRow(pane, next); };
 }

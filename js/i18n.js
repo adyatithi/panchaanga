@@ -12,6 +12,14 @@ export const LANGUAGE_FOR_SCRIPT = { tamil: 'ta', telugu: 'te', kannada: 'kn', d
 export const T = {
   en: {
     vishayasuuchii: 'Contents',
+    cal_add: 'Add to calendar',
+    cal_app: 'Subscribe in your calendar app',
+    cal_google: 'Subscribe in Google Calendar',
+    cal_copy: 'Copy the feed’s address',
+    cal_download: 'Download it once (.ics)',
+    cal_note: 'A subscribed calendar keeps itself up to date as the pañcāṅga is rebuilt each week. Times are {city} time; where there is a window (kṣaura, pradoṣa …) the event is timed to it.',
+    cal_all: 'Every festival of the year, from the festival sources chosen in settings, as a file to import into a calendar. To subscribe instead, choose a festival group first.',
+    cal_all_btn: 'Download every festival of {year} (.ics)',
     dinam: 'Day', sankshepah: 'Brief', kaalaah: 'Kālas', vistarah: 'Detail', maasah: 'Month', saptaahah: 'Week', parvaani: 'Festivals',
     anyat: 'More', vinyaasah: 'Settings', anveshanam: 'Search festivals', preshanam: 'Share', chitram: 'Image',
     lekhah: 'Text', sanketah: 'Link', pratilipih: 'Copied', pratiikshasva: 'Loading…',

@@ -693,3 +693,19 @@ details.fold:not([open]) > summary::after { transform: rotate(-90deg); }
 .gc-num { min-width: 1.4rem; text-align: right; color: var(--ink-3); font-family: var(--font-latin); font-variant-numeric: tabular-nums lining-nums; }
 .gt-num { color: inherit; }
 .uuna-chosen { font-weight: 600; }
+/* Add to calendar */
+.search-row { display: flex; gap: .5rem; align-items: stretch; }
+.search-row .search { flex: 1; min-width: 0; }
+.title-row { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+.title-row .block-title { margin-bottom: .3rem; }
+.cal-btn { display: inline-flex; align-items: center; gap: .35rem; color: var(--blue); border: 1px solid var(--blue); border-radius: 3px; padding: .2rem .55rem; font-size: .8125rem; white-space: nowrap; flex: none; background: var(--paper); }
+.cal-btn:hover { background: var(--blue-wash); }
+.search-row .cal-btn span { display: none; }
+@media (min-width: 30rem) { .search-row .cal-btn span { display: inline; } }
+.cal-note { font-size: .875rem; color: var(--ink-2); margin: 0 0 .8rem; }
+.cal-opts { display: flex; flex-direction: column; gap: .5rem; }
+.cal-opt { display: flex; flex-direction: column; align-items: flex-start; text-align: left; padding: .65rem .8rem; border: 1px solid var(--hair); border-radius: 3px; color: var(--ink); text-decoration: none; }
+.cal-opt:hover { border-color: var(--blue); background: var(--blue-wash); }
+.cal-opt-label { color: var(--blue); }
+.cal-opt-sub { font-size: .75rem; color: var(--ink-3); }
+.cal-url { overflow-wrap: anywhere; font-family: var(--font-latin); }

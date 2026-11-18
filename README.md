@@ -126,3 +126,17 @@ data/                 generated; do not edit by hand
 
 Arbitrary locations (data exists only for the cities generated), saṅkalpa text, the rāśi chart,
 notifications and home-screen widgets.
+
+## Calendar feeds
+
+Each festival group, each muhūrta list and the ūna-śrāddha days can be subscribed to in a
+calendar app ("Add to calendar" beside each list): `data/ics/<script>/<City>/<feed>.ics`. Events
+with a window (kṣaura, pradoṣa …) are timed to it; the rest are all-day. Every festival of a year
+is offered as a download built in the browser, from the reader's chosen festival sources.
+
+The feeds come to about 100 MB across cities and scripts, so they are not committed: the
+**Publish site** workflow (`.github/workflows/pages.yml`) writes them with `tools/ics_feeds.py`
+when it publishes the site, on every push to `main` and after each weekly data build.
+
+**One-time setting:** Settings → Pages → Build and deployment → Source: **GitHub Actions**. Until
+then the site is still published from the branch, without the feeds.
