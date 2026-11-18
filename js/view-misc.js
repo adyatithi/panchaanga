@@ -55,20 +55,31 @@ export function openSettings(ctx) {
   const { L, settings } = ctx;
   const current = { ...settings, lang: ctx.lang };
   let dlg;
-  const group = (label, key, options, onpick) => h('fieldset', { class: 'opt-group' },
+  const group = (label, key, options, onpick, cls = '') => h('fieldset', { class: 'opt-group' + cls },
     h('legend', null, label),
     h('div', { class: 'opts' }, options.map(([value, text, sub]) => h('button', {
       type: 'button', class: 'opt' + (String(current[key]) === String(value) ? ' active' : ''),
       'aria-pressed': String(current[key]) === String(value),
       onclick: () => { dlg.close(); onpick ? onpick(value) : ctx.saveSettings({ [key]: value }); },
     }, h('span', null, text), sub && h('span', { class: 'opt-sub' }, sub)))));
+  // Cities in alphabetical order (by their English names), the chosen one first; one line shows,
+  // the rest open with "All".
+  const cityGroup = () => {
+    const sorted = [...ctx.index.cities].sort((a, b) => (a.id === settings.city ? -1 : b.id === settings.city ? 1 : a.label.localeCompare(b.label)));
+    const g = group(L('nagaram'), 'city', sorted.map((c) => [c.id, c.name[settings.script] || c.label, c.label]),
+      (id) => { ctx.saveSettings({ city: id }); ctx.go({ city: id }); }, ' cities folded');
+    g.append(h('button', { type: 'button', class: 'opts-more', onclick: (e) => {
+      g.classList.toggle('folded');
+      e.currentTarget.textContent = g.classList.contains('folded') ? `${L('sarvaani')} (${ctx.num(sorted.length)}) ▾` : '▴';
+    } }, `${L('sarvaani')} (${ctx.num(sorted.length)}) ▾`));
+    return g;
+  };
   dlg = sheet(L('vinyaasah'), [
-    group(L('nagaram'), 'city', ctx.index.cities.map((c) => [c.id, c.name[settings.script] || c.label, c.label]),
-      (id) => { ctx.saveSettings({ city: id }); ctx.go({ city: id }); }),
+    cityGroup(),
     group(L('bhaashaa'), 'lang', LANGUAGES),
     group(L('lipih'), 'script', ctx.index.scripts.map((s) => [s, SCRIPT_NAMES[s] || s])),
     settings.script === 'devanagari' && group(L('akshararupam'), 'face', [['noto', 'नोटो सेरिफ्', 'Noto Serif'], ['siddhanta', 'सिद्धान्त', 'Siddhanta (PDF)']]),
-    group(L('samayarupam'), 'time', [['24', '25:30*', L('horaa24')], ['12', '1:30am*', L('horaa12')]]),
+    group(L('samayarupam'), 'time', [['24', '25:30*', L('horaa24')], ['plus', '+1:30*', L('horaaplus')], ['12', '1:30am*', L('horaa12')]]),
     group(L('varnah'), 'theme', [['auto', L('svatah')], ['light', L('shuklam')], ['dark', L('shyaamam')]]),
     h('p', { class: 'hint' }, '* ', ctx.S.kaala.madhyaraatri || '', ' ▸'),
     // The reader's janma nakshatra: for taaraabala in the muhurta lists and the Detail page.

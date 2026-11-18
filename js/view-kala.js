@@ -90,7 +90,7 @@ function ghatikaClock(ctx, day, prev) {
   const read = h('div', { class: 'gh-read' },
     h('div', { class: 'gh-value time', id: 'gh-value' }, '—'),
     h('div', { class: 'gh-label' }, ctx.L('ghatikaah'), ' · ', h('span', { class: 'time', id: 'gh-clock' }, '')));
-  const box = h('div', { class: 'gh-clock' }, h('span', { html: dial(132) }), read);
+  const box = h('div', { class: 'gh-clock' }, h('span', { html: dial(88) }), read);
   const tick = () => {
     const now = nowSecondsIn(ctx.city.tz);
     let s = now.seconds;
@@ -103,12 +103,12 @@ function ghatikaClock(ctx, day, prev) {
     if (!v || g == null) return;
     const [a, b, c] = ghatikaParts(g);
     v.textContent = `${ctx.num(a)}-${ctx.num(String(b).padStart(2, '0'))}-${ctx.num(String(c).padStart(2, '0'))}`;
-    const hh = Math.floor(now.seconds / 3600), mm = Math.floor(now.seconds / 60) % 60, ss = now.seconds % 60;
+    const hh = Math.floor(now.seconds / 3600), mm = Math.floor(now.seconds / 60) % 60, ss = Math.floor(now.seconds) % 60;
     document.getElementById('gh-clock').textContent = [hh, mm, ss].map((x) => String(x).padStart(2, '0')).join(':');
-    hand.setAttribute('transform', `rotate(${(g / 60) * 360} 66 66)`);
+    hand.setAttribute('transform', `rotate(${(g / 60) * 360} 44 44)`);
   };
   if (clockTimer) clearInterval(clockTimer);
-  clockTimer = setInterval(() => { if (!document.getElementById('gh-value')) { clearInterval(clockTimer); clockTimer = null; } else tick(); }, 1000);
+  clockTimer = setInterval(() => { if (!document.getElementById('gh-value')) { clearInterval(clockTimer); clockTimer = null; } else tick(); }, 400);
   requestAnimationFrame(tick);
   return box;
 }
@@ -199,37 +199,42 @@ export async function renderKala(ctx, root) {
     lane('tl-angas', markEls),
     nowLine);
 
-  // The same day as a list, in order of time.
-  const agenda = [
-    ...kalaIntervals(ctx, day).map((i) => ({ t: i.start, end: i.end, text: i.label, quality: i.quality })),
-    ...sandhya.map((i) => ({ t: i.start, end: i.end, text: i.label })),
-    ...[...marks.entries()].flatMap(([t, texts]) => texts.map((text) => ({ t, text, anga: true }))),
-    { t: rise, text: L('suryodayah') }, { t: set, text: L('suryaastamayah') },
-    { t: k.braahma, text: S.kaala.braahma }, { t: k.dinaanta, text: L('dinaantah') },
-  ].sort((a, b) => a.t - b.t || (a.end || 0) - (b.end || 0));
+  // Every kaala of the day at a glance, in order of time: the sandhyas, the brahma muhurta and
+  // the intervals to avoid or to use, as the ghatika-clock app lists them.
+  const summary = [
+    { start: k.braahma, end: Math.round(k.braahma + nightMuhurta), label: L('braahmam') },
+    ...sandhya.map((i) => ({ start: i.start, end: i.end, label: i.label })),
+    ...kalaIntervals(ctx, day).map((i) => ({ start: i.start, end: i.end, label: i.label, quality: i.quality })),
+  ].sort((a, b) => a.start - b.start || a.end - b.end);
 
   const progress = now != null ? await cues(ctx, day, now).catch(() => null) : null;
   const prev = now != null ? (await ctx.loadDay(addDays(day.date, -1)).catch(() => null))?.day : null;
+  const kaalaList = h('div', { class: 'kaala-sum' }, summary.map((i) => h('div', {
+    class: `ks-item ${i.quality || ''}${now != null && i.start <= now && now < i.end ? ' live' : ''}`,
+  }, h('span', { class: 'ks-name' }, i.label), h('span', { class: 'time ks-time' }, `${T(i.start)}–${T(i.end)}`))));
+
+  // The top stays in place (now, the ghatika clock, the kaalas); only the timeline scrolls.
+  root.classList.add('pane-view');
   root.append(
-    sunMoon(ctx, day),
-    now != null && h('section', { class: 'now kala-now' }, h('div', { class: 'now-head' },
-      h('span', { class: 'now-dot', 'aria-hidden': 'true' }), h('span', { class: 'label' }, ctx.L('idaaniim')),
-      h('span', { class: 'time now-clock' }, ctx.T(now))), ghatikaClock(ctx, day, prev), progress),
-    h('div', { class: 'tl-heads', 'aria-hidden': 'true' },
-      h('span', null, ''), h('span', null, L('dinavibhaagaah')), h('span', null, L('sandhyaa')),
-      h('span', null, h('span', { class: 'bad-text' }, L('ashubham')), ' · ', h('span', { class: 'good-text' }, L('shubham'))),
-      h('span', null, L('panchaangam'))),
-    timeline,
-    h('section', { class: 'block' }, h('h2', { class: 'block-title' }, L('kaalakramah')),
-      h('ol', { class: 'agenda' }, agenda.map((a) => h('li', { class: `${a.quality || ''} ${now != null && a.t <= now && (a.end ?? a.t) >= now ? 'live' : ''}` },
-        h('span', { class: 'time agenda-time' }, a.end != null ? `${T(a.t)}–${T(a.end)}` : T(a.t)),
-        h('span', { class: 'agenda-text' }, a.text))))),
-    h('section', { class: 'block' }, h('h2', { class: 'block-title' }, L('lagnaani')),
-      h('div', { class: 'grid-cells' }, day.lagna.map(([id, end], i) => {
-        const start = i ? day.lagna[i - 1][1] : rise;
-        return h('div', { class: 'cell' + (now != null && start <= now && now < end ? ' live' : '') },
-          h('span', null, N.rashi(id)), h('span', { class: 'time' }, '▸' + T(end)));
-      }))),
+    h('div', { class: 'pane-top kala-top' },
+      sunMoon(ctx, day),
+      now != null && ctx.fold('kala-now',
+        h('span', { class: 'now-head' }, h('span', { class: 'now-dot', 'aria-hidden': 'true' }), h('span', { class: 'label' }, ctx.L('idaaniim')),
+          h('span', { class: 'time now-clock' }, ctx.T(now))),
+        h('section', { class: 'now kala-now' }, ghatikaClock(ctx, day, prev), progress)),
+      ctx.fold('kala-list', h('span', { class: 'label' }, L('kaalaah')), kaalaList)),
+    h('div', { class: 'pane-scroll kala-scroll' },
+      h('div', { class: 'tl-heads', 'aria-hidden': 'true' },
+        h('span', null, ''), h('span', null, L('dinavibhaagaah')), h('span', null, L('sandhyaa')),
+        h('span', null, h('span', { class: 'bad-text' }, L('ashubham')), ' · ', h('span', { class: 'good-text' }, L('shubham'))),
+        h('span', null, L('panchaangam'))),
+      timeline,
+      h('section', { class: 'block' }, h('h2', { class: 'block-title' }, L('lagnaani')),
+        h('div', { class: 'grid-cells' }, day.lagna.map(([id, end], i) => {
+          const start = i ? day.lagna[i - 1][1] : rise;
+          return h('div', { class: 'cell' + (now != null && start <= now && now < end ? ' live' : '') },
+            h('span', null, N.rashi(id)), h('span', { class: 'time' }, '▸' + T(end)));
+        })))),
   );
   // Labels for anga changes are placed by time, then pushed down where a wrapped label would
   // run into the next one; this needs their rendered heights, so it runs after layout.
@@ -241,8 +246,9 @@ export async function renderKala(ctx, root) {
       bottom = top + el.offsetHeight;
     });
   });
-  if (nowLine) requestAnimationFrame(() => {
-    const el = document.getElementById('tl-now');
-    if (el && window.scrollY < 10) window.scrollTo(0, Math.max(0, el.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.4));
-  });
+  // The timeline opens at "now" (or at sunrise on another day).
+  root.paneStart = (pane) => {
+    const target = now != null ? y(now) : y(rise);
+    pane.scrollTop = Math.max(0, target - pane.clientHeight * 0.35);
+  };
 }

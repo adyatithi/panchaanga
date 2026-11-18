@@ -11,7 +11,7 @@ folder is the site.
 | Tab | What it shows |
 |---|---|
 | दिनम् (Dina) | The simplified day: the PDF's two-panel head, sun and moon, the five angas with what follows each, observances, and the kaalas to keep clear of. When the page is today's, a strip shows what is running now. |
-| कालाः (Kaala) | On today's page, a live ghaṭikā clock (after ghatika-clock.web.app) and how much of each anga has run. Then the day drawn to scale from the brāhma muhūrta to the next sunrise: divisions of the day, sandhyā windows, rāhu/yama/gulika, durmuhūrta, tyājya and amṛta kāla, with each anga's change marked and "now" as a line. The same in list form below, then the lagnas. |
+| कालाः (Kaala) | On today's page, a live ghaṭikā clock (after ghatika-clock.web.app, updating every tatpara, about 0.4 s) and how much of each anga has run; every kāla of the day listed with its times; then the day drawn to scale from the brāhma muhūrta to the next sunrise — divisions of the day, sandhyā windows, rāhu/yama/gulika, durmuhūrta, tyājya and amṛta kāla, each anga's change and "now" as a line — which is the only part that scrolls; then the lagnas. The clock and the kāla list fold. |
 | विस्तरः (Vistara) | Everything the PDF page prints, in its order, then the grahas at sunrise in a rāśi box and the hyperlinked edition's detail: sandhyāvandana and śrāddha kālas, horās, tārābala (the PDF's 9 × 3 table), muhūrtas, and the festival notes. |
 | मासः (Maasa) | A month grid with the moon's phase, solar day and nakshatra per cell, and the month's observances listed below. A switch at the top gives the week instead (a mock-up). |
 | पञ्चाङ्ग-पठनम् (Pathanam) | Reached from Dina. The day set for reading aloud: each anga with its śloka and devatā in large type, then the nishiddha lines. |

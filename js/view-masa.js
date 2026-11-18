@@ -43,17 +43,19 @@ export async function renderMasa(ctx, root) {
   const masas = uniq(days.map((d) => N.chandramasa(d.chandra))).join(' · ');
   const sauras = uniq(days.map((d) => N.rashi(d.saura.m))).join(' · ');
 
-  root.append(
+  // The calendar stays in place; only the month's festival list below it scrolls.
+  root.classList.add('pane-view');
+  root.append(h('div', { class: 'pane-top' },
     switcher(ctx, 'masa'),
     h('div', { class: 'cal-head' },
       h('div', null, h('span', { class: 'label' }, ctx.L('chaandramaasah')), ' ', masas),
       h('div', null, h('span', { class: 'label' }, ctx.L('sauramaasah')), ' ', sauras)),
     h('div', { class: 'cal-grid cal-week', 'aria-hidden': 'true' }, WDAYS.map((w) => h('div', null, w))),
-    h('div', { class: 'cal-grid' }, cells),
-    h('section', { class: 'block' },
+    h('div', { class: 'cal-grid' }, cells)),
+    h('section', { class: 'pane-scroll cal-scroll' },
       h('ul', { class: 'cal-list' }, days.filter((d) => d.fest.length).map((d) => {
         const dt = parseDate(d.date);
-        return h('li', null,
+        return h('li', { 'data-date': d.date, class: d.date < ctx.date ? 'before' : '' },
           h('button', { type: 'button', class: 'cal-list-date', onclick: () => ctx.go({ date: d.date, view: 'dina' }) },
             h('span', { class: 'cal-list-num' }, dt.getUTCDate()), h('span', { class: 'cal-list-wd' }, WDAYS[d.wd])),
           h('div', { class: 'cal-list-fests' },
@@ -62,4 +64,9 @@ export async function renderMasa(ctx, root) {
               e.t && h('span', { class: 'fest-time time' }, ' ' + ctx.festTimes(e))))));
       }))),
   );
+  // Start the list at the chosen day (or the first festival after it).
+  root.paneStart = (pane) => {
+    const row = pane.querySelector('li:not(.before)');
+    if (row && row !== pane.querySelector('li')) pane.scrollTop = row.getBoundingClientRect().top - pane.getBoundingClientRect().top - 4;
+  };
 }

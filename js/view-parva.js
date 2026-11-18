@@ -19,7 +19,7 @@ export async function renderParva(ctx, root) {
   let current = 'all';
   let query = '';
 
-  const body = h('div', { class: 'parva-body' });
+  const body = h('div', { class: 'parva-body pane-scroll' });
   const chips = h('div', { class: 'parva-chips no-swipe' });
   const search = h('input', {
     type: 'search', id: 'parva-search', class: 'search', placeholder: L('anveshanam'), 'aria-label': L('anveshanam'),
@@ -31,12 +31,23 @@ export async function renderParva(ctx, root) {
     return h('button', { type: 'button', class: 'row-date', onclick: () => ctx.go({ date, view: 'dina' }) },
       h('span', { class: 'time' }, date), h('span', { class: 'row-wd' }, WDAYS[dt.getUTCDay()]));
   };
+  // A festival opens the same sheet as on the day page: its entry is found in that day's data.
+  const openOne = async (date, key) => {
+    const got = await ctx.loadDay(date);
+    if (!got) return;
+    const { day } = got;
+    const entry = day.fest.find((e) => (e.k ?? e.id) === key);
+    if (entry) return ctx.openFestival(entry, day);
+    const an = day.anadhyayana;
+    if (an && an.list.some((e) => (e.k ?? e.id) === key)) return ctx.openFestival({ anadhyayana: an }, day);
+    ctx.go({ date, view: 'dina' });
+  };
   const rows = (items) => {
     if (!items.length) return h('p', { class: 'empty' }, '—');
     const out = [];
     let prev = null;
     for (const [date, key, t] of items) {
-      const name = h('span', { class: 'fest-plain' }, F[key] || key,
+      const name = h('button', { type: 'button', class: 'fest-plain fest-link', onclick: () => openOne(date, key) }, F[key] || key,
         t && h('span', { class: 'time fest-time' }, ` ${t[0] == null ? '' : ctx.T(t[0])}▸${t[1] == null ? '' : ctx.T(t[1])}`));
       if (date === prev) out[out.length - 1].lastChild.append(h('br'), name);
       else out.push(h('li', { class: date === ctx.now.date ? 'today' : date < ctx.now.date ? 'past' : '' }, dateCell(date), h('div', { class: 'row-names' }, name)));
@@ -46,15 +57,13 @@ export async function renderParva(ctx, root) {
   };
 
   // Open a list at what comes next, not at the start of the year.
+  // Open a list at what comes next, not at the start of the year: only the list scrolls.
   function upcomingFirst() {
     const next = body.querySelector('li:not(.past)');
+    body.scrollTop = 0;
     if (!next || next === body.querySelector('li')) return;
     next.classList.add('upcoming');
-    requestAnimationFrame(() => {
-      const prevRow = next.previousElementSibling || next;
-      const top = prevRow.getBoundingClientRect().top + window.scrollY - 170;
-      if (top > window.innerHeight * 0.4) window.scrollTo(0, top);
-    });
+    if (body.isConnected) requestAnimationFrame(() => scrollToRow(body, next));
   }
 
   function draw() {
@@ -66,7 +75,7 @@ export async function renderParva(ctx, root) {
       ...groups.map((g) => h('button', {
         type: 'button', class: 'pchip' + (g === current && !query ? ' active' : ''),
         onclick: () => { current = g; query = ''; search.value = ''; draw(); },
-      }, icon(GROUP_ICONS[g], 18), h('span', null, (S.festgroup[g] || g).replace(/-[^-]*$/, '')),
+      }, icon(GROUP_ICONS[g], 18), h('span', null, S.festgroup_name?.[g] || (S.festgroup[g] || g).replace(/-[^-]*$/, '')),
       h('span', { class: 'pchip-count' }, ctx.num(new Set(lists[g].map((i) => i[0])).size)))));
     if (query) {
       const q = query.toLowerCase();
@@ -88,21 +97,27 @@ export async function renderParva(ctx, root) {
     }
   }
 
-  root.append(
-    yearHead(ctx, meta, yr),
-    search, chips, body);
+  root.classList.add('pane-view');
+  root.append(h('div', { class: 'pane-top' }, yearHead(ctx, meta, yr, true), search, chips), body);
   draw();
+  root.paneStart = (pane) => { const next = pane.querySelector('li.upcoming'); if (next) scrollToRow(pane, next); };
+}
+
+// Bring a row to the top of a scrolling list, with the row before it still in view.
+function scrollToRow(pane, row) {
+  const prev = row.previousElementSibling || row;
+  pane.scrollTop = Math.max(0, prev.getBoundingClientRect().top - pane.getBoundingClientRect().top + pane.scrollTop - 8);
 }
 
 // The year's name, Kali year and city, with a switch between the years held: shared by the
 // year lists (Festivals, the muhurta lists, una-shraaddha).
-export function yearHead(ctx, meta, yr) {
+export function yearHead(ctx, meta, yr, compact = false) {
   const { L } = ctx;
   const N = names(ctx);
   return (
-    h('header', { class: 'year-head' },
+    h('header', { class: 'year-head' + (compact ? ' compact' : '') },
       h('div', { class: 'year-name' }, `${N.samvatsara(meta.samvatsara)} – ${meta.vatsara[ctx.settings.script]}`),
-      h('div', { class: 'year-sub' }, `${L('kali')} ${ctx.num(meta.kali_running)} · ${meta.start.slice(0, 4)}–${meta.end.slice(0, 4)} · ${ctx.cityName}`),
+      !compact && h('div', { class: 'year-sub' }, `${L('kali')} ${ctx.num(meta.kali_running)} · ${meta.start.slice(0, 4)}–${meta.end.slice(0, 4)} · ${ctx.cityName}`),
       ctx.city.years.length > 1 && h('div', { class: 'year-switch no-swipe' }, ctx.city.years.map((yy) => h('button', {
         type: 'button', class: 'pchip' + (yy.kali === yr.kali ? ' active' : ''),
         onclick: () => ctx.go({ date: yy.start <= ctx.now.date && ctx.now.date <= yy.end ? null : yy.start }),

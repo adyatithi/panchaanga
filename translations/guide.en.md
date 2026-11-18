@@ -202,7 +202,7 @@ Festivals and observances from the adyatithi rule collection. The Festivals tab 
 
 **muhurtadinaani**
 
-Days suited to an oil bath (abhyaṅga), a haircut or shave (kṣaura) and beginning study (vidyārambha), each a page of its own under More, with the window on each day. They follow the rules in the muhūrta configurations: which tithis, nakṣatras and weekdays are allowed, which solar months and festivals to avoid, and which part of the day. A star means the window was shortened by those rules. For kṣaura, choosing your janma-nakṣatra tags each nakṣatra with its tārā and greys out days whose whole window has an unfavourable one; days on which chaturthī, ṣaṣṭhī or chaturdaśī falls are marked !mātā, !bhrātā or !bhaginī, as they are avoided by one whose mother, brother or sister is living. Chips at the top hide days by weekday, by these marks, or by poor tārābala.
+Days suited to an oil bath (abhyaṅga), a haircut or shave (kṣaura) and beginning study (vidyārambha), each a page of its own under More, with the window on each day. They follow the rules in the muhūrta configurations: which tithis, nakṣatras and weekdays are allowed, which solar months and festivals to avoid, and which part of the day. A star means the window was shortened by those rules. For kṣaura, choosing your janma-nakṣatra tags each nakṣatra with its tārā and greys out days whose whole window has an unfavourable one (the tārābala chip turns the greying off); days on which chaturthī, ṣaṣṭhī or chaturdaśī falls are marked !mātā, !bhrātā or !bhaginī, as they are avoided by one whose mother, brother or sister is living. Every chip at the top starts selected; turning a weekday or a mark off drops those days. Months before the current one are folded.
 
 **अनध्यायः**
 

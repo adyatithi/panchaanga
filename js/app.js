@@ -14,7 +14,7 @@ import { renderGuide } from './view-guide.js';
 import { makeU, LANGUAGE_FOR_SCRIPT } from './i18n.js';
 
 // Words that belong to the app rather than to the pañcāṅga.
-const CHROME = new Set(['sankshepah', 'dinam', 'kaalaah', 'vistarah', 'maasah', 'saptaahah', 'parvaani', 'anyat', 'vinyaasah',
+const CHROME = new Set(['horaaplus', 'sankshepah', 'dinam', 'kaalaah', 'vistarah', 'maasah', 'saptaahah', 'parvaani', 'anyat', 'vinyaasah',
   'anveshanam', 'preshanam', 'chitram', 'lekhah', 'sanketah', 'pratilipih', 'pratiikshasva', 'nopalabhyate', 'nagaram',
   'lipih', 'bhaashaa', 'akshararupam', 'samayarupam', 'horaa24', 'horaa12', 'varnah', 'svatah', 'shuklam', 'shyaamam',
   'parichayah', 'margadarshika', 'adya', 'idaaniim', 'anantaram', 'sheshah', 'parvasrotaamsi', 'atiriktaani',
@@ -142,6 +142,15 @@ async function buildContext(route) {
     cityName: city.name[settings.script] || city.label,
     range: data.rangeOf(city),
     go, saveSettings, repos: R, enabled, showKey,
+    // Remember a setting without re-drawing the page (folded sections and the like).
+    saveQuiet(patch) { Object.assign(settings, patch); store('settings', settings); },
+    // Whether a foldable section is folded, and a <details> that remembers it.
+    folded: (id) => !!(settings.folded || {})[id],
+    fold(id, summary, ...body) {
+      return h('details', { class: 'fold', 'data-fold': id, open: (settings.folded || {})[id] ? undefined : true,
+        ontoggle: (e) => { settings.folded = { ...(settings.folded || {}), [id]: !e.target.open }; store('settings', settings); } },
+      h('summary', null, summary), ...body);
+    },
     async loadDay(date) {
       const got = await data.loadDay(city, date);
       return got && { ...got, day: filterDay(got.day) };
@@ -235,7 +244,12 @@ async function render() {
   const view = h('div', { class: 'view view-' + route.view });
   // Views append optional pieces; skip the ones that are absent.
   view.append = (...c) => Element.prototype.append.apply(view, c.flat().filter((x) => x != null && x !== false));
-  const keepScroll = main.dataset.view === route.view + '|' + ctx.date + '|' + settings.script ? window.scrollY : 0;
+  const same = main.dataset.view === route.view + '|' + ctx.date + '|' + settings.script;
+  const keepScroll = same ? window.scrollY : 0;
+  // A page with a scrolling region (.pane-scroll) keeps its top part in place: only that region
+  // scrolls. Its position is kept across a re-render of the same page.
+  const oldPane = main.querySelector('.pane-scroll');
+  const keepPane = same && oldPane ? oldPane.scrollTop : null;
   try {
     await RENDERERS[route.view](ctx, view);
   } catch (e) {
@@ -243,10 +257,14 @@ async function render() {
     view.replaceChildren(h('p', { class: 'empty' }, ctx.L('nopalabhyate')));
   }
   if (token !== renderToken) return;
+  const pane = view.querySelector('.pane-scroll');
+  document.body.classList.toggle('pane', !!pane);
   main.replaceChildren(view);
   main.dataset.view = route.view + '|' + ctx.date + '|' + settings.script;
   data.prefetchYear(ctx.city, ctx.date, settings.script, index.build);
-  window.scrollTo(0, keepScroll);
+  window.scrollTo(0, pane ? 0 : keepScroll);
+  if (pane && keepPane != null) pane.scrollTop = keepPane;
+  else if (pane && view.paneStart) view.paneStart(pane);
   document.title = `${ctx.cityName} · ${ctx.date} · Adyatithi Panchaanga`;
 }
 

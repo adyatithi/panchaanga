@@ -7,8 +7,10 @@ import { hero, sunMoon, angaLine, festivalList, footerLines, missing, names, ras
 
 const mod = (n, m) => ((n % m) + m) % m;
 
-function section(title, ...body) {
-  return h('section', { class: 'block' }, title && h('h2', { class: 'block-title' }, title), body);
+// A section of the detail below the PDF page: it folds, and stays folded (across days too)
+// until it is opened again.
+function section(ctx, id, title, ...body) {
+  return h('section', { class: 'block fold-block' }, ctx.fold('detail-' + id, h('h2', { class: 'block-title' }, title), body));
 }
 
 function pairs(rows) {
@@ -89,23 +91,28 @@ export async function renderVistara(ctx, root) {
         h('span', { class: 'ft-item' }, L('shuulam'), '—', S.shula[day.wd][0], ' (▸', tm(day.shula), ') ', L('parihaarah'), '—', S.shula[day.wd][1])))));
 
   // --- the grahas at sunrise, as the PDF's raashi-box edition prints them ---
-  if (day.graha) root.append(h('section', { class: 'block' }, h('h2', { class: 'block-title' }, L('grahasthitih')), rashiBox(ctx, day)));
+  // The anga shlokas and what to avoid are read on their own page: offered right after the day.
+  root.append(h('section', { class: 'block' },
+    h('button', { type: 'button', class: 'more-btn wide', onclick: () => ctx.go({ view: 'pathana' }) },
+      ctx.L('pathanam'), h('span', { 'aria-hidden': 'true' }, ' ›'))));
+
+  if (day.graha) root.append(section(ctx, 'graha', L('grahasthitih'), rashiBox(ctx, day)));
 
   // --- the hyperlinked edition's detail ---
   const sandhya = ['praatas_sandhyaa', 'maadhyaahnika_sandhyaa', 'saayam_sandhyaa'];
-  root.append(section(L('sandhyaavandanakaalaah'), pairs(sandhya.map((key, i) => [
+  root.append(section(ctx, 'sandhya', L('sandhyaavandanakaalaah'), pairs(sandhya.map((key, i) => [
     S.kaala[key],
     [h('span', { class: 'time muted' }, `(${T(day.sandhya_gauna[i])}▸) `), h('span', { class: 'time' }, `${T(k[key][0])}▸${T(k[key][1])}`)],
   ]))));
 
   const shr = ['shraaddhaarambha_mukhya', 'shraaddhaarambha_gauna', 'shraaddha_kaala'];
-  root.append(section(L('shraaddhakaalaah'), pairs(shr.map((key, i) => [
+  root.append(section(ctx, 'shraaddha', L('shraaddhakaalaah'), pairs(shr.map((key, i) => [
     S.kaala[key], h('span', { class: 'time' }, `${T(day.shraaddha_kaala[i][0])}▸${T(day.shraaddha_kaala[i][1])}`),
   ]))));
 
   const now = ctx.nowOn(day);
   let start = day.sun[0];
-  root.append(section(L('horaah'), h('div', { class: 'grid-cells' }, day.hora.map(([graha, end]) => {
+  root.append(section(ctx, 'hora', L('horaah'), h('div', { class: 'grid-cells' }, day.hora.map(([graha, end]) => {
     const live = now != null && start <= now && now < end;
     start = end;
     return h('div', { class: 'cell' + (live ? ' live' : '') }, h('span', null, S.graha_hora[graha] || graha), h('span', { class: 'time' }, '▸' + T(end)));
@@ -117,7 +124,7 @@ export async function renderVistara(ctx, root) {
   if (naks.length === 2 && naks[0][1] != null && naks[0][1] < day.aahneya_end) shown.push(naks[1]);
   shown.forEach(([id, end], i) => {
     const from = i > 0 ? shown[i - 1][1] : null;
-    root.append(section([L('taaraabalam'), ' — ', N.nakshatra(id),
+    root.append(section(ctx, 'tara' + i, [L('taaraabalam'), ' — ', N.nakshatra(id),
       from != null && h('span', { class: 'time muted' }, ` ${T(from)}▸`),
       end != null && h('span', { class: 'time muted' }, ` ▸${T(end)}`)],
     taraGrid(ctx, N, id)));
@@ -125,19 +132,14 @@ export async function renderVistara(ctx, root) {
 
   const muh = (list, ends) => h('div', { class: 'grid-cells' }, list.map((name, i) =>
     h('div', { class: 'cell' }, h('span', null, S.kaala[name] || name), h('span', { class: 'time' }, '▸' + T(ends[i])))));
-  root.append(section(L('muhurtaah'),
+  root.append(section(ctx, 'muhurta', L('muhurtaah'),
     h('h3', { class: 'sub' }, L('ahah')), muh(S.muhurta_day, day.muhurta[0]),
     h('h3', { class: 'sub' }, L('raatrih')), muh(S.muhurta_night, day.muhurta[1])));
-
-  // The anga shlokas and what to avoid are read on their own page.
-  root.append(h('section', { class: 'block' },
-    h('button', { type: 'button', class: 'more-btn wide', onclick: () => ctx.go({ view: 'pathana' }) },
-      ctx.L('pathanam'), h('span', { 'aria-hidden': 'true' }, ' ›'))));
 
   // Festival notes, loaded as they are opened.
   const noted = [...day.fest, ...((day.anadhyayana && day.anadhyayana.list) || [])].filter((e) => e.x);
   if (noted.length) {
-    root.append(section(L('utsavaah'), noted.map((e) => {
+    root.append(section(ctx, 'notes', L('utsavaah'), noted.map((e) => {
       const body = h('div', { class: 'desc' });
       return h('details', {
         class: 'fest-note',

@@ -60,13 +60,16 @@ export function nowIn(tz) {
 // Minutes after local midnight -> the PDF's notation. Times past midnight keep counting (24:39*),
 // exactly as printed, unless the reader has chosen the 12-hour clock.
 // Seconds since local midnight, now, in a timezone; and that date.
+// The fraction of a second is kept: a tatpara is about 0.4 s, so the ghatika clock needs it.
 export function nowSecondsIn(tz) {
+  const t = new Date();
   const parts = new Intl.DateTimeFormat('en-CA', {
     timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit',
     second: '2-digit', hourCycle: 'h23',
-  }).formatToParts(new Date());
+  }).formatToParts(t);
   const p = Object.fromEntries(parts.map((x) => [x.type, x.value]));
-  return { date: `${p.year}-${p.month}-${p.day}`, seconds: Number(p.hour) * 3600 + Number(p.minute) * 60 + Number(p.second) };
+  return { date: `${p.year}-${p.month}-${p.day}`,
+    seconds: Number(p.hour) * 3600 + Number(p.minute) * 60 + Number(p.second) + t.getMilliseconds() / 1000 };
 }
 
 export function fmtTime(m, mode = '24') {
@@ -79,6 +82,8 @@ export function fmtTime(m, mode = '24') {
     const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
     return `${h12}:${mm}${h24 < 12 ? 'am' : 'pm'}${star}`;
   }
+  // 'plus': past midnight as hours into the next day, 26:30 as +2:30*.
+  if (mode === 'plus' && m >= 1440) return `+${hh - 24}:${mm}${star}`;
   return `${String(hh).padStart(2, '0')}:${mm}${star}`;
 }
 
