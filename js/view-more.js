@@ -17,6 +17,8 @@ const ICONS = {
   kshaura: 'M4 15l9-9a2.5 2.5 0 0 1 3.5 3.5L8 18H4zM14 17h6',
   vidyarambha: 'M19 4c-6 1-10 5-12 11l-2 5M7 15c4 0 7-2 9.5-5.5M4 20h16',
   uuna: 'M15 4a8 8 0 1 0 5 13a7 7 0 0 1-5-13z',
+  // Janmadinas: a lamp.
+  janma: 'M12 3c1.6 2 2.2 3.3 2.2 4.3a2.2 2.2 0 0 1-4.4 0c0-1 .6-2.3 2.2-4.3zM4 13h16c0 3.9-3.6 7-8 7s-8-3.1-8-7zM12 13v-2',
 };
 
 export async function renderMore(ctx, root) {
@@ -46,7 +48,8 @@ export async function renderMore(ctx, root) {
       item('settings', L('vinyaasah'), null, () => ctx.openSettings()),
       item('about', L('parichayah'), null, () => ctx.go({ view: 'about' }))),
     head('samvatsaravishayaah'),
-    h('ul', { class: 'menu' }, item('nava', L('navanaayakaah'), null, () => ctx.go({ view: 'nava' }))),
+    h('ul', { class: 'menu' }, item('nava', L('navanaayakaah'), null, () => ctx.go({ view: 'nava' })),
+      item('janma', L('janmadinaani'), ctx.U('jm_menu'), () => ctx.go({ view: 'janma', date: null }))),
     head('dinavishayaah'),
     h('ul', { class: 'menu' },
       item('pathana', L('pathanam'), null, () => ctx.go({ view: 'pathana' })),

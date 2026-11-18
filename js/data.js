@@ -24,6 +24,8 @@ export const loadDescription = (script, id) => get(`text/${script}/desc-${id[0]}
 export const loadRepos = () => get('repos.json').catch(() => ({ repos: [], fest: {} }));
 export const loadMeta = (city, kali) => get(`c/${city}/${kali}/meta.json`);
 export const loadMonth = (city, kali, ym) => get(`c/${city}/${kali}/${ym}.json`);
+// Janmadinas: {n: {'<solar month>-<nakshatra>': [dates]}, t: {'<lunar month>-<tithi>': [dates]}}.
+export const loadJanma = (city, kali) => get(`c/${city}/${kali}/janma.json`);
 
 // The Kali year whose pages cover a date. The first day of a year is also printed as the last
 // page of the previous one; the later year wins.
@@ -76,6 +78,7 @@ export function prefetchYear(cityRec, date, script, build) {
       const meta = await loadMeta(cityRec.id, yr.kali);
       const files = [
         ...meta.months.map((ym) => `c/${cityRec.id}/${yr.kali}/${ym}.json`),
+        ...cityRec.years.map((y) => `c/${cityRec.id}/${y.kali}/janma.json`),
         `text/${script}/lines.json`,
         ...'0123456789abcdef'.split('').map((b) => `text/${script}/desc-${b}.json`),
       ];

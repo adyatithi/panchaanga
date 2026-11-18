@@ -215,11 +215,15 @@ Where each graha is at sunrise, by sidereal rāśi, with degrees within the rā�
 
 **संवत्सर-विषयाः**
 
-For the year: the nava-nāyakas.
+For the year: the nava-nāyakas, and the janmadinas.
 
 **नवनायकाः**
 
 The nine "officers" of the year (rājā, mantrī …), the graha holding each, and the traditional verse on what it portends.
+
+**जन्म-दिनानि**
+
+The day each year on which a birthday by the Indian calendar is kept, by nakṣatra in a solar month or by tithi in a lunar month, for each year held. The nakṣatra (or tithi) should stand three muhūrtas after sunrise, reaching the saṅgava; if it ends within six nāḍīs of sunrise, the previous day is taken; when it comes twice in a month, the later. People can be saved on the phone, each shown with their next janmadina, and all of them added to a calendar with a reminder the evening before.
 
 **दिन-विषयाः**
 

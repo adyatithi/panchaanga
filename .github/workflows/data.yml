@@ -7,6 +7,11 @@ on:
   schedule:
     - cron: "17 21 * * 6"   # Saturday 21:17 UTC (Sunday 02:47 IST)
   workflow_dispatch:
+    inputs:
+      recompute_janma:
+        description: "Recompute the janmadina tables (only after a change to how jyotisha places festivals)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -80,7 +85,12 @@ jobs:
       - name: Build
         env:
           PYTHONWARNINGS: ignore
-        run: adyatithi generate app-data --years ${{ steps.years.outputs.years }} --output-dir "$RUNNER_TEMP/data" > build.log 2>&1 || (tail -50 build.log; exit 1)
+        # The janmadina tables are kept from data/ (they change only with jyotisha's festival
+        # engine); a new year or city gets one. Tick "Recompute" when starting by hand to redo all.
+        run: >-
+          adyatithi generate app-data --years ${{ steps.years.outputs.years }} --output-dir "$RUNNER_TEMP/data"
+          --janma-from data ${{ inputs.recompute_janma && '--recompute-janma' || '' }}
+          > build.log 2>&1 || (tail -50 build.log; exit 1)
 
       - name: Publish if changed
         run: |

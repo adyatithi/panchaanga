@@ -39,8 +39,8 @@ export function subscribeSheet(ctx, key, title) {
 
 // --- every festival of a year, as a file built here ---
 
-const esc = (t) => String(t).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
-function fold(line) {
+export const esc = (t) => String(t).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+export function fold(line) {
   const enc = new TextEncoder();
   const out = [];
   let cur = '';

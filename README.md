@@ -140,3 +140,16 @@ when it publishes the site, on every push to `main` and after each weekly data b
 
 **One-time setting:** Settings → Pages → Build and deployment → Source: **GitHub Actions**. Until
 then the site is still published from the branch, without the feeds.
+
+## Janmadinas
+
+Under More → संवत्सर-विषयाः: the day each year on which a birthday by the Indian calendar is kept,
+by nakṣatra in a solar month or by tithi in a lunar month, for each year held. The days come
+from `data/c/<City>/<kali>/janma.json`, written by the exporter: one rule for every month ×
+nakṣatra and month × tithi (paraviddha, saṅgava), placed by jyotisha's festival engine. People can
+be saved on the phone (nothing leaves it), each with their next janmadina, and all added to a
+calendar with a reminder the evening before.
+
+The tables change only if jyotisha changes how it places festivals, so the weekly build keeps
+the existing ones and computes only for a new year or city. To redo them all, start **Weekly data
+build** by hand from the Actions tab and tick **Recompute the janmadina tables**.

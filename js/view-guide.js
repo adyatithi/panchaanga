@@ -102,8 +102,9 @@ export function sections(ctx) {
     {
       title: 'Pages under More',
       items: [
-        [SL('samvatsaravishayaah'), 'For the year: the nava-nāyakas.'],
+        [SL('samvatsaravishayaah'), 'For the year: the nava-nāyakas, and the janmadinas.'],
         [L('navanaayakaah'), 'The nine "officers" of the year (rājā, mantrī …), the graha holding each, and the traditional verse on what it portends.'],
+        [L('janmadinaani'), 'The day each year on which a birthday by the Indian calendar is kept, by nakṣatra in a solar month or by tithi in a lunar month, for each year held. The nakṣatra (or tithi) should stand three muhūrtas after sunrise, reaching the saṅgava; if it ends within six nāḍīs of sunrise, the previous day is taken; when it comes twice in a month, the later. People can be saved on the phone, each shown with their next janmadina, and all of them added to a calendar with a reminder the evening before.'],
         [SL('dinavishayaah'), 'For the day: paṭhanam and what to avoid.'],
         [L('pathanam'), 'The day set out for reading aloud: each anga with its śloka and devatā, and the phalaśruti. The ślokas are from Śānti Kusumākara.'],
         [L('varjayitum'), 'The verses on what is better avoided today (oil bath, bathing, cleaning the teeth, shaving, certain foods and so on), selected by the day\'s angas, as in the PDFs.'],
