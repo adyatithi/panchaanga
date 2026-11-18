@@ -45,15 +45,11 @@ A range is a period, from the first time to the second.
 
 **दिनम्**
 
-The day: the head of the page, sun and moon, the five angas and the day's festivals. A switch at the top shows it brief or in detail; the detail is the full PDF page.
+The day: the head of the page, sun and moon, the five angas and the day's festivals. A switch at the top shows it brief or in detail; the detail is the full PDF page, followed by the detail of the hyperlinked edition. The app remembers which you chose.
 
 **कालाः**
 
 On today's page, the ghaṭikā clock and how much of each anga is left; then every kāla of the day with its times, and the day drawn to scale from the brāhma muhūrta to the next sunrise. Only the drawing scrolls; the clock and the list of kālas fold away.
-
-**विस्तरः**
-
-The full PDF page for the day, followed by the detail of the hyperlinked edition.
 
 **मासः**
 

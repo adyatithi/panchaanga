@@ -2,7 +2,6 @@
 import { h, store, nowIn, isDate, addDays, addMonths, parseDate, fmtTime, MONTHS, WDAYS } from './util.js';
 import * as data from './data.js';
 import { renderDina } from './view-dina.js';
-import { renderVistara } from './view-vistara.js';
 import { renderKala } from './view-kala.js';
 import { renderMasa } from './view-masa.js';
 import { renderParva } from './view-parva.js';
@@ -23,12 +22,11 @@ import { openShare } from './share.js';
 import { renderPathana } from './view-pathana.js';
 import { renderMuhurta, renderUuna } from './view-muhurta.js';
 
-const VIEWS = ['dina', 'kala', 'vistara', 'masa', 'parva', 'anyat', 'about', 'pathana', 'saptaha', 'varjya', 'nava', 'guide',
+const VIEWS = ['dina', 'kala', 'masa', 'parva', 'anyat', 'about', 'pathana', 'saptaha', 'varjya', 'nava', 'guide',
   'abhyanga', 'kshaura', 'vidyarambha', 'uuna'];
 const TABS = [
   ['dina', 'dinam', 'M4 5h16v15H4zM4 9h16M8 3v4M16 3v4'],
   ['kala', 'kaalaah', 'M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18zM12 7v5l3 2'],
-  ['vistara', 'vistarah', 'M5 6h14M5 10h14M5 14h14M5 18h9'],
   ['masa', 'maasah', 'M4 5h16v15H4zM4 10h16M9 10v10M15 10v10M4 15h16'],
   ['parva', 'parvaani', 'M12 3l2.6 5.6 6 .7-4.5 4.1 1.3 6-5.4-3.1-5.4 3.1 1.3-6L3.4 9.3l6-.7z'],
   ['anyat', 'anyat', 'M5 12h.01M12 12h.01M19 12h.01'],
@@ -73,6 +71,8 @@ function parseRoute() {
   const route = { city: settings.city, date: null, view: 'dina' };
   for (const p of parts) {
     if (isDate(p)) route.date = p;
+    // The Detail tab is retired: a link to it opens the day page in Detail.
+    else if (p === 'vistara') { route.view = 'dina'; route.detail = true; }
     else if (VIEWS.includes(p)) route.view = p;
     else if (index && index.cities.some((c) => c.id === p)) route.city = p;
   }
@@ -221,12 +221,17 @@ function renderTabbar(ctx) {
 }
 
 const RENDERERS = { abhyanga: renderMuhurta, kshaura: renderMuhurta, vidyarambha: renderMuhurta, uuna: renderUuna,
-  dina: renderDina, vistara: renderVistara, kala: renderKala, masa: renderMasa, parva: renderParva, about: renderAbout, pathana: renderPathana, saptaha: renderSaptaha,
+  dina: renderDina, kala: renderKala, masa: renderMasa, parva: renderParva, about: renderAbout, pathana: renderPathana, saptaha: renderSaptaha,
   anyat: renderMore, varjya: renderVarjya, nava: renderNava, guide: renderGuide };
 
 async function render() {
   const token = ++renderToken;
   const route = parseRoute();
+  if (route.detail) {
+    settings.dayFull = true;
+    store('settings', settings);
+    history.replaceState(null, '', location.hash.replace(/\/vistara\/?$/, ''));
+  }
   if (route.city !== settings.city) {
     settings.city = route.city;
     store('settings', settings);
@@ -279,7 +284,7 @@ main.addEventListener('touchend', (e) => {
   const dy = e.changedTouches[0].clientY - touch.y;
   touch = null;
   const r = parseRoute();
-  if (!['dina', 'vistara', 'kala', 'pathana', 'varjya'].includes(r.view) || e.target.closest('.no-swipe')) return;
+  if (!['dina', 'kala', 'pathana', 'varjya'].includes(r.view) || e.target.closest('.no-swipe')) return;
   if (Math.abs(dx) > 70 && Math.abs(dx) > 2.2 * Math.abs(dy)) {
     const city = cityRec(r.city);
     const base = r.date || clampDate(city, nowIn(city.tz).date);

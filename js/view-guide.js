@@ -28,9 +28,8 @@ export function sections(ctx) {
     {
       title: 'The tabs',
       items: [
-        [SL('dinam'), 'The day: the head of the page, sun and moon, the five angas and the day\'s festivals. A switch at the top shows it brief or in detail; the detail is the full PDF page.'],
+        [SL('dinam'), 'The day: the head of the page, sun and moon, the five angas and the day\'s festivals. A switch at the top shows it brief or in detail; the detail is the full PDF page, followed by the detail of the hyperlinked edition. The app remembers which you chose.'],
         [SL('kaalaah'), 'On today\'s page, the ghaṭikā clock and how much of each anga is left; then every kāla of the day with its times, and the day drawn to scale from the brāhma muhūrta to the next sunrise. Only the drawing scrolls; the clock and the list of kālas fold away.'],
-        [SL('vistarah'), 'The full PDF page for the day, followed by the detail of the hyperlinked edition.'],
         [SL('maasah'), 'The month as a calendar, with the tithi, nakṣatra and festival icons on each day and the festivals listed below it; a switch shows the week instead.'],
         [SL('parvaani'), 'Every festival of the year, and the year\'s lists, with search.'],
         [SL('anyat'), 'This guide, settings and the acknowledgements; the year\'s nava-nāyakas; the day\'s paṭhanam and what to avoid; and the lists of days for an oil bath, a haircut, beginning study and the ūna-śrāddhas.'],
