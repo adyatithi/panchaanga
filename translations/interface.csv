@@ -48,4 +48,4 @@ mu_poor,,"Greyed out: the tārā counted from your janma-nakṣatra is unfavoura
 mu_mixed,,"Unfavourable for part of the window only.",,,,,"new, 18 Nov 2026"
 mu_adjusted,,"The window is shorter than the full span, cut by the day’s other rules.",,,,,"new, 18 Nov 2026"
 mu_warn,,"Avoided by one whose mother (chaturthī), brother (ṣaṣṭhī) or sister (chaturdaśī) is living: the tithi falls on the day.",,,,,"new, 18 Nov 2026"
-mu_filter,,"Tap a chip to hide those days; tap again to show them.",,,,,"new, 18 Nov 2026"
+mu_filter,,"Pick weekdays to see only those days. The marked chips start selected: tap one to drop those days.",,,,,"new, 18 Nov 2026"

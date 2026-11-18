@@ -60,10 +60,18 @@ export async function renderMuhurta(ctx, root) {
     const U = ctx.U;
     const warnOf = (t) => (t ? m.warn_tithis?.[String(t % 15)] : null);   // label key, e.g. w_mAtA
     // What the reader has chosen to hide, per list: 'wd:<0-6>', a warning key, or 'poor'.
-    const hidden = new Set((ctx.settings.muHide || {})[key] || []);
+    // Two kinds of filter, remembered per list. Weekdays are picked: none picked shows every
+    // day, otherwise only the picked weekdays. The marks (!mAtA …) and poor taaraabala start
+    // selected: deselecting one drops those days.
+    const hidden = new Set(((ctx.settings.muHide || {})[key] || []).filter((t) => !t.startsWith('wd:')));
+    const picked = new Set((ctx.settings.muWd || {})[key] || []);
     const toggle = (tag) => {
       hidden.has(tag) ? hidden.delete(tag) : hidden.add(tag);
       saveKeeping(ctx, key, { muHide: { ...(ctx.settings.muHide || {}), [key]: [...hidden] } });
+    };
+    const pick = (wd) => {
+      picked.has(wd) ? picked.delete(wd) : picked.add(wd);
+      saveKeeping(ctx, key, { muWd: { ...(ctx.settings.muWd || {}), [key]: [...picked] } });
     };
     const picker = m.taarabala && h('label', { class: 'janma-pick', for: 'janma-nakshatra' },
       h('span', { class: 'janma-label' }, ctx.L('janmanakshatram')),
@@ -84,20 +92,24 @@ export async function renderMuhurta(ctx, root) {
       const wd = parseDate(date).getUTCDay();
       return { date, a, b, adjusted, naks, tithis, taaraas, poor, mixed, warns, wd };
     });
-    const shown = days.filter((d) => !hidden.has('wd:' + d.wd) && !d.warns.some((w) => hidden.has(w)) && !(d.poor && hidden.has('poor')));
+    const shown = days.filter((d) => (!picked.size || picked.has(d.wd)) && !d.warns.some((w) => hidden.has(w)) && !(d.poor && hidden.has('poor')));
 
     const chip = (tag, label, n, cls = '') => h('button', {
-      type: 'button', class: `fchip ${cls}${hidden.has(tag) ? ' off' : ''}`, 'aria-pressed': String(!hidden.has(tag)),
+      type: 'button', class: `fchip ${cls}${hidden.has(tag) ? ' off' : ' on'}`, 'aria-pressed': String(!hidden.has(tag)),
       onclick: () => toggle(tag),
-    }, label, h('span', { class: 'fchip-n' }, ctx.num(n)));
+    }, h('span', { class: 'fchip-tick', 'aria-hidden': 'true' }, hidden.has(tag) ? '' : '✓'), label, h('span', { class: 'fchip-n' }, ctx.num(n)));
+    const wdChip = (wd, n) => h('button', {
+      type: 'button', class: `fchip fchip-wd${picked.has(wd) ? ' on' : ''}`, 'aria-pressed': String(picked.has(wd)),
+      onclick: () => pick(wd),
+    }, WDAYS[wd], h('span', { class: 'fchip-n' }, ctx.num(n)));
     const count = (pred) => days.filter(pred).length;
     const weekdays = [...new Set(days.map((d) => d.wd))].sort();
     const warnKinds = Object.values(m.warn_tithis || {}).filter((w) => days.some((d) => d.warns.includes(w)));
     const filters = h('div', { class: 'mu-filters no-swipe' },
-      h('div', { class: 'fchips' }, weekdays.map((wd) => chip('wd:' + wd, WDAYS[wd], count((d) => d.wd === wd), 'fchip-wd'))),
-      (warnKinds.length || janma) && h('div', { class: 'fchips' },
+      h('div', { class: 'fchips' }, weekdays.map((wd) => wdChip(wd, count((d) => d.wd === wd)))),
+      (warnKinds.length > 0 || janma > 0) && h('div', { class: 'fchips' },
         warnKinds.map((w) => chip(w, `! ${S.muhurta_warn?.[w] || w}`, count((d) => d.warns.includes(w)), 'fchip-warn')),
-        janma && chip('poor', [h('span', { class: 'mu-swatch' }), ' ', ctx.L('taaraabalam')], count((d) => d.poor), 'fchip-poor')),
+        janma > 0 && chip('poor', [h('span', { class: 'mu-swatch' }), ' ', ctx.L('taaraabalam')], count((d) => d.poor), 'fchip-poor')),
       h('p', { class: 'fchip-hint' }, U('mu_filter')));
 
     let good = 0;
@@ -135,7 +147,7 @@ export async function renderMuhurta(ctx, root) {
     const countText = janma || shown.length !== days.length ? `${ctx.num(janma ? good : shown.length)} / ${total}` : total;
     const notes = h('div', { class: 'mu-notes' },
       m.taarabala && !janma && h('p', null, U('mu_pick')),
-      janma && h('p', null, h('span', { class: 'mu-swatch' }), U('mu_poor')),
+      janma > 0 && h('p', null, h('span', { class: 'mu-swatch' }), U('mu_poor')),
       shown.some((d) => d.mixed) && h('p', null, h('span', { class: 'nak-tag has-taaraa poor mu-sample' }, '●'), ' ', U('mu_mixed')),
       warnKinds.length > 0 && h('p', null, h('span', { class: 'mu-warn' }, '!'), ' ', U('mu_warn')),
       shown.some((d) => d.adjusted) && h('p', null, h('sup', { class: 'mu-adj' }, '*'), ' ', U('mu_adjusted')));

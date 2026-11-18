@@ -37,10 +37,10 @@ export async function renderMore(ctx, root) {
     meta.uuna?.length && item('uuna', L('uunashraaddha'), nextSub(nextOf(meta.uuna)), () => ctx.go({ view: 'uuna', date: null })),
   ].filter(Boolean) : [];
   root.append(
+    h('ul', { class: 'menu' }, item('guide', L('margadarshika'), ctx.U('guidelead'), () => ctx.go({ view: 'guide' }))),
     lists.length && h('h2', { class: 'menu-head' }, L('muhurtadinaani')),
     lists.length && h('ul', { class: 'menu' }, lists),
-    h('ul', { class: 'menu' + (lists.length ? ' menu-gap' : '') },
-    item('guide', L('margadarshika'), ctx.U('guidelead'), () => ctx.go({ view: 'guide' })),
+    h('ul', { class: 'menu menu-gap' },
     item('pathana', L('pathanam'), null, () => ctx.go({ view: 'pathana' })),
     item('varjya', L('varjayitum'), null, () => ctx.go({ view: 'varjya' })),
     item('nava', L('navanaayakaah'), null, () => ctx.go({ view: 'nava' })),

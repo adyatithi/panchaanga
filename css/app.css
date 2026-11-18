@@ -603,3 +603,8 @@ dialog.sheet::backdrop { background: rgb(0 0 0 / .45); }
 .tithi-tag.warn { color: var(--red); }
 .menu-head { font-size: .8125rem; font-weight: 400; color: var(--ink-2); letter-spacing: .04em; margin: .9rem 0 0; }
 .menu-gap { margin-top: 1.4rem; }
+.fchip.on { background: var(--ink); color: var(--paper); border-color: var(--ink); border-style: solid; }
+.fchip.on .fchip-n { color: inherit; opacity: .75; }
+.fchip-warn.on { background: var(--red); border-color: var(--red); color: #fff; }
+.fchip-tick { font-size: .75rem; }
+.fchip-tick:empty { display: none; }
