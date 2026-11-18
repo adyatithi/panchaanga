@@ -75,7 +75,7 @@ export function sections(ctx) {
       items: [
         [L('shraaddhatithih'), 'The tithi whose śrāddha falls on this day, by the solar (saura) month. When two fall on one day, "tithidvayam"; when the lunar (cāndra) reckoning differs, it is shown too. Given for places in India only, as in the PDFs.'],
         [L('shraaddhakaalaah'), 'The śrāddha period, the eighth to the twelfth muhūrtas of the day; the main time to begin (mukhya, the eighth muhūrta, kutapa) and the secondary one (gauṇa, the seventh).'],
-        [L('uunashraaddha'), 'Days suitable for the ūna-māsika śrāddhas, with the nakṣatra in the afternoon. Listed under Festivals, for places in India.'],
+        [L('uunashraaddha'), 'Days suitable for the ūna-māsika śrāddhas, with the nakṣatra in the afternoon. A page of its own under More, for places in India.'],
       ],
     },
     {
@@ -97,7 +97,7 @@ export function sections(ctx) {
       title: 'Festivals',
       items: [
         [L('parvaani'), 'Festivals and observances from the adyatithi rule collection. The Festivals tab opens on every festival of the year, at the next one; the chips select a single group, as listed at the start of the PDFs.'],
-        [L('muhurtadinaani'), 'Days suited to an oil bath (abhyaṅga), a haircut or shave (kṣaura) and beginning study (vidyārambha), each with the window on that day. They follow the rules in the muhūrta configurations: which tithis, nakṣatras and weekdays are allowed, which solar months and festivals to avoid, and which part of the day. A star means the window was shortened because the tithi or nakṣatra changes within it. For kṣaura, choosing your janma nakṣatra keeps only days with a favourable tārā, and marks days that touch your own nakṣatra.'],
+        [L('muhurtadinaani'), 'Days suited to an oil bath (abhyaṅga), a haircut or shave (kṣaura) and beginning study (vidyārambha), each a page of its own under More, with the window on each day. They follow the rules in the muhūrta configurations: which tithis, nakṣatras and weekdays are allowed, which solar months and festivals to avoid, and which part of the day. A star means the window was shortened by those rules. For kṣaura, choosing your janma-nakṣatra tags each nakṣatra with its tārā and greys out days whose whole window has an unfavourable one; days on which chaturthī, ṣaṣṭhī or chaturdaśī falls are marked !mātā, !bhrātā or !bhaginī, as they are avoided by one whose mother, brother or sister is living. Chips at the top hide days by weekday, by these marks, or by poor tārābala.'],
         [L('anadhyaayah'), 'Days on which Vedic study is suspended. Off by default; switch it on under Settings → Festival sources.'],
         [L('parvasrotaamsi'), 'The festivals come from separate collections (by deity, region, tradition, temple). By default the app shows the same collections as the PDFs, without anadhyayana; others can be switched on, and any switched off, in settings.'],
       ],

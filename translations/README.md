@@ -12,3 +12,5 @@ The drafts were machine-assisted, so please check both the language and the subs
 
 When a file is reviewed, send it back (or commit it here); the app's strings live in
 `js/i18n.js` and `js/view-guide.js`, and are updated from these files.
+
+**Changed in English, 18 Nov 2026** (the drafts still describe the old text): `uunashraaddha` and `muhurtadinaani` — these lists moved from Festivals to pages of their own under More, and kṣaura gained the !mātā/bhrātā/bhaginī marks and filters.

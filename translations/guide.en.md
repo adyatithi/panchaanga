@@ -168,7 +168,7 @@ The śrāddha period, the eighth to the twelfth muhūrtas of the day; the main t
 
 **ऊन-श्राद्ध-योग्य-दिनानि**
 
-Days suitable for the ūna-māsika śrāddhas, with the nakṣatra in the afternoon. Listed under Festivals, for places in India.
+Days suitable for the ūna-māsika śrāddhas, with the nakṣatra in the afternoon. A page of its own under More, for places in India.
 
 ## On the Detail page
 
@@ -202,7 +202,7 @@ Festivals and observances from the adyatithi rule collection. The Festivals tab 
 
 **muhurtadinaani**
 
-Days suited to an oil bath (abhyaṅga), a haircut or shave (kṣaura) and beginning study (vidyārambha), each with the window on that day. They follow the rules in the muhūrta configurations: which tithis, nakṣatras and weekdays are allowed, which solar months and festivals to avoid, and which part of the day. A star means the window was shortened because the tithi or nakṣatra changes within it. For kṣaura, choosing your janma nakṣatra keeps only days with a favourable tārā, and marks days that touch your own nakṣatra.
+Days suited to an oil bath (abhyaṅga), a haircut or shave (kṣaura) and beginning study (vidyārambha), each a page of its own under More, with the window on each day. They follow the rules in the muhūrta configurations: which tithis, nakṣatras and weekdays are allowed, which solar months and festivals to avoid, and which part of the day. A star means the window was shortened by those rules. For kṣaura, choosing your janma-nakṣatra tags each nakṣatra with its tārā and greys out days whose whole window has an unfavourable one; days on which chaturthī, ṣaṣṭhī or chaturdaśī falls are marked !mātā, !bhrātā or !bhaginī, as they are avoided by one whose mother, brother or sister is living. Chips at the top hide days by weekday, by these marks, or by poor tārābala.
 
 **अनध्यायः**
 

@@ -21,8 +21,10 @@ const CHROME = new Set(['sankshepah', 'dinam', 'kaalaah', 'vistarah', 'maasah', 
   'sarvaani', 'dinavibhaagaah', 'sandhyaa', 'shubham', 'ashubham', 'kaalakramah']);
 import { openShare } from './share.js';
 import { renderPathana } from './view-pathana.js';
+import { renderMuhurta, renderUuna } from './view-muhurta.js';
 
-const VIEWS = ['dina', 'kala', 'vistara', 'masa', 'parva', 'anyat', 'about', 'pathana', 'saptaha', 'varjya', 'nava', 'guide'];
+const VIEWS = ['dina', 'kala', 'vistara', 'masa', 'parva', 'anyat', 'about', 'pathana', 'saptaha', 'varjya', 'nava', 'guide',
+  'abhyanga', 'kshaura', 'vidyarambha', 'uuna'];
 const TABS = [
   ['dina', 'dinam', 'M4 5h16v15H4zM4 9h16M8 3v4M16 3v4'],
   ['kala', 'kaalaah', 'M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18zM12 7v5l3 2'],
@@ -32,9 +34,10 @@ const TABS = [
   ['anyat', 'anyat', 'M5 12h.01M12 12h.01M19 12h.01'],
 ];
 // Pages reached from a tab other than their own.
-const TAB_OF = { pathana: 'anyat', varjya: 'anyat', nava: 'anyat', guide: 'anyat', about: 'anyat', saptaha: 'masa' };
+const TAB_OF = { pathana: 'anyat', varjya: 'anyat', nava: 'anyat', guide: 'anyat', about: 'anyat', saptaha: 'masa',
+  abhyanga: 'anyat', kshaura: 'anyat', vidyarambha: 'anyat', uuna: 'anyat' };
 // Pages that show a year rather than a day, so the top bar has no day arrows.
-const NO_DAY_NAV = ['parva', 'about', 'anyat', 'guide', 'nava'];
+const NO_DAY_NAV = ['parva', 'about', 'anyat', 'guide', 'nava', 'abhyanga', 'kshaura', 'vidyarambha', 'uuna'];
 
 const settings = Object.assign(
   { city: 'Chennai', script: 'devanagari', time: '24', theme: 'auto', face: 'noto', repos: {} },
@@ -208,7 +211,8 @@ function renderTabbar(ctx) {
     h('span', { class: 'tab-label' }, ctx.L(label)))));
 }
 
-const RENDERERS = { dina: renderDina, vistara: renderVistara, kala: renderKala, masa: renderMasa, parva: renderParva, about: renderAbout, pathana: renderPathana, saptaha: renderSaptaha,
+const RENDERERS = { abhyanga: renderMuhurta, kshaura: renderMuhurta, vidyarambha: renderMuhurta, uuna: renderUuna,
+  dina: renderDina, vistara: renderVistara, kala: renderKala, masa: renderMasa, parva: renderParva, about: renderAbout, pathana: renderPathana, saptaha: renderSaptaha,
   anyat: renderMore, varjya: renderVarjya, nava: renderNava, guide: renderGuide };
 
 async function render() {

@@ -15,7 +15,8 @@ folder is the site.
 | विस्तरः (Vistara) | Everything the PDF page prints, in its order, then the grahas at sunrise in a rāśi box and the hyperlinked edition's detail: sandhyāvandana and śrāddha kālas, horās, tārābala (the PDF's 9 × 3 table), muhūrtas, and the festival notes. |
 | मासः (Maasa) | A month grid with the moon's phase, solar day and nakshatra per cell, and the month's observances listed below. A switch at the top gives the week instead (a mock-up). |
 | पञ्चाङ्ग-पठनम् (Pathanam) | Reached from Dina. The day set for reading aloud: each anga with its śloka and devatā in large type, then the nishiddha lines. |
-| पर्वाणि (Parva) | Every festival of the year, opening at the next one; the PDF front matter's lists (ekādaśī, pradoṣa, saṅkramaṇa, eclipses …); the ūna-śrāddha days; the abhyanga, kṣaura and vidyārambha days from the muhūrta rules (kṣaura with a janma-nakṣatra filter); and search. |
+| पर्वाणि (Parva) | Every festival of the year, opening at the next one; the PDF front matter's lists (ekādaśī, pradoṣa, saṅkramaṇa, eclipses …); and search. |
+| अन्यत् (More) | The muhūrta lists (abhyanga, kṣaura with tārābala, the !mātā/bhrātā/bhaginī marks and filters, vidyārambha) and the ūna-śrāddha days, each a page of its own showing the next date; then the Guide, paṭhanam, varjya-viṣayas, nava-nāyakas, settings and About. |
 | अन्यत् (More) | The Guide, Pañcāṅga-paṭhanam, varjya-viṣayas, Navanāyakas, Settings, About. |
 
 Settings (city, script, typeface, clock, theme, festival repositories) and the About page are behind the icon at the top right.

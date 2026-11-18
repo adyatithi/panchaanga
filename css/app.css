@@ -601,3 +601,5 @@ dialog.sheet::backdrop { background: rgb(0 0 0 / .45); }
 .mu-warn { color: var(--red); font-size: .875rem; }
 .tithi-tag { color: var(--ink); }
 .tithi-tag.warn { color: var(--red); }
+.menu-head { font-size: .8125rem; font-weight: 400; color: var(--ink-2); letter-spacing: .04em; margin: .9rem 0 0; }
+.menu-gap { margin-top: 1.4rem; }
