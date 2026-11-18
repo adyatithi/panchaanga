@@ -21,6 +21,7 @@ function pairs(rows) {
 // The day's own nakshatra is janma; the other two in its row are anujanma and trijanma.
 function taraGrid(ctx, N, nakId) {
   const rows = [];
+  const mine = Number(ctx.settings.janma) || 0;        // the reader's own janma nakshatra, if set
   for (let r = 1; r <= 9; r++) {
     const count = (j) => mod(nakId - j, 27) + 1;       // 1 .. 27, from janma nakshatra j to today's
     const tara = mod(count(r) - 1, 9) + 1;             // 1 janma … 9 paramamitra
@@ -28,8 +29,9 @@ function taraGrid(ctx, N, nakId) {
     const cells = [r, r + 9, r + 18].map((j) => {
       const c = count(j);
       const sub = c === 1 ? ctx.S.tara[1] : c === 10 ? ctx.L('anujanma') : c === 19 ? ctx.L('trijanma') : null;
-      return h('div', { class: `tara-n tara-${idx}${c === 1 ? ' is-day' : ''}` },
-        h('span', { class: 'tara-nak' }, N.nakshatra(j)), sub && h('span', { class: 'tara-sub' }, sub));
+      return h('div', { class: `tara-n tara-${idx}${c === 1 ? ' is-day' : ''}${j === mine ? ' is-mine' : ''}` },
+        h('span', { class: 'tara-nak' }, j === mine && h('span', { class: 'tara-mine', 'aria-label': ctx.L('janmanakshatram') }, '★ '), N.nakshatra(j)),
+        sub && h('span', { class: 'tara-sub' }, sub));
     });
     rows.push(...cells, h('div', { class: `tara-t tara-${idx}` }, `[${ctx.num(tara)}] ${ctx.S.tara[idx]}`));
   }

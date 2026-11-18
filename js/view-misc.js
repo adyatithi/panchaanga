@@ -71,6 +71,14 @@ export function openSettings(ctx) {
     group(L('samayarupam'), 'time', [['24', '25:30*', L('horaa24')], ['12', '1:30am*', L('horaa12')]]),
     group(L('varnah'), 'theme', [['auto', L('svatah')], ['light', L('shuklam')], ['dark', L('shyaamam')]]),
     h('p', { class: 'hint' }, '* ', ctx.S.kaala.madhyaraatri || '', ' ▸'),
+    // The reader's janma nakshatra: for taaraabala in the muhurta lists and the Detail page.
+    h('fieldset', { class: 'opt-group' }, h('legend', null, L('janmanakshatram')),
+      h('select', {
+        class: 'opt-select', 'aria-label': L('janmanakshatram'),
+        onchange: (e) => { dlg.close(); ctx.saveSettings({ janma: Number(e.target.value) || 0 }); },
+      }, h('option', { value: 0, selected: !settings.janma }, '—'),
+      Array.from({ length: 27 }, (_, i) => h('option', { value: i + 1, selected: Number(settings.janma) === i + 1 },
+        names(ctx).nakshatra(i + 1))))),
     repoChooser(ctx),
     h('button', { type: 'button', class: 'more-btn wide', onclick: () => { dlg.close(); ctx.go({ view: 'about' }); } }, L('parichayah'), ' ›'),
   ]);

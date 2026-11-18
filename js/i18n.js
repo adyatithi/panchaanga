@@ -20,6 +20,10 @@ export const T = {
     adya: 'Today', idaaniim: 'Now', anantaram: 'Next', sheshah: 'left', parvasrotaamsi: 'Festival sources',
     atiriktaani: 'Additional, off by default', sarvaani: 'All', dinavibhaagaah: 'Parts of the day',
     sandhyaa: 'Sandhyā', shubham: 'Good', ashubham: 'Avoid', kaalakramah: 'In order of time',
+    mu_pick: 'Choose your janma-nakṣatra to see each day’s tārābala.',
+    mu_poor: 'Greyed out: the tārā counted from your janma-nakṣatra is unfavourable (janma, vipat, pratyari or vadha) for the whole window.',
+    mu_mixed: 'Unfavourable for part of the window only.',
+    mu_adjusted: 'The window is shorter than the full span, cut by the day’s other rules.',
     mataani: 'Also on this page', guidelead: 'What each part of the pañcāṅga means, and how to read the times.',
   },
   hi: {

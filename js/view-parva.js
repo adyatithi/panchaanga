@@ -1,5 +1,5 @@
 // Parva: the year's lists, as in the PDF's front matter, plus search across every observance.
-import { h, parseDate, WDAYS } from './util.js';
+import { h, parseDate, WDAYS, MONTHS } from './util.js';
 import * as data from './data.js';
 import { icon, GROUP_ICONS, names, missing } from './parts.js';
 
@@ -49,32 +49,70 @@ export async function renderParva(ctx, root) {
   };
 
   // Open a list at what comes next, not at the start of the year.
-  // Open a list at what comes next, not at the start of the year.
-  // A muhurta list: the days and the window on each. Where the rule includes taaraabala (kshaura),
-  // a janma nakshatra can be chosen: days whose window has a favourable taaraa for it are kept,
-  // and days when the window touches that nakshatra itself are marked, as the muhurta command does.
+  // A muhurta list: the days and the window on each, under month headings. Where the rule
+  // includes taaraabala (kshaura), a janma nakshatra can be chosen (it is also in Settings): each
+  // nakshatra of a window is then tagged with its taaraa counted from the janma nakshatra, and a
+  // day whose whole window falls in unfavourable taaraas (janma, vipat, pratyari, vadha) is
+  // greyed out. The muhurta command leaves such days out; they stay here, greyed, so the year
+  // reads the same for everyone.
+  function taaraOf(janma, nak) {
+    const count = ((nak - janma) % 27 + 27) % 27 + 1;      // 1 … 27
+    const taaraa = (count - 1) % 9 + 1;                    // 1 janma … 9 paramamitra
+    const name = count === 10 ? ctx.L('anujanma') : count === 19 ? ctx.L('trijanma') : S.tara[taaraa % 9];
+    return { taaraa, idx: taaraa % 9, poor: [1, 3, 5, 7].includes(taaraa), name };
+  }
   function muhurtaList(key) {
     const m = meta.muhurta[key];
-    const janma = Number(ctx.settings.janma) || 0;
-    const good = (nak) => [2, 4, 6, 8, 0].includes(((nak - janma + 1) % 9 + 9) % 9);
-    let items = m.list;
-    if (m.taarabala && janma) items = items.filter(([, , , , a, b]) => good(a) || good(b));
-    const picker = m.taarabala && h('label', { class: 'janma-pick', for: 'janma-nakshatra' }, ctx.L('janmanakshatram'),
+    const janma = m.taarabala ? Number(ctx.settings.janma) || 0 : 0;
+    const U = ctx.U;
+    const picker = m.taarabala && h('label', { class: 'janma-pick', for: 'janma-nakshatra' },
+      h('span', { class: 'janma-label' }, ctx.L('janmanakshatram')),
       h('select', {
         id: 'janma-nakshatra',
         onchange: (e) => { ctx.saveSettings({ janma: Number(e.target.value) || 0 }); },
       }, h('option', { value: 0, selected: !janma }, '—'),
       Array.from({ length: 27 }, (_, i) => h('option', { value: i + 1, selected: janma === i + 1 }, N.nakshatra(i + 1)))));
-    const list = h('ul', { class: 'rows' }, items.map(([date, a, b, adjusted, na, nb]) => {
-      const own = janma && (na === janma || nb === janma);
-      return h('li', { class: date < ctx.now.date ? 'past' : '' }, dateCell(date),
-        h('div', { class: 'row-names muhurta-row' },
-          h('span', { class: 'time' }, `${ctx.T(a)}–${ctx.T(b)}`), adjusted && h('span', { class: 'muted' }, ' *'),
-          h('span', { class: 'muted' }, ` · ${N.nakshatra(na)}${nb !== na ? '/' + N.nakshatra(nb) : ''}`),
-          own && h('span', { class: 'bad-text' }, ` (! ${N.nakshatra(janma)})`)));
-    }));
-    return [h('h2', { class: 'block-title' }, `${S.muhurta_names?.[key] || key} (${ctx.num(items.length)})`),
-      picker, list];
+    let good = 0;
+    let anyAdjusted = false;
+    let anyMixed = false;
+    const sections = [];
+    let month = null;
+    let ul = null;
+    for (const [date, a, b, adjusted, na, nb] of m.list) {
+      const naks = nb !== na ? [na, nb] : [na];
+      const taaraas = janma ? naks.map((n) => taaraOf(janma, n)) : [];
+      const poor = janma && taaraas.every((t) => t.poor);
+      const mixed = janma && !poor && taaraas.some((t) => t.poor);
+      if (!poor) good++;
+      anyAdjusted ||= adjusted;
+      anyMixed ||= mixed;
+      const ym = date.slice(0, 7);
+      if (ym !== month) {
+        month = ym;
+        ul = h('ul', { class: 'rows mu-rows' });
+        sections.push(h('h3', { class: 'mu-month' }, `${MONTHS[Number(ym.slice(5)) - 1]} ${ym.slice(0, 4)}`), ul);
+      }
+      const tags = naks.map((n, i) => {
+        const t = taaraas[i];
+        return h('span', { class: 'nak-tag' + (t ? ` has-taaraa${t.poor ? ' poor' : ''}` : '') },
+          t && h('i', { class: `tara-dot tara-${t.idx}`, 'aria-hidden': 'true' }),
+          N.nakshatra(n), t && h('span', { class: 'nak-taaraa' }, t.name));
+      });
+      ul.append(h('li', { class: [date < ctx.now.date ? 'past' : '', poor ? 'poor' : ''].join(' ').trim() },
+        dateCell(date),
+        h('div', { class: 'row-names mu-row' },
+          h('div', { class: 'mu-window time' }, `${ctx.T(a)}–${ctx.T(b)}`,
+            adjusted && h('sup', { class: 'mu-adj', title: U('mu_adjusted') }, '*')),
+          h('div', { class: 'mu-naks' }, tags))));
+    }
+    const count = janma ? `${ctx.num(good)} / ${ctx.num(m.list.length)}` : ctx.num(m.list.length);
+    const notes = h('div', { class: 'mu-notes' },
+      m.taarabala && !janma && h('p', null, U('mu_pick')),
+      janma && h('p', null, h('span', { class: 'mu-swatch' }), U('mu_poor')),
+      anyMixed && h('p', null, h('span', { class: 'nak-tag has-taaraa poor mu-sample' }, '●'), ' ', U('mu_mixed')),
+      anyAdjusted && h('p', null, h('sup', { class: 'mu-adj' }, '*'), ' ', U('mu_adjusted')));
+    return [h('h2', { class: 'block-title' }, `${S.muhurta_names?.[key] || key} `, h('span', { class: 'mu-count' }, `(${count})`)),
+      picker, notes, ...sections];
   }
 
   function upcomingFirst() {
