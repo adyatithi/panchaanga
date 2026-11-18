@@ -71,8 +71,6 @@ function parseRoute() {
   const route = { city: settings.city, date: null, view: 'dina' };
   for (const p of parts) {
     if (isDate(p)) route.date = p;
-    // The Detail tab is retired: a link to it opens the day page in Detail.
-    else if (p === 'vistara') { route.view = 'dina'; route.detail = true; }
     else if (VIEWS.includes(p)) route.view = p;
     else if (index && index.cities.some((c) => c.id === p)) route.city = p;
   }
@@ -227,11 +225,6 @@ const RENDERERS = { abhyanga: renderMuhurta, kshaura: renderMuhurta, vidyarambha
 async function render() {
   const token = ++renderToken;
   const route = parseRoute();
-  if (route.detail) {
-    settings.dayFull = true;
-    store('settings', settings);
-    history.replaceState(null, '', location.hash.replace(/\/vistara\/?$/, ''));
-  }
   if (route.city !== settings.city) {
     settings.city = route.city;
     store('settings', settings);
