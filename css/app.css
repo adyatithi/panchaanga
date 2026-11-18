@@ -590,3 +590,14 @@ dialog.sheet::backdrop { background: rgb(0 0 0 / .45); }
 .tara-n.is-mine { box-shadow: inset 0 0 0 2px #f2c14e; }
 .tara-mine { font-size: .6875rem; color: #f2c14e; }
 .opt-select { font: inherit; padding: .35rem .5rem; border: 1px solid var(--ink-3); background: var(--paper); color: var(--ink); border-radius: 3px; min-width: 12rem; }
+.mu-filters { margin: .3rem 0 .5rem; }
+.fchips { display: flex; flex-wrap: wrap; gap: .35rem; margin: .35rem 0; }
+.fchip { display: inline-flex; align-items: center; gap: .4rem; padding: .2rem .55rem; border: 1px solid var(--ink-3); border-radius: 3px; background: var(--paper); color: var(--ink); font: inherit; font-size: .875rem; cursor: pointer; }
+.fchip-wd { font-size: .75rem; letter-spacing: .08em; }
+.fchip-n { font-size: .75rem; color: var(--ink-2); }
+.fchip-warn { color: var(--red); border-color: color-mix(in srgb, var(--red) 45%, transparent); }
+.fchip.off { opacity: .45; text-decoration: line-through; border-style: dashed; }
+.fchip-hint { font-size: .75rem; color: var(--ink-2); margin: .1rem 0 0; }
+.mu-warn { color: var(--red); font-size: .875rem; }
+.tithi-tag { color: var(--ink); }
+.tithi-tag.warn { color: var(--red); }

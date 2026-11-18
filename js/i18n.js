@@ -24,6 +24,8 @@ export const T = {
     mu_poor: 'Greyed out: the tārā counted from your janma-nakṣatra is unfavourable (janma, vipat, pratyari or vadha) for the whole window.',
     mu_mixed: 'Unfavourable for part of the window only.',
     mu_adjusted: 'The window is shorter than the full span, cut by the day’s other rules.',
+    mu_warn: 'Avoided by one whose mother (chaturthī), brother (ṣaṣṭhī) or sister (chaturdaśī) is living: the tithi falls on the day.',
+    mu_filter: 'Tap a chip to hide those days; tap again to show them.',
     mataani: 'Also on this page', guidelead: 'What each part of the pañcāṅga means, and how to read the times.',
   },
   hi: {
