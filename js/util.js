@@ -111,7 +111,7 @@ export function moonSvg(tithi, size = 16) {
 
 // The nightly build is the same app published under nightly/ beside the stable one. It keeps its
 // own settings (starting from the stable app's), so trying a change never disturbs the stable copy.
-export const NIGHTLY = /\/nightly\//.test(location.pathname);
+export const NIGHTLY = typeof location !== 'undefined' && /\/nightly\//.test(location.pathname);
 const PREFIX = NIGHTLY ? 'adyatithi-nightly.' : 'adyatithi.';
 
 export function store(key, value) {

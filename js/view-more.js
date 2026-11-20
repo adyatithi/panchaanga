@@ -18,8 +18,8 @@ const ICONS = {
   kshaura: 'M4 15l9-9a2.5 2.5 0 0 1 3.5 3.5L8 18H4zM14 17h6',
   vidyarambha: 'M19 4c-6 1-10 5-12 11l-2 5M7 15c4 0 7-2 9.5-5.5M4 20h16',
   uuna: 'M15 4a8 8 0 1 0 5 13a7 7 0 0 1-5-13z',
-  // The sankalpa: a water vessel (kalasha).
-  sankalpa: 'M8 9h8c1.7 1.4 2.5 3.2 2.5 5.2C18.5 17.4 15.6 20 12 20s-6.5-2.6-6.5-5.8C5.5 12.2 6.3 10.4 8 9zM9.5 9V6.5h5V9M8.5 4.5h7',
+  // The sankalpa: hands folded (anjali).
+  sankalpa: 'M12 3c-2 1.8-3 4.5-3 7.5V15l-3.5 4.5M12 3c2 1.8 3 4.5 3 7.5V15l3.5 4.5M12 3v13.5M9 11c-1.3.4-2.1 1.5-2.1 3M15 11c1.3.4 2.1 1.5 2.1 3',
   // Shannavati: water poured from cupped hands.
   shannavati: 'M5 9c0 4 3 6 7 6s7-2 7-6zM12 15v2M10 19.5c0-1 2-2.5 2-2.5s2 1.5 2 2.5a2 2 0 0 1-4 0z',
   // Feedback: a speech bubble; contribute: a gift; acknowledgements: a flower.

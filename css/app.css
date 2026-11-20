@@ -758,6 +758,10 @@ details.fold:not([open]) > summary::after { transform: rotate(-90deg); }
 .fb .fchips { margin: .4rem 0 .6rem; }
 .fb-input { margin-bottom: .5rem; }
 .fb-text { display: block; resize: vertical; min-height: 8rem; line-height: 1.5; }
+.sk-option { margin: .6rem 0 0; }
+.sk-status { margin: .3rem 0 0; font-size: .875rem; }
+.sk-option[hidden], .sk-status[hidden] { display: none; }
+.linkish { color: var(--blue); text-decoration: underline; text-underline-offset: 2px; }
 .fb-check { display: flex; align-items: center; gap: .4rem; font-size: .9375rem; margin: .2rem 0 .4rem; }
 .fb-ctx { white-space: pre-wrap; word-break: break-word; font: .75rem/1.45 ui-monospace, monospace; color: var(--ink-2); border: 1px solid var(--hair); padding: .5rem .6rem; margin: 0 0 .6rem; }
 .fb-actions { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; }

@@ -157,3 +157,38 @@ export function sankalpaText(day, samvatsara, K, T) {
   ];
   return parts.join('\t').replace(PH_RE, (_, m) => T(Number(m)));
 }
+
+// The sankalpa for one moment of the day: the samvatsara, months, tithi, nakshatra, yoga and
+// karana running at minute `t` (after the day's midnight, past 1440 until the next sunrise), each
+// a single name with no times, in the same phrasing as above. `nextChandra` is the next day's
+// lunar month, for after the amavasya has ended. Returns the text and the minute it next changes
+// (null if nothing changes before the next sunrise).
+export function sankalpaAt(day, samvatsara, K, t, nextChandra) {
+  const ends = [];
+  const at = (key) => {
+    const [id, end] = day[key].find(([, e]) => e == null || e > t) || day[key].at(-1);
+    if (end != null) ends.push(end);
+    return id;
+  };
+  const tithi = at('tithi'), nak = at('nakshatra'), yoga = at('yoga'), kar = at('karana');
+  let m = day.saura.m;
+  if (day.saura.end) {
+    if (day.saura.end[1] <= t) m = (day.saura.end[0] % 12) + 1;
+    else ends.push(day.saura.end[1]);
+  }
+  const newMoon = day.tithi.some(([id, end]) => id === 30 && end != null && end <= t);
+  const chandra = K.chandra[String(newMoon && nextChandra != null ? nextChandra : day.chandra)] || '';
+  const vowel = (key, id) => K.vowel[key].includes(id);
+  const parts = [
+    K.samvatsara[samvatsara], K.ayana[m], K.rtu[m], `${K.saura[m]}${chandra}`, K.paksha[tithi <= 15 ? 0 : 1],
+    `${K.tithi[tithi]} ${K.zubha}`,
+    K.vara[day.wd][vowel('nakshatra', nak) ? 0 : 1],
+    K.nakshatra[nak] + K.yukta[vowel('yoga', yoga) ? 0 : 1],
+    K.yoga[yoga] + K.yukta[vowel('karana', kar) ? 0 : 1],
+    K.karana[kar] + K.yukta[0],
+    `${K.evam} `,
+    `${K.asyam[vowel('tithi', tithi) ? 0 : 1]} ${K.tithi[tithi]}`,
+  ];
+  const next = ends.filter((e) => e > t && e < day.next_sunrise);
+  return { text: parts.join('\t'), until: next.length ? Math.min(...next) : null };
+}

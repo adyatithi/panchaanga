@@ -1,9 +1,8 @@
 # Guide — English source
 
-Generated from `js/view-guide.js`; edit the text there. Each entry is a term (as the app
-shows it, in Devanagari here) and its explanation. Sections are numbered as in the app.
+Each entry is a term (as the app shows it, in Devanagari here) and its explanation.
 
-## 1. Reading the times
+## Reading the times
 
 **24:39\***
 
@@ -41,7 +40,7 @@ Marked when a tithi touches three days: it is running at three successive sunris
 
 A range is a period, from the first time to the second.
 
-## 2. The tabs
+## The tabs
 
 **दिनम्**
 
@@ -63,7 +62,7 @@ Every festival of the year, and the year's lists, with search.
 
 This guide, settings, About, Contribute, Acknowledgements and Feedback (which opens a prefilled GitHub issue); the year's nava-nāyakas, ṣaṇṇavati-tarpaṇa days and janmadinas; the day's paṭhanam, saṅkalpa and what to avoid; and the lists of days for an oil bath, a haircut, beginning study and the ūna-śrāddhas.
 
-## 3. The head of the page
+## The head of the page
 
 **संवत्सरः**
 
@@ -89,7 +88,7 @@ The day of the week, by its planet; it runs from sunrise to sunrise.
 
 Sunrise, midday and sunset; moonrise and moonset. A dash means the Moon does not rise or set before the next sunrise.
 
-## 4. The five angas
+## The five angas
 
 **तिथिः**
 
@@ -111,7 +110,7 @@ Half a tithi. Seven karaṇas repeat through the month; four (śakuni, catuṣp�
 
 The rāśi rising on the eastern horizon, each with the time it ends.
 
-## 5. Parts of the day
+## Parts of the day
 
 **ब्राह्मम्**
 
@@ -141,7 +140,7 @@ Day and night are each divided into fifteen named muhūrtas; the Kālas page lis
 
 Day and night are each divided into twelve horās, each ruled by a graha, the first by the lord of the weekday; listed on the Kālas page.
 
-## 6. Times to avoid, and good times
+## Times to avoid, and good times
 
 **राहुकालः**
 
@@ -171,7 +170,7 @@ The direction in which travel is avoided on this weekday, until the time given, 
 
 The rāśi eighth from the Moon's: a day for caution for those whose janma rāśi it is.
 
-## 7. Śrāddha
+## Śrāddha
 
 **श्राद्ध-तिथिः**
 
@@ -185,7 +184,7 @@ The śrāddha period, the eighth to the twelfth muhūrtas of the day; the main t
 
 Days suitable for the ūna-māsika śrāddhas, with the nakṣatra in the afternoon: a page of its own under More, for places in India. Choose a nakṣatra to see only its days.
 
-## 8. On the Detail page
+## On the Detail page
 
 **पञ्चाङ्ग-पठनम् · सङ्कल्पः · वर्जयितुम् उचित-विषयाः**
 
@@ -203,7 +202,7 @@ Count from a person's janma nakṣatra to the day's nakṣatra: the count falls 
 
 Where each graha is at sunrise, by sidereal rāśi, with degrees within the rāśi, set out in the South Indian chart (Mīna at top left, running clockwise).
 
-## 9. Pages under More
+## Pages under More
 
 **संवत्सर-विषयाः**
 
@@ -227,7 +226,7 @@ The day set out for reading aloud: each anga with its śloka and devatā, and th
 
 **सङ्कल्पः**
 
-The day's part of the sankalpa, from the samvatsara to the tithi, as in the PDFs' sankalpa list, for the first 24 ghaṭikās of the day; a change of month, tithi, nakṣatra, yoga or karaṇa within them is given with its time. One phrase to a line, with buttons for larger or smaller type and to copy it. Also a button on the Detail page.
+The day's part of the sankalpa, from the samvatsara to the tithi. On today's page it is the sankalpa for this moment, and changes by itself as the tithi, nakṣatra, yoga, karaṇa or month changes; a box turns it to the one printed in the PDFs' sankalpa list, from sunrise for the first 24 ghaṭikās, with the time of each change within them. One phrase to a line, with buttons for larger or smaller type and to copy it. Also a button on the Detail page.
 
 **वर्जयितुम् उचित-विषयाः**
 
@@ -241,7 +240,7 @@ Days suited to an oil bath (abhyaṅga), a haircut or shave (kṣaura) and begin
 
 Choosing your janma-nakṣatra tags each nakṣatra with its tārā and greys out days whose whole window has an unfavourable one; the tārābala chip turns the greying off. Days on which chaturthī, ṣaṣṭhī or chaturdaśī falls are marked !mātā, !bhrātā or !bhaginī, as they are avoided by one whose mother, brother or sister is living. Every chip starts selected; turning a weekday or a mark off drops those days.
 
-## 10. Festivals
+## Festivals
 
 **पर्वाणि**
 
@@ -259,7 +258,7 @@ Days on which Vedic study is suspended. Off by default; switch it on under Setti
 
 The festivals come from separate collections (by deity, region, tradition, temple). By default the app shows the same collections as the PDFs, without anadhyayana; others can be switched on, and any switched off, in settings.
 
-## 11. Settings
+## Settings
 
 **नगरम्**
 
@@ -277,7 +276,7 @@ Three ways to write times after midnight: 25:30* as printed in the PDFs, +1:30*,
 
 Your janma nakṣatra: used for tārābala in the kṣaura list, and starred in the Detail page's tārābala tables.
 
-## 12. How it is computed
+## How it is computed
 
 **jyotisha**
 
