@@ -70,7 +70,12 @@ body {
   padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px));
 }
 [hidden] { display: none !important; }
-button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+/* Square corners on every control: Safari on iPhone otherwise rounds buttons into ovals and
+   fields into pills. Classes that want a radius (icon buttons, chips) set their own. */
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer;
+  border-radius: 0; -webkit-appearance: none; appearance: none; }
+input, select, textarea { border-radius: 0; }
+input[type="text"], input[type="search"], textarea { -webkit-appearance: none; appearance: none; }
 button:disabled { opacity: .3; cursor: default; }
 a { color: var(--blue); }
 :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 2px; }
