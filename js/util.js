@@ -126,8 +126,13 @@ export function store(key, value) {
 
 // The rule files' text is Markdown with some TeX habits. This renders the subset that occurs
 // (paragraphs, bullet and numbered lists, bold, links, bare URLs) and tidies the rest.
+// A citation closing a verse, as "…॥ mahAbhAratE 13-136-2 ॥" (in any script and its digits), on a
+// line of its own after the verse's double danda, with an em dash: "…॥" / "— mahAbhAratE 13-136-2".
+export const citeOwnLine = (text) => String(text)
+  .replace(/॥[ \t]*([\p{L}\p{M}]+)[ \t]+(\p{Nd}+(?:-\p{Nd}+)+)[ \t]*॥[ \t]*(?=\n|$)/gu, '॥\n— $1 $2');
+
 function tidy(text) {
-  return String(text)
+  return citeOwnLine(text)
     .replace(/\{\}/g, '')
     .replace(/\{(\[[^\]{}]*\])\}/g, '$1')
     .replace(/``/g, '“').replace(/''/g, '”')
