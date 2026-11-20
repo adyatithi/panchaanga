@@ -2,15 +2,17 @@
 # build from the `nightly` branch (when there is one) under nightly/. The calendar feeds
 # (data/ics/…) are generated from main's data at publish time, so they are never committed (they
 # come to about 100 MB across cities and scripts); the nightly app subscribes to those same feeds.
-# Runs on every push to main or nightly and after each weekly data build (whose push does not
-# trigger workflows by itself). Needs Settings → Pages → Source: "GitHub Actions".
+# Runs on every push to main, after each weekly data build (whose push does not trigger workflows
+# by itself), and after each push to nightly (by way of the "Nightly pushed" workflow: the
+# github-pages environment deploys only from main, and a workflow_run runs as main). Needs
+# Settings → Pages → Source: "GitHub Actions".
 name: Publish site
 
 on:
   push:
-    branches: [main, nightly]
+    branches: [main]
   workflow_run:
-    workflows: ["Weekly data build"]
+    workflows: ["Weekly data build", "Nightly pushed"]
     types: [completed]
   workflow_dispatch:
 

@@ -1,0 +1,17 @@
+# A push to the nightly branch: nothing to do here but finish, so that the Publish workflow runs
+# after it (on workflow_run, from main). GitHub's github-pages environment deploys only from main,
+# so a Publish run started by the nightly push itself would be refused.
+name: Nightly pushed
+
+on:
+  push:
+    branches: [nightly]
+
+permissions:
+  contents: read
+
+jobs:
+  noted:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "nightly at ${{ github.sha }}; the Publish workflow follows"
