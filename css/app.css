@@ -5,6 +5,8 @@
 
 @font-face { font-family: "Alegreya Sans"; src: url("../fonts/AlegreyaSans-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
 @font-face { font-family: "Alegreya Sans"; src: url("../fonts/AlegreyaSans-Bold.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+/* Single-colour emoji, in the icons' colour: only the glyphs the app uses (🙏 and four flowers). */
+@font-face { font-family: "Noto Emoji Mono"; src: url("../fonts/NotoEmoji-subset.ttf") format("truetype"); font-display: block; }
 @font-face { font-family: "Siddhanta"; src: url("../fonts/siddhanta.ttf") format("truetype"); font-display: swap; unicode-range: U+0900-097F, U+1CD0-1CFF, U+A8E0-A8FF, U+200C-200D, U+25CC; }
 @font-face { font-family: "Noto Serif Devanagari Local"; src: url("../fonts/NotoSerifDevanagari-Regular.woff2") format("woff2"); font-display: swap; unicode-range: U+0900-097F, U+1CD0-1CFF, U+A8E0-A8FF, U+200C-200D, U+25CC; }
 /* Tamil and Grantha letterforms are wide; the PDFs set them well below the Devanagari size. */
@@ -758,7 +760,7 @@ details.fold:not([open]) > summary::after { transform: rotate(-90deg); }
 .fb .fchips { margin: .4rem 0 .6rem; }
 .fb-input { margin-bottom: .5rem; }
 .fb-text { display: block; resize: vertical; min-height: 8rem; line-height: 1.5; }
-.emoji-icon { display: inline-block; line-height: 1; width: 1.2em; text-align: center; }
+.emoji-icon { display: inline-block; line-height: 1; width: 1.2em; text-align: center; font-family: "Noto Emoji Mono"; color: inherit; font-variant-emoji: text; }
 .sk-option { margin: .6rem 0 0; }
 .sk-status { margin: .3rem 0 0; font-size: .875rem; }
 .sk-option[hidden], .sk-status[hidden] { display: none; }

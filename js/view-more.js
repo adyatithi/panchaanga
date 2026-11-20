@@ -28,11 +28,12 @@ const ICONS = {
   janma: 'M12 3c1.6 2 2.2 3.3 2.2 4.3a2.2 2.2 0 0 1-4.4 0c0-1 .6-2.3 2.2-4.3zM4 13h16c0 3.9-3.6 7-8 7s-8-3.1-8-7zM12 13v-2',
 };
 
-// Icons that are an emoji rather than a drawing: the sankalpa's folded hands.
+// Icons that are an emoji rather than a drawing, set in a single-colour emoji font (Noto Emoji)
+// in the icons' own colour: the sankalpa's folded hands.
 const EMOJI = { sankalpa: '🙏' };
 // One of the icons above, as inline SVG (or its emoji, at the same size).
 export const iconSvg = (key, size = 22) => EMOJI[key]
-  ? `<span class="emoji-icon" style="font-size:${Math.round(size * 0.85)}px" aria-hidden="true">${EMOJI[key]}</span>`
+  ? `<span class="emoji-icon" style="font-size:${size}px" aria-hidden="true">${EMOJI[key]}</span>`
   : `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${ICONS[key]}"/></svg>`;
 
 export async function renderMore(ctx, root) {
