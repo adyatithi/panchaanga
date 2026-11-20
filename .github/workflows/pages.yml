@@ -48,7 +48,10 @@ jobs:
         with:
           python-version: "3.12"
       - name: Calendar feeds
-        run: python tools/ics_feeds.py data
+        # tzdata carries the alias zones (US/Pacific …) the runner's system data no longer has.
+        run: |
+          pip install -q tzdata
+          python tools/ics_feeds.py data
       - name: Site
         run: |
           mkdir -p "$RUNNER_TEMP/site"
