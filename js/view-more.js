@@ -90,22 +90,33 @@ export function dayHead(ctx, day, meta, title) {
       `${N.rashi(day.saura.m)} ${ctx.num(day.saura.d)} · ${N.chandramasa(day.chandra)}`));
 }
 
-// What is better avoided today: the nishiddha verses for the day's angas, as in the PDFs.
+// What is better avoided today: the nishiddha verses for the day's angas, as in the PDFs, by the
+// activity they concern (open at first; the vihita below are folded).
+const NISHIDDHA_TOPICS = ['bhojana', 'abhyanga', 'snana', 'dantadhavana', 'kshaura', 'patra_grahana', 'maithuna', 'shraaddha', 'etc'];
 export async function renderVarjya(ctx, root) {
   const got = await ctx.loadDay(ctx.date);
   if (!got) return root.append(missing(ctx));
   const { day, meta } = got;
-  const lines = await data.loadLines(ctx.settings.script).catch(() => ({}));
-  const verses = day.nishiddha.map((id) => lines[id]).filter(Boolean);
-  const head = dayHead(ctx, day, meta, ctx.L('varjayitum'));
-  head.append(h('div', { class: 'share-row' }, shareButton(ctx, () => ctx.openShare({ day, meta, mode: 'varjya', verses }))));
+  const [lines, topics] = await Promise.all([
+    data.loadLines(ctx.settings.script).catch(() => ({})),
+    data.loadNishiddhaTopics().catch(() => ({})),
+  ]);
+  // The day's lines by activity, in the order the rules are gathered, each keeping the day's order.
+  const ids = day.nishiddha.filter((id) => lines[id]);
+  const groups = NISHIDDHA_TOPICS.map((t) => [t, ids.filter((id) => (topics[id] || 'etc') === t).map((id) => lines[id])])
+    .filter(([, list]) => list.length);
+  const { L } = ctx;
+  const head = dayHead(ctx, day, meta, L('varjayitum'));
+  head.append(h('div', { class: 'share-row' }, shareButton(ctx, () => ctx.openShare({ day, meta, mode: 'varjya',
+    groups: groups.map(([t, list]) => [L(`ni_${t}`), list]) }))));
   root.append(head,
-    verses.length
-      ? h('section', { class: 'nishiddha reading' }, verses.map((line) => h('p', null, verseLines(line))))
+    groups.length
+      ? h('section', { class: 'vihita nishiddha-groups' }, groups.map(([t, list]) => ctx.fold(`nishiddha-${t}`,
+        h('span', { class: 'label' }, L(`ni_${t}`)),
+        h('div', { class: 'nishiddha reading' }, list.map((line) => h('p', null, verseLines(line)))))))
       : h('p', { class: 'empty' }, '—'));
   // What is commended today (the vihita rules), by activity, each with its note; folded at first.
   if (day.vihita?.length) {
-    const { L } = ctx;
     root.append(h('section', { class: 'vihita' },
       h('h2', { class: 'vihita-head' }, `॥ ${L('kartum')} ॥`),
       day.vihita.map(([activity, items]) => ctx.foldShut(`vihita-${activity}`,

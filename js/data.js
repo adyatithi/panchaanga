@@ -21,6 +21,8 @@ export const loadStatic = (script) => get(`static/${script}.json`);
 export const loadFestNames = (script) => get(`text/${script}/fest.json`);
 export const loadPhrases = (script) => get(`text/${script}/phr.json`);
 export const loadLines = (script) => get(`text/${script}/lines.json`);
+// Which activity each nishiddha line belongs to (bhojana, snana, ...): one file for every script.
+export const loadNishiddhaTopics = () => get('text/nishiddha-topics.json');
 export const loadDescription = (script, id) => get(`text/${script}/desc-${id[0]}.json`).then((b) => b[id] || null);
 export const loadRepos = () => get('repos.json').catch(() => ({ repos: [], fest: {} }));
 export const loadMeta = (city, kali) => get(`c/${city}/${kali}/meta.json`);
@@ -81,6 +83,7 @@ export function prefetchYear(cityRec, date, script, build) {
         ...meta.months.map((ym) => `c/${cityRec.id}/${yr.kali}/${ym}.json`),
         ...cityRec.years.map((y) => `c/${cityRec.id}/${y.kali}/janma.json`),
         `text/${script}/lines.json`,
+        'text/nishiddha-topics.json',
         ...'0123456789abcdef'.split('').map((b) => `text/${script}/desc-${b}.json`),
       ];
       for (const f of files) {
