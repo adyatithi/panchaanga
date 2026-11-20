@@ -1,0 +1,75 @@
+key,sanskrit (from the app),en,hi,ta,te,kn,notes
+dinam,"दिनम्","Day","दिन","நாள்","రోజు","ದಿನ",
+sankshepah,"सङ्क्षेपः","Brief","संक्षेप","சுருக்கம்","సంక్షిప్తం","ಸಂಕ್ಷಿಪ್ತ",
+kaalaah,"कालाः","Kālas","काल","காலம்","కాలాలు","ಕಾಲಗಳು",
+vistarah,"विस्तरः","Detail","विस्तार","விவரம்","వివరం","ವಿವರ",
+maasah,"मासः","Month","माह","மாதம்","నెల","ತಿಂಗಳು",
+saptaahah,"सप्ताहः","Week","सप्ताह","வாரம்","వారం","ವಾರ",
+parvaani,"पर्वाणि","Festivals","पर्व","பண்டிகை","పండుగలు","ಹಬ್ಬಗಳು",
+anyat,"अन्यत्","More","और","மேலும்","మరిన్ని","ಇನ್ನಷ್ಟು",
+vinyaasah,"विन्यासः","Settings","सेटिंग्स","அமைப்புகள்","అమరికలు","ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
+anveshanam,"अन्वेषणम्","Search festivals","पर्व खोजें","பண்டிகை தேடல்","పండుగ వెతుకు","ಹಬ್ಬ ಹುಡುಕಿ",
+preshanam,"प्रेषणम्","Share","साझा करें","பகிர்","పంచుకో","ಹಂಚಿಕೊಳ್ಳಿ",
+chitram,"चित्रम्","Image","चित्र","படம்","చిత్రం","ಚಿತ್ರ",
+lekhah,"लेखः","Text","पाठ","உரை","పాఠ్యం","ಪಠ್ಯ",
+sanketah,"सङ्केतः","Link","लिंक","இணைப்பு","లింక్","ಕೊಂಡಿ",
+pratilipih,"प्रतिलिपिः कृता","Copied","कॉपी हो गया","நகலெடுக்கப்பட்டது","కాపీ అయింది","ನಕಲಿಸಲಾಗಿದೆ",
+pratiikshasva,"क्षणं प्रतीक्षस्व","Loading…","लोड हो रहा है…","ஏற்றுகிறது…","లోడ్ అవుతోంది…","ಲೋಡ್ ಆಗುತ್ತಿದೆ…",
+nopalabhyate,"अस्य दिनस्य विवरणं नोपलभ्यते","This day is not in the data.","इस दिन का विवरण उपलब्ध नहीं है।","இந்த நாளுக்கான விவரம் இல்லை.","ఈ రోజు వివరాలు అందుబాటులో లేవు.","ಈ ದಿನದ ವಿವರ ಲಭ್ಯವಿಲ್ಲ.",
+nagaram,"नगरम्","City","शहर","நகரம்","నగరం","ನಗರ",
+lipih,"लिपिः","Script","लिपि","எழுத்து","లిపి","ಲಿಪಿ",
+bhaashaa,"भाषा","Language","भाषा","மொழி","భాష","ಭಾಷೆ",
+akshararupam,"अक्षर-रूपम्","Typeface","फ़ॉन्ट","எழுத்துரு","ఫాంట్","ಅಕ್ಷರಶೈಲಿ",
+samayarupam,"समय-रूपम्","Time","समय","நேரம்","సమయం","ಸಮಯ",
+horaa24,"चतुर्विंशति-होराः","24-hour","24 घंटे","24 மணி","24 గంటలు","24 ಗಂಟೆ",
+horaa12,"द्वादश-होराः","12-hour","12 घंटे","12 மணி","12 గంటలు","12 ಗಂಟೆ",
+varnah,"वर्णः","Theme","रंग","வண்ணம்","రంగు","ಬಣ್ಣ",
+svatah,"स्वतः","Automatic","स्वतः","தானாக","స్వయంచాలకం","ಸ್ವಯಂ",
+shuklam,"शुक्लम्","Light","हल्का","வெளிர்","లేత","ತಿಳಿ",
+shyaamam,"श्यामम्","Dark","गहरा","இருள்","ముదురు","ಗಾಢ",
+parichayah,"परिचयः","About","परिचय","அறிமுகம்","పరిచయం","ಪರಿಚಯ",
+margadarshika,"मार्गदर्शिका","Guide","मार्गदर्शिका","வழிகாட்டி","మార్గదర్శి","ಮಾರ್ಗದರ್ಶಿ",
+adya,"अद्य","Today","आज","இன்று","ఈరోజు","ಇಂದು",
+idaaniim,"इदानीम्","Now","अभी","இப்போது","ఇప్పుడు","ಈಗ",
+anantaram,"अनन्तरम्","Next","आगे","அடுத்து","తర్వాత","ಮುಂದೆ",
+sheshah,"शेषः","left","शेष","மீதம்","మిగిలింది","ಉಳಿದಿದೆ",
+parvasrotaamsi,"पर्व-स्रोतांसि","Festival sources","पर्व स्रोत","பண்டிகை மூலங்கள்","పండుగ మూలాలు","ಹಬ್ಬದ ಮೂಲಗಳು",
+atiriktaani,"अतिरिक्तानि","Additional, off by default","अतिरिक्त, सामान्यतः बंद","கூடுதல், இயல்பாக அணைப்பு","అదనపు, సాధారణంగా ఆఫ్","ಹೆಚ್ಚುವರಿ, ಸಾಮಾನ್ಯವಾಗಿ ಆಫ್",
+sarvaani,"सर्वाणि","All","सभी","அனைத்தும்","అన్నీ","ಎಲ್ಲಾ",
+dinavibhaagaah,"दिन-विभागाः","Parts of the day","दिन के भाग","பகல் பிரிவுகள்","పగటి భాగాలు","ಹಗಲಿನ ಭಾಗಗಳು",
+sandhyaa,"सन्ध्या","Sandhyā","संध्या","சந்தியா","సంధ్య","ಸಂಧ್ಯಾ",
+shubham,"शुभम्","Good","शुभ","சுபம்","శుభం","ಶುಭ",
+ashubham,"अशुभम्","Avoid","वर्ज्य","தவிர்க்க","వర్జ్యం","ವರ್ಜ್ಯ",
+kaalakramah,"कालक्रमः","In order of time","समय के क्रम में","நேர வரிசையில்","కాలక్రమంలో","ಕಾಲಕ್ರಮದಲ್ಲಿ",
+mataani,,"Also on this page",,,,,
+guidelead,,"What each part of the pañcāṅga means, and how to read the times.",,,,,
+mu_pick,,"Choose your janma-nakṣatra to see each day’s tārābala.",,,,,"new, 18 Nov 2026"
+mu_poor,,"Greyed out: the tārā counted from your janma-nakṣatra is unfavourable (janma, vipat, pratyari or vadha) for the whole window.",,,,,"new, 18 Nov 2026"
+mu_mixed,,"Unfavourable for part of the window only.",,,,,"new, 18 Nov 2026"
+mu_adjusted,,"The window is shorter than the full span, cut by the day’s other rules.",,,,,"new, 18 Nov 2026"
+mu_warn,,"Avoided by one whose mother (chaturthī), brother (ṣaṣṭhī) or sister (chaturdaśī) is living: the tithi falls on the day.",,,,,"new, 18 Nov 2026"
+mu_filter,,"Every chip starts selected: tap one to drop those days. For tārābala, tapping it stops the greying.",,,,,"new, 18 Nov 2026"
+mu_key,,"What the marks mean",,,,,"new, 18 Nov 2026"
+mu_count,,"{n} days",,,,,"new, 18 Nov 2026; keep {n}"
+mu_count_shown,,"{s} of {n} days",,,,,"new, 18 Nov 2026; keep {s} and {n}"
+mu_count_tara,,"{g} with good tārābala",,,,,"new, 18 Nov 2026; keep {g}"
+horaaplus,,"After midnight as +",,,,,"new, 18 Nov 2026: time format showing 26:30 as +2:30*"
+vishayasuuchii,"विषय-सूची","Contents","विषय-सूची","உள்ளடக்கம்","విషయ సూచిక","ಪರಿವಿಡಿ","new, 18 Nov 2026: Guide contents"
+cal_add,,"Add to calendar",,,,,"new, 18 Nov 2026: calendar feeds; keep {…} as is"
+cal_app,,"Subscribe in your calendar app",,,,,"new, 18 Nov 2026: calendar feeds; keep {…} as is"
+cal_google,,"Subscribe in Google Calendar",,,,,"new, 18 Nov 2026: calendar feeds; keep {…} as is"
+cal_copy,,"Copy the feed’s address",,,,,"new, 18 Nov 2026: calendar feeds; keep {…} as is"
+cal_download,,"Download it once (.ics)",,,,,"new, 18 Nov 2026: calendar feeds; keep {…} as is"
+cal_note,,"A subscribed calendar keeps itself up to date as the pañcāṅga is rebuilt each week. Times are {city} time; where there is a window (kṣaura, pradoṣa …) the event is timed to it.",,,,,"new, 18 Nov 2026: calendar feeds; keep {…} as is"
+cal_all,,"Every festival of the year, from the festival sources chosen in settings, as a file to import into a calendar. To subscribe instead, choose a festival group first.",,,,,"new, 18 Nov 2026: calendar feeds; keep {…} as is"
+cal_all_btn,,"Download every festival of {year} (.ics)",,,,,"new, 18 Nov 2026: calendar feeds; keep {…} as is"
+jm_menu,,"The day a birthday falls, by nakṣatra or tithi",,,,,"new, 18 Nov 2026: janmadina finder"
+jm_lead,,"The day each year on which a birthday by the Indian calendar is kept: by nakṣatra in a solar month, or by tithi in a lunar month.",,,,,"new, 18 Nov 2026: janmadina finder"
+jm_next,,"Next",,,,,"new, 18 Nov 2026: janmadina finder"
+jm_none,,"Not within the years held.",,,,,"new, 18 Nov 2026: janmadina finder"
+jm_name,,"Name, to save",,,,,"new, 18 Nov 2026: janmadina finder"
+jm_save,,"Save",,,,,"new, 18 Nov 2026: janmadina finder"
+jm_saved,,"Saved",,,,,"new, 18 Nov 2026: janmadina finder"
+jm_remove,,"Remove",,,,,"new, 18 Nov 2026: janmadina finder"
+jm_private,,"Saved on this phone only. ""Add to calendar"" downloads every saved janmadina in the years held, each with a reminder the evening before.",,,,,"new, 18 Nov 2026: janmadina finder"
+jm_rule,,"The day is decided as the texts say: the nakṣatra (or tithi) should stand for three muhūrtas after sunrise, reaching the saṅgava; if it ends earlier than six nāḍīs after sunrise, the previous day is taken. It is placed by the same festival engine that places the pañcāṅga's festivals.",,,,,"new, 18 Nov 2026: janmadina finder"

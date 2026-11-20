@@ -1,0 +1,17 @@
+# What the weekly data build (.github/workflows/data.yml) computes with. Change a commit here to
+# move the app's data to a newer jyotisha or adyatithi; the build records the commits it used in
+# data/index.json, so every published version of the data can be reproduced.
+
+[jyotisha]
+repository = "jyotisham/jyotisha"
+# master, with the month-at-kaala (#209) and bOdhAyana-amAvAsyA (#211) fixes.
+commit = "005b8106c67d0e173e24f2968fe2a5743cf8bdb7"
+
+[adyatithi]
+repository = "jyotisham/adyatithi"
+commit = "dae7bff210f2ab42c7bd4ee730c2d8ca49ce0321"
+
+[adyatithi-panchaanga]
+# The exporter. It lives in a private repository, read with the ADYATITHI_PANCHAANGA_TOKEN secret.
+repository = "karthikraman/adyatithi-panchaanga"
+ref = "main"
