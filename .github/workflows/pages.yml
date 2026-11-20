@@ -1,12 +1,14 @@
-# Publishes the site to GitHub Pages, with the calendar feeds (data/ics/…) generated from data/ at
-# publish time, so they are never committed (they come to about 100 MB across cities and scripts).
-# Runs on every push to main and after each weekly data build (whose push does not trigger
-# workflows by itself). Needs Settings → Pages → Source: "GitHub Actions".
+# Publishes the site to GitHub Pages: the stable app from `main` at the root, and the nightly
+# build from the `nightly` branch (when there is one) under nightly/. The calendar feeds
+# (data/ics/…) are generated from main's data at publish time, so they are never committed (they
+# come to about 100 MB across cities and scripts); the nightly app subscribes to those same feeds.
+# Runs on every push to main or nightly and after each weekly data build (whose push does not
+# trigger workflows by itself). Needs Settings → Pages → Source: "GitHub Actions".
 name: Publish site
 
 on:
   push:
-    branches: [main]
+    branches: [main, nightly]
   workflow_run:
     workflows: ["Weekly data build"]
     types: [completed]
@@ -32,6 +34,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
+      - name: Nightly
+        id: nightly
+        run: |
+          if git ls-remote --exit-code --heads origin nightly >/dev/null; then
+            git fetch --depth 1 origin nightly
+            mkdir -p "$RUNNER_TEMP/nightly"
+            git --work-tree="$RUNNER_TEMP/nightly" checkout FETCH_HEAD -- .
+            git reset -q
+            echo "present=yes" >> "$GITHUB_OUTPUT"
+          fi
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -41,6 +53,11 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/site"
           rsync -a --exclude .git --exclude .github --exclude tools ./ "$RUNNER_TEMP/site/"
+          if [ "${{ steps.nightly.outputs.present }}" = "yes" ]; then
+            rsync -a --exclude .git --exclude .github --exclude tools --exclude data/ics \
+              "$RUNNER_TEMP/nightly/" "$RUNNER_TEMP/site/nightly/"
+          fi
+          du -sh "$RUNNER_TEMP/site" "$RUNNER_TEMP/site/nightly" 2>/dev/null || true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ${{ runner.temp }}/site

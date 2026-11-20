@@ -1,5 +1,5 @@
 // Settings sheet, festival sheet, and the About page.
-import { h } from './util.js';
+import { h, NIGHTLY } from './util.js';
 import * as data from './data.js';
 import { descriptionBody } from './view-vistara.js';
 import { names } from './parts.js';
@@ -92,6 +92,10 @@ export function openSettings(ctx) {
         names(ctx).nakshatra(i + 1))))),
     repoChooser(ctx),
     h('button', { type: 'button', class: 'more-btn wide', onclick: () => { dlg.close(); ctx.go({ view: 'about' }); } }, L('parichayah'), ' ›'),
+    // The nightly build: what is being tried before it reaches everyone (same address, nightly/).
+    h('fieldset', { class: 'opt-group nightly-opt' }, h('legend', null, ctx.U(NIGHTLY ? 'nt_on' : 'nt_title')),
+      h('p', { class: 'hint' }, ctx.U(NIGHTLY ? 'nt_on_note' : 'nt_note')),
+      h('a', { class: 'more-btn wide', href: (NIGHTLY ? '../' : 'nightly/') + location.hash }, ctx.U(NIGHTLY ? 'nt_back' : 'nt_go'), ' ›')),
   ]);
 }
 
@@ -129,7 +133,8 @@ export function acknowledgements(ctx) {
       h('p', null, 'Code base: ', a('https://github.com/jyotisham/jyotisha', 'jyotisha'), ' • ', a('https://github.com/jyotisham/adyatithi', 'adyatithi')),
       h('p', null, 'Developers: ', a('https://github.com/karthikraman', 'Karthik Raman'), ' • ', a('https://github.com/vvasuki', 'Vishvas Vasuki')),
       h('p', null, 'With inputs from: ', a('https://github.com/jamadagni', 'Brahmashri Shriramana Sharma'), ' & Saketha Nath'),
-      h('p', null, 'Ślokas for pañcāṅga-paṭhanam: Śānti Kusumākara')),
+      h('p', null, 'Ślokas for pañcāṅga-paṭhanam: Śānti Kusumākara'),
+      h('p', null, 'With gratitude to the ', a('https://www.kamakoti.org/', 'Śrī Kāñcī Kāmakoṭi Pīṭham'), ' Pañcāṅga Sadas, for its guidance')),
     h('p', { class: 'colophon-build' },
       b.date ? `Data generated on ${b.date}` : null, h('br'),
       '(', [commit('adyatithi', b.adyatithi), commit('jyotisha', b.jyotisha)].filter(Boolean).map((x, i) => [i ? ', ' : '', x]),
@@ -151,14 +156,6 @@ export async function renderAbout(ctx, root) {
         'This pañchāṅga continues that noble tradition. Creating an accurate daily pañchāṅga demands deep knowledge of astronomical ' +
         'calculations, mastery of traditional texts, modern computational expertise, and hundreds of hours of careful verification.'),
       h('p', null, 'This work is offered to you freely — vidyā-dāna — knowledge as sacred gift.')),
-    h('section', { class: 'appeal' },
-      h('h2', null, 'Give Back · Preserve the Tradition'),
-      h('p', null, 'If this panchanga has enriched your life, please support the next generation of scholars.'),
-      h('p', { class: 'appeal-name' }, 'Jyautiṣa Research Fellowship'),
-      h('p', null, 'This fellowship enables dedicated scholars to study, research, and revive authentic jyautiṣa traditions.'),
-      h('a', { class: 'appeal-btn', href: 'https://sethubandhanam.com/jyautisha-research-fellowship-2025', target: '_blank', rel: 'noopener' }, 'CONTRIBUTE NOW'),
-      h('p', { class: 'about-shloka small' }, 'धर्मो रक्षति रक्षितः'),
-      h('p', { class: 'muted' }, 'Dharma protects those who protect it')),
     h('section', { class: 'prose' },
       h('h2', { class: 'block-title' }, L('nagaram')),
       h('ul', { class: 'about-cities' }, index.cities.map((c) => h('li', null,
@@ -171,10 +168,9 @@ export async function renderAbout(ctx, root) {
         ' festival rules, using the same code that produces the printed Adyatithi pañchāṅga PDFs. Times are local to each city; ' +
         'a time marked * falls after midnight, on the next civil date.'),
       h('p', null, 'Read more at ', h('a', { href: 'https://adyatithi.substack.com/', target: '_blank', rel: 'noopener' }, 'adyatithi.substack.com'), '.'),
-      h('p', { class: 'muted colophon' }, 'Typefaces: Alegreya Sans, Noto Serif Devanagari, Noto Sans Tamil, Noto Serif Grantha, Noto Sans Kannada and Mandali, ',
-        'under the SIL Open Font License; Siddhanta by Mihail Bayaryn, under ',
-        h('a', { href: 'https://creativecommons.org/licenses/by-nc-nd/3.0/', target: '_blank', rel: 'noopener' }, 'CC BY-NC-ND 3.0'), ', served unmodified.'),
+      h('p', null, h('button', { type: 'button', class: 'fest', onclick: () => ctx.go({ view: 'thanks' }) }, L('kritajnataa'), ' ›'), ' · ',
+        h('button', { type: 'button', class: 'fest', onclick: () => ctx.go({ view: 'contribute' }) }, L('yogadaanam'), ' ›'), ' · ',
+        h('button', { type: 'button', class: 'fest', onclick: () => ctx.go({ view: 'feedback' }) }, L('abhipraayah'), ' ›')),
     ),
-    acknowledgements(ctx),
   );
 }

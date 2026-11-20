@@ -1,5 +1,5 @@
 // Application shell: settings, routing, and the shared context every view renders from.
-import { h, store, nowIn, isDate, addDays, addMonths, parseDate, fmtTime, MONTHS, WDAYS } from './util.js';
+import { h, store, NIGHTLY, nowIn, isDate, addDays, addMonths, parseDate, fmtTime, MONTHS, WDAYS } from './util.js';
 import * as data from './data.js';
 import { renderDina } from './view-dina.js';
 import { renderKala } from './view-kala.js';
@@ -16,15 +16,18 @@ import { makeU, LANGUAGE_FOR_SCRIPT } from './i18n.js';
 const CHROME = new Set(['vishayasuuchii', 'horaaplus', 'sankshepah', 'dinam', 'kaalaah', 'vistarah', 'maasah', 'saptaahah', 'parvaani', 'anyat', 'vinyaasah',
   'anveshanam', 'preshanam', 'chitram', 'lekhah', 'sanketah', 'pratilipih', 'pratiikshasva', 'nopalabhyate', 'nagaram',
   'lipih', 'bhaashaa', 'akshararupam', 'samayarupam', 'horaa24', 'horaa12', 'varnah', 'svatah', 'shuklam', 'shyaamam',
-  'parichayah', 'margadarshika', 'adya', 'idaaniim', 'anantaram', 'sheshah', 'parvasrotaamsi', 'atiriktaani',
+  'parichayah', 'abhipraayah', 'yogadaanam', 'kritajnataa', 'margadarshika', 'adya', 'idaaniim', 'anantaram', 'sheshah', 'parvasrotaamsi', 'atiriktaani',
   'sarvaani', 'dinavibhaagaah', 'sandhyaa', 'shubham', 'ashubham', 'kaalakramah']);
 import { openShare } from './share.js';
 import { renderPathana } from './view-pathana.js';
+import { renderSankalpa } from './view-sankalpa.js';
 import { renderMuhurta, renderUuna } from './view-muhurta.js';
 import { renderJanma } from './view-janma.js';
+import { renderShannavati } from './view-shannavati.js';
+import { renderFeedback, renderContribute, renderThanks } from './view-info.js';
 
-const VIEWS = ['dina', 'kala', 'masa', 'parva', 'anyat', 'about', 'pathana', 'saptaha', 'varjya', 'nava', 'guide',
-  'abhyanga', 'kshaura', 'vidyarambha', 'uuna', 'janma'];
+const VIEWS = ['dina', 'kala', 'masa', 'parva', 'anyat', 'about', 'pathana', 'sankalpa', 'saptaha', 'varjya', 'nava', 'guide',
+  'abhyanga', 'kshaura', 'vidyarambha', 'uuna', 'janma', 'shannavati', 'feedback', 'contribute', 'thanks'];
 const TABS = [
   ['dina', 'dinam', 'M4 5h16v15H4zM4 9h16M8 3v4M16 3v4'],
   ['kala', 'kaalaah', 'M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18zM12 7v5l3 2'],
@@ -33,10 +36,11 @@ const TABS = [
   ['anyat', 'anyat', 'M5 12h.01M12 12h.01M19 12h.01'],
 ];
 // Pages reached from a tab other than their own.
-const TAB_OF = { pathana: 'anyat', varjya: 'anyat', nava: 'anyat', guide: 'anyat', about: 'anyat', saptaha: 'masa',
-  abhyanga: 'anyat', kshaura: 'anyat', vidyarambha: 'anyat', uuna: 'anyat', janma: 'anyat' };
+const TAB_OF = { pathana: 'anyat', sankalpa: 'anyat', varjya: 'anyat', nava: 'anyat', guide: 'anyat', about: 'anyat', saptaha: 'masa',
+  abhyanga: 'anyat', kshaura: 'anyat', vidyarambha: 'anyat', uuna: 'anyat', janma: 'anyat',
+  shannavati: 'anyat', feedback: 'anyat', contribute: 'anyat', thanks: 'anyat' };
 // Pages that show a year rather than a day, so the top bar has no day arrows.
-const NO_DAY_NAV = ['parva', 'about', 'anyat', 'guide', 'nava', 'abhyanga', 'kshaura', 'vidyarambha', 'uuna', 'janma'];
+const NO_DAY_NAV = ['parva', 'about', 'anyat', 'guide', 'nava', 'abhyanga', 'kshaura', 'vidyarambha', 'uuna', 'janma', 'shannavati', 'feedback', 'contribute', 'thanks'];
 
 const settings = Object.assign(
   { city: 'Chennai', script: 'devanagari', time: '24', theme: 'auto', face: 'noto', repos: {} },
@@ -145,8 +149,12 @@ async function buildContext(route) {
     saveQuiet(patch) { Object.assign(settings, patch); store('settings', settings); },
     // Whether a foldable section is folded, and a <details> that remembers it.
     folded: (id) => !!(settings.folded || {})[id],
-    fold(id, summary, ...body) {
-      return h('details', { class: 'fold', 'data-fold': id, open: (settings.folded || {})[id] ? undefined : true,
+    fold(id, summary, ...body) { return this.foldAs(id, false, summary, ...body); },
+    // The same, starting folded until the reader opens it once.
+    foldShut(id, summary, ...body) { return this.foldAs(id, true, summary, ...body); },
+    foldAs(id, shut, summary, ...body) {
+      const saved = (settings.folded || {})[id];
+      return h('details', { class: 'fold', 'data-fold': id, open: (saved ?? shut) ? undefined : true,
         ontoggle: (e) => { settings.folded = { ...(settings.folded || {}), [id]: !e.target.open }; store('settings', settings); } },
       h('summary', null, summary), ...body);
     },
@@ -196,7 +204,7 @@ function renderTopbar(ctx) {
   topbar.replaceChildren(
     h('button', { class: 'city-btn', type: 'button', onclick: () => openSettings(ctx), 'aria-label': ctx.L('vinyaasah') },
       h('span', { class: 'city-name' }, ctx.cityName),
-      h('span', { class: 'city-sub' }, city.label)),
+      h('span', { class: 'city-sub' }, city.label, NIGHTLY && h('span', { class: 'nightly-tag' }, ' nightly'))),
     yearView ? h('span', { class: 'datenav' }) : h('div', { class: 'datenav' },
       h('button', { type: 'button', class: 'nav-btn', 'aria-label': '‹', disabled: ctx.range && date <= ctx.range.start, onclick: () => step(-1) }, '‹'),
       h('label', { class: 'date-label', for: 'date-picker' }, label, picker),
@@ -220,8 +228,9 @@ function renderTabbar(ctx) {
 }
 
 const RENDERERS = { janma: renderJanma, abhyanga: renderMuhurta, kshaura: renderMuhurta, vidyarambha: renderMuhurta, uuna: renderUuna,
-  dina: renderDina, kala: renderKala, masa: renderMasa, parva: renderParva, about: renderAbout, pathana: renderPathana, saptaha: renderSaptaha,
-  anyat: renderMore, varjya: renderVarjya, nava: renderNava, guide: renderGuide };
+  dina: renderDina, kala: renderKala, masa: renderMasa, parva: renderParva, about: renderAbout, pathana: renderPathana, sankalpa: renderSankalpa, saptaha: renderSaptaha,
+  anyat: renderMore, varjya: renderVarjya, nava: renderNava, guide: renderGuide,
+  shannavati: renderShannavati, feedback: renderFeedback, contribute: renderContribute, thanks: renderThanks };
 
 async function render() {
   const token = ++renderToken;
@@ -278,7 +287,7 @@ main.addEventListener('touchend', (e) => {
   const dy = e.changedTouches[0].clientY - touch.y;
   touch = null;
   const r = parseRoute();
-  if (!['dina', 'kala', 'pathana', 'varjya'].includes(r.view) || e.target.closest('.no-swipe')) return;
+  if (!['dina', 'kala', 'pathana', 'sankalpa', 'varjya'].includes(r.view) || e.target.closest('.no-swipe')) return;
   if (Math.abs(dx) > 70 && Math.abs(dx) > 2.2 * Math.abs(dy)) {
     const city = cityRec(r.city);
     const base = r.date || clampDate(city, nowIn(city.tz).date);

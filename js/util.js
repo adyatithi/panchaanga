@@ -109,10 +109,17 @@ export function moonSvg(tithi, size = 16) {
   return span;
 }
 
+// The nightly build is the same app published under nightly/ beside the stable one. It keeps its
+// own settings (starting from the stable app's), so trying a change never disturbs the stable copy.
+export const NIGHTLY = /\/nightly\//.test(location.pathname);
+const PREFIX = NIGHTLY ? 'adyatithi-nightly.' : 'adyatithi.';
+
 export function store(key, value) {
   try {
-    if (value === undefined) return JSON.parse(localStorage.getItem('adyatithi.' + key));
-    localStorage.setItem('adyatithi.' + key, JSON.stringify(value));
+    if (value === undefined) {
+      return JSON.parse(localStorage.getItem(PREFIX + key) ?? (NIGHTLY ? localStorage.getItem('adyatithi.' + key) : null));
+    }
+    localStorage.setItem(PREFIX + key, JSON.stringify(value));
   } catch (e) { /* storage may be unavailable; the app works without it */ }
   return value ?? null;
 }
@@ -124,8 +131,10 @@ function tidy(text) {
     .replace(/\{\}/g, '')
     .replace(/\{(\[[^\]{}]*\])\}/g, '$1')
     .replace(/``/g, '“').replace(/''/g, '”')
-    .replace(/\s*---\s*/g, ' — ').replace(/ — (\n|$)/g, ' —$1')
-    .replace(/\+\+\+\(([^)]*)\)\+\+\+/g, '($1)');
+    // TeX's --- as an em dash, without taking a line break next to it: a source named before a
+    // verse (smRtyantarE---) ends its line, and one after a verse (---mahAbhAratE) starts its own.
+    .replace(/[ \t]*---[ \t]*/g, ' — ').replace(/ — (\n|$)/g, '—$1').replace(/(^|\n) — /g, '$1—')
+    .replace(/\+\+\+\(([\s\S]*?)\)\+\+\+/g, '($1)')  // an aside, which may have brackets of its own;
 }
 
 function inline(target, text) {

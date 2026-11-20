@@ -3,7 +3,7 @@ import { h } from './util.js';
 import * as data from './data.js';
 import { shareButton } from './share.js';
 import { renderVistara } from './view-vistara.js';
-import { hero, sunMoon, angaLine, festivalList, footerLines, missing, kalaIntervals, names } from './parts.js';
+import { hero, sunMoon, angaLine, festivalList, footerTop, footerLines, missing, kalaIntervals, names } from './parts.js';
 
 function nowStrip(ctx, day) {
   const now = ctx.nowOn(day);
@@ -63,7 +63,7 @@ export async function renderDina(ctx, root) {
     h('section', { class: 'angas' },
       angaLine(ctx, day, 'tithi'), angaLine(ctx, day, 'nakshatra'), angaLine(ctx, day, 'yoga'), angaLine(ctx, day, 'karana')),
     festivalList(ctx, day),
-    h('section', { class: 'footer' }, footerLines(ctx, day, { full: false })),
+    h('section', { class: 'footer' }, footerTop(ctx, day, meta), footerLines(ctx, day, { full: false })),
     h('div', { class: 'share-row' }, shareButton(ctx, () => ctx.openShare({ day, meta }))),
   );
 }

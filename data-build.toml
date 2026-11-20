@@ -4,13 +4,14 @@
 
 [jyotisha]
 repository = "jyotisham/jyotisha"
-commit = "e716eff5fb6befae3198f2fcb7a18f55605649c7"
+# master, with the month-at-kaala (#209) and bOdhAyana-amAvAsyA (#211) fixes.
+commit = "005b8106c67d0e173e24f2968fe2a5743cf8bdb7"
 
 [adyatithi]
 repository = "jyotisham/adyatithi"
-commit = "adfb93b9e9a3bf79ccd7b2a0c2fcdf47509671b8"
+commit = "dae7bff210f2ab42c7bd4ee730c2d8ca49ce0321"
 
 [adyatithi-panchaanga]
 # The exporter. It lives in a private repository, read with the ADYATITHI_PANCHAANGA_TOKEN secret.
 repository = "karthikraman/adyatithi-panchaanga"
-ref = "claude/stoic-bohr-euvvgt"
+ref = "main"

@@ -159,7 +159,6 @@ export async function renderKala(ctx, root) {
     { label: L('praatahsandhyaa'), start: k.praatas_sandhyaa[0], end: k.praatas_sandhyaa[1] },
     { label: L('maadhyaahnikam'), start: k.maadhyaahnika_sandhyaa[0], end: k.maadhyaahnika_sandhyaa[1] },
     { label: L('saayamsandhyaa'), start: k.saayam_sandhyaa[0], end: k.saayam_sandhyaa[1] },
-    { label: L('shayanam'), start: k.shayana[0], end: k.shayana[1] },
   ].sort((a, b) => a.start - b.start));
   // Lane 3: what to avoid, and the amrta kaala.
   const kalas = layout(kalaIntervals(ctx, day));
@@ -226,6 +225,21 @@ export async function renderKala(ctx, root) {
     class: `ks-item ${i.quality || ''}${now != null && i.start <= now && now < i.end ? ' live' : ''}`,
   }, h('span', { class: 'ks-name' }, i.label), h('span', { class: 'time ks-time' }, `${T(i.start)}–${T(i.end)}`))));
 
+  // The sandhyavandana and shraaddha kaalas, as the hyperlinked edition gives them.
+  const pairs = (rows) => h('dl', { class: 'pairs' }, rows.map(([a, b]) => [h('dt', null, a), h('dd', null, b)]));
+  const sandhyaKaalas = pairs(['praatas_sandhyaa', 'maadhyaahnika_sandhyaa', 'saayam_sandhyaa'].map((key, i) => [S.kaala[key],
+    [h('span', { class: 'time muted' }, `(${T(day.sandhya_gauna[i])}▸) `), h('span', { class: 'time' }, `${T(k[key][0])}▸${T(k[key][1])}`)]]));
+  const shraaddhaKaalas = pairs(['shraaddhaarambha_mukhya', 'shraaddhaarambha_gauna', 'shraaddha_kaala'].map((key, i) => [S.kaala[key],
+    h('span', { class: 'time' }, `${T(day.shraaddha_kaala[i][0])}▸${T(day.shraaddha_kaala[i][1])}`)]));
+  // Lagnas, horas and muhurtas below the timeline: [name, end] cells, the current one marked.
+  const cells = (rows, from) => h('div', { class: 'grid-cells' }, rows.map(([name, end], i) => {
+    const start = i ? rows[i - 1][1] : from;
+    return h('div', { class: 'cell' + (now != null && start <= now && now < end ? ' live' : '') },
+      h('span', null, name), h('span', { class: 'time' }, '▸' + T(end)));
+  }));
+  const listBlock = (id, title, ...body) => h('section', { class: 'block fold-block' },
+    ctx.fold('kala-' + id, h('h2', { class: 'block-title' }, title), ...body));
+
   // The top stays in place (now, the ghatika clock, the kaalas); only the timeline scrolls.
   root.classList.add('pane-view');
   root.append(
@@ -235,19 +249,21 @@ export async function renderKala(ctx, root) {
         h('span', { class: 'now-head' }, h('span', { class: 'now-dot', 'aria-hidden': 'true' }), h('span', { class: 'label' }, ctx.L('idaaniim')),
           h('span', { class: 'time now-clock' }, ctx.T(now))),
         h('section', { class: 'now kala-now' }, ghatikaClock(ctx, day, prev), progress)),
-      ctx.fold('kala-list', h('span', { class: 'label' }, L('kaalaah')), kaalaList)),
+      ctx.fold('kala-list', h('span', { class: 'label' }, L('kaalaah')), kaalaList),
+      ctx.foldShut('kala-sandhya', h('span', { class: 'label' }, L('sandhyaavandanakaalaah')), sandhyaKaalas),
+      ctx.foldShut('kala-shraaddha', h('span', { class: 'label' }, L('shraaddhakaalaah')), shraaddhaKaalas)),
     h('div', { class: 'pane-scroll kala-scroll' },
       h('div', { class: 'tl-heads', 'aria-hidden': 'true' },
         h('span', null, ''), h('span', null, L('dinavibhaagaah')), h('span', null, L('sandhyaa')),
         h('span', null, h('span', { class: 'bad-text' }, L('ashubham')), ' · ', h('span', { class: 'good-text' }, L('shubham'))),
         h('span', null, L('panchaangam'))),
       timeline,
-      h('section', { class: 'block' }, h('h2', { class: 'block-title' }, L('lagnaani')),
-        h('div', { class: 'grid-cells' }, day.lagna.map(([id, end], i) => {
-          const start = i ? day.lagna[i - 1][1] : rise;
-          return h('div', { class: 'cell' + (now != null && start <= now && now < end ? ' live' : '') },
-            h('span', null, N.rashi(id)), h('span', { class: 'time' }, '▸' + T(end)));
-        })))),
+      h('div', { class: 'kala-lists' },
+        listBlock('lagna', L('lagnaani'), cells(day.lagna.map(([id, end]) => [N.rashi(id), end]), rise)),
+        listBlock('hora', L('horaah'), cells(day.hora.map(([graha, end]) => [S.graha_hora[graha] || graha, end]), rise)),
+        listBlock('muhurta', L('muhurtaah'),
+          h('h3', { class: 'sub' }, L('ahah')), cells(S.muhurta_day.map((name, i) => [S.kaala[name] || name, day.muhurta[0][i]]), rise),
+          h('h3', { class: 'sub' }, L('raatrih')), cells(S.muhurta_night.map((name, i) => [S.kaala[name] || name, day.muhurta[1][i]]), set)))),
   );
   // Labels for anga changes are placed by time, then pushed down where a wrapped label would
   // run into the next one; this needs their rendered heights, so it runs after layout.

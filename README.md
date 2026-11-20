@@ -46,11 +46,23 @@ not load JavaScript modules or JSON from `file://`.)
 
 ## Publish
 
-These files sit at the root of `adyatithi/panchaanga`, with GitHub Pages set to deploy from the
-default branch (Settings → Pages → Deploy from a branch → `main`, `/ (root)`). All paths are
-relative, so the app works under any path. `.nojekyll` is present so that Pages serves the
-files as they are. After changing any file under `js/` or `css/`, raise `CACHE` in `sw.js` so
-that installed copies pick the change up promptly.
+The site is served by GitHub Pages from GitHub Actions (Settings → Pages → Source: GitHub
+Actions; `.github/workflows/pages.yml`), on two channels:
+
+| Channel | Branch | Address |
+|---|---|---|
+| Stable | `main` | https://adyatithi.github.io/panchaanga/ |
+| Nightly | `nightly` | https://adyatithi.github.io/panchaanga/nightly/ |
+
+Both are this folder, published from the `adyatithi-panchaanga` repository with
+`tools/publish_site.sh nightly` (its work in progress) or `tools/publish_site.sh main` (once
+merged there). A push to either branch republishes both. Settings has a link to the nightly
+build, which shows "nightly" under the city and has a link back. The two keep separate settings
+(the nightly starts from the stable one's), separate offline caches and separate service
+workers; the calendar feeds are generated for main only, and the nightly subscribes to those.
+The nightly carries only Chennai, Hyderabad (Bhagyanagaram) and London, to keep the site small.
+All paths are relative, so the app works under any path. After changing any file under `js/`
+or `css/`, raise `VERSION` in `sw.js` so that installed copies pick the change up promptly.
 
 ## Data
 
@@ -148,7 +160,9 @@ by nakṣatra in a solar month or by tithi in a lunar month, for each year held.
 from `data/c/<City>/<kali>/janma.json`, written by the exporter: one rule for every month ×
 nakṣatra and month × tithi (paraviddha, saṅgava), placed by jyotisha's festival engine. People can
 be saved on the phone (nothing leaves it), each with their next janmadina, and all added to a
-calendar with a reminder the evening before.
+calendar with a reminder the evening before. The solar month is the one at the three-muhūrta
+mark, not at sunset: on a saṅkrānti day after that mark, the morning's nakṣatra counts for the month
+that is ending.
 
 The tables change only if jyotisha changes how it places festivals, so the weekly build keeps
 the existing ones and computes only for a new year or city. To redo them all, start **Weekly data

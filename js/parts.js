@@ -143,7 +143,9 @@ export function sunMoon(ctx, day) {
     h('div', { class: 'sm-group' },
       item(SUN, '▲', day.sun[0], ctx.L('suryodayah')),
       item(SUN, '', day.sun[2], ctx.L('madhyaahnah')),
-      item(SUN, '▼', day.sun[1], ctx.L('suryaastamayah'))),
+      item(SUN, '▼', day.sun[1], ctx.L('suryaastamayah')),
+      day.kala && day.kala.dinaanta != null && h('span', { class: 'sm-item sm-dinaanta', title: ctx.L('dinaantah'), 'aria-label': `${ctx.L('dinaantah')} ${ctx.T(day.kala.dinaanta)}` },
+        h('span', { class: 'sm-label' }, ctx.L('dinaantah')), h('span', { class: 'time' }, '▸' + ctx.T(day.kala.dinaanta)))),
     h('div', { class: 'sm-group' }, moonItems));
 }
 
@@ -185,6 +187,16 @@ export function angaLine(ctx, day, key, { detail = false } = {}) {
 }
 
 // The PDF footer's small centred lines. `full` adds the night intervals, as printed.
+// The line above the footer: the shraaddha tithi (India only) and the amritadi yoga.
+export function footerTop(ctx, day, meta) {
+  const { L, S } = ctx;
+  return h('div', { class: 'footer-top' },
+    meta.india && day.shraaddha && h('span', null, L('shraaddhatithih'), '—', ctx.P[day.shraaddha] || day.shraaddha),
+    h('span', null, day.amritadi.map((a) => S.amritadi[a] || a).join('/'), '-', L('yoga_suffix')));
+}
+
+// Raahu, yama and gulika; in full (Detail), also their night parts, the tyaajyam, the
+// durmuhurtas and the amrita kaala.
 export function footerLines(ctx, day, { full = true } = {}) {
   const { L, T } = ctx;
   const r = ([a, b]) => h('span', { class: 'time' }, `${T(a)}–${T(b)}`);
@@ -194,9 +206,9 @@ export function footerLines(ctx, day, { full = true } = {}) {
       item(L('s_raahu'), r(day.raahu)),
       item(L('s_yama'), r(day.yama), full && [' ', r(day.raatri_yama)]),
       item(L('s_gulika'), r(day.gulika), full && [' ', r(day.raatri_gulika)])),
-    day.tyajya.length > 0 && h('div', null, item(L('s_tyaajyam'),
+    full && day.tyajya.length > 0 && h('div', null, item(L('s_tyaajyam'),
       day.tyajya.map(([a, b, tag], i) => [i > 0 && ' ', r([a, b]), ` (${L(tag)})`]))),
-    h('div', null,
+    full && h('div', null,
       item(L('durmuhurtaah'), day.durmuhurta.map((s, i) => [i > 0 && '  ', r(s)])),
       item(L('amrtakaalah'), day.amrta.length ? day.amrta.map((s, i) => [i > 0 && '  ', r(s)]) : '—')));
 }

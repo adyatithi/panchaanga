@@ -61,7 +61,7 @@ Every festival of the year, and the year's lists, with search.
 
 **अन्यत्**
 
-This guide, settings and the acknowledgements; the year's nava-nāyakas; the day's paṭhanam and what to avoid; and the lists of days for an oil bath, a haircut, beginning study and the ūna-śrāddhas.
+This guide, settings, About, Contribute, Acknowledgements and Feedback (which opens a prefilled GitHub issue); the year's nava-nāyakas, ṣaṇṇavati-tarpaṇa days and janmadinas; the day's paṭhanam, saṅkalpa and what to avoid; and the lists of days for an oil bath, a haircut, beginning study and the ūna-śrāddhas.
 
 ## 3. The head of the page
 
@@ -123,15 +123,11 @@ The time from sunrise to sunset in five equal parts. The Detail page gives the t
 
 **प्रातः सन्ध्या**
 
-The three sandhyāvandana periods: morning, from the last muhūrta of the night through the fourth of the day; midday (mādhyāhnika), the sixth to the thirteenth muhūrtas of the day; evening, the last muhūrta of the day and the first of the night. On the Detail page the time in brackets is the earlier, secondary (gauṇa) start.
-
-**शयनम्**
-
-The time for going to sleep: from the end of the first quarter of the night to three-eighths of the way through it.
+The three sandhyāvandana periods: morning, from the last muhūrta of the night through the fourth of the day; midday (mādhyāhnika), the sixth to the thirteenth muhūrtas of the day; evening, the last muhūrta of the day and the first of the night. Under sandhyāvandana-kālāḥ on the Kālas page, the time in brackets is the earlier, secondary (gauṇa) start.
 
 **दिनान्तः**
 
-Five-eighths of the way from sunset to the next sunrise.
+The end of the day for reckoning: five-eighths of the way from sunset to the next sunrise. On the top line, after sunset.
 
 **घटिकाः**
 
@@ -139,11 +135,11 @@ On today's Kālas page, a live clock gives the time since sunrise in ghaṭikās
 
 **मुहूर्ताः**
 
-Day and night are each divided into fifteen named muhūrtas; the Detail page gives the time each ends.
+Day and night are each divided into fifteen named muhūrtas; the Kālas page lists the time each ends.
 
 **होराः**
 
-Day and night are each divided into twelve horās, each ruled by a graha, the first by the lord of the weekday.
+Day and night are each divided into twelve horās, each ruled by a graha, the first by the lord of the weekday; listed on the Kālas page.
 
 ## 6. Times to avoid, and good times
 
@@ -175,10 +171,6 @@ The direction in which travel is avoided on this weekday, until the time given, 
 
 The rāśi eighth from the Moon's: a day for caution for those whose janma rāśi it is.
 
-**मौढ्यम्**
-
-Grahas in maudhya: too close to the Sun to be seen.
-
 ## 7. Śrāddha
 
 **श्राद्ध-तिथिः**
@@ -195,13 +187,13 @@ Days suitable for the ūna-māsika śrāddhas, with the nakṣatra in the aftern
 
 ## 8. On the Detail page
 
-**पञ्चाङ्ग-पठनम्**
+**पञ्चाङ्ग-पठनम् · सङ्कल्पः · वर्जयितुम् उचित-विषयाः**
 
-Right after the day's page: the day set out for reading aloud (see Pages under More).
+Right after the day's page, three buttons: the day set out for reading aloud, the day's sankalpa, and what is better avoided today (see Pages under More).
 
 **▾**
 
-Each section below the page (graha-sthiti, sandhyā and śrāddha kālas, horās, tārābala, muhūrtas, festival notes) folds. A folded section stays folded, on every day, until it is opened again.
+Each section below the page (graha-sthiti, tārābala, festival notes) folds, as do the lists on the Kālas page (lagnas, horās, muhūrtas, and the sandhyāvandana and śrāddha kālas, which start folded). A folded section stays folded, on every day, until it is opened again.
 
 **ताराबलम्**
 
@@ -233,9 +225,13 @@ For the day: paṭhanam and what to avoid.
 
 The day set out for reading aloud: each anga with its śloka and devatā, and the phalaśruti. The ślokas are from Śānti Kusumākara.
 
+**सङ्कल्पः**
+
+The day's part of the sankalpa, from the samvatsara to the tithi, as in the PDFs' sankalpa list, for the first 24 ghaṭikās of the day; a change of month, tithi, nakṣatra, yoga or karaṇa within them is given with its time. One phrase to a line, with buttons for larger or smaller type and to copy it. Also a button on the Detail page.
+
 **वर्जयितुम् उचित-विषयाः**
 
-The verses on what is better avoided today (oil bath, bathing, cleaning the teeth, shaving, certain foods and so on), selected by the day's angas, as in the PDFs.
+The verses on what is better avoided today (oil bath, bathing, cleaning the teeth, shaving, certain foods and so on), selected by the day's angas, as in the PDFs. Below them, under कर्तुम् उचित-विषयाः, what the Mahābhārata, Rāmāyaṇa and Bhāgavata commend for the day's tithi and nakṣatra (fasting, bathing, gifts, pūjā, recitation, śrāddha), each with a note in English; tap a heading to open it.
 
 **मुहूर्त-दिनानि**
 

@@ -1,3 +1,4 @@
+import { NIGHTLY } from './util.js';
 // Data access. Everything is a static JSON file under data/, fetched once and kept in memory;
 // the service worker keeps a copy for offline use.
 
@@ -69,7 +70,7 @@ const prefetched = new Set();
 export function prefetchYear(cityRec, date, script, build) {
   const yr = yearFor(cityRec, date);
   if (!yr || !('serviceWorker' in navigator) || !navigator.serviceWorker.controller || navigator.onLine === false) return;
-  const key = `pf.${cityRec.id}.${yr.kali}.${script}.${Object.values(build || {}).join('-')}`;
+  const key = `${NIGHTLY ? 'nightly.' : ''}pf.${cityRec.id}.${yr.kali}.${script}.${Object.values(build || {}).join('-')}`;
   if (prefetched.has(key)) return;
   prefetched.add(key);
   try { if (localStorage.getItem(key)) return; } catch (e) { /* ignore */ }

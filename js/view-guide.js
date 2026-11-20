@@ -32,7 +32,7 @@ export function sections(ctx) {
         [SL('kaalaah'), 'On today\'s page, the ghaṭikā clock and how much of each anga is left; then every kāla of the day with its times, and the day drawn to scale from the brāhma muhūrta to the next sunrise. Only the drawing scrolls; the clock and the list of kālas fold away.'],
         [SL('maasah'), 'The month as a calendar, with the tithi, nakṣatra and festival icons on each day and the festivals listed below it; a switch shows the week instead.'],
         [SL('parvaani'), 'Every festival of the year, and the year\'s lists, with search.'],
-        [SL('anyat'), 'This guide, settings and the acknowledgements; the year\'s nava-nāyakas; the day\'s paṭhanam and what to avoid; and the lists of days for an oil bath, a haircut, beginning study and the ūna-śrāddhas.'],
+        [SL('anyat'), 'This guide, settings, About, Contribute, Acknowledgements and Feedback (which opens a prefilled GitHub issue); the year\'s nava-nāyakas, ṣaṇṇavati-tarpaṇa days and janmadinas; the day\'s paṭhanam, saṅkalpa and what to avoid; and the lists of days for an oil bath, a haircut, beginning study and the ūna-śrāddhas.'],
       ],
     },
     {
@@ -61,12 +61,11 @@ export function sections(ctx) {
       items: [
         [L('braahmam'), 'Brāhma muhūrta: the fourteenth of the fifteen muhūrtas of the night, the one before the last before sunrise.'],
         [`${L('praatah')} · ${L('sangavah')} · ${L('madhyaahnah')} · ${L('aparaahnah')} · ${L('saayaahnah')}`, 'The time from sunrise to sunset in five equal parts. The Detail page gives the time each begins.'],
-        [L('praatahsandhyaa'), 'The three sandhyāvandana periods: morning, from the last muhūrta of the night through the fourth of the day; midday (mādhyāhnika), the sixth to the thirteenth muhūrtas of the day; evening, the last muhūrta of the day and the first of the night. On the Detail page the time in brackets is the earlier, secondary (gauṇa) start.'],
-        [L('shayanam'), 'The time for going to sleep: from the end of the first quarter of the night to three-eighths of the way through it.'],
-        [L('dinaantah'), 'Five-eighths of the way from sunset to the next sunrise.'],
+        [L('praatahsandhyaa'), 'The three sandhyāvandana periods: morning, from the last muhūrta of the night through the fourth of the day; midday (mādhyāhnika), the sixth to the thirteenth muhūrtas of the day; evening, the last muhūrta of the day and the first of the night. Under sandhyāvandana-kālāḥ on the Kālas page, the time in brackets is the earlier, secondary (gauṇa) start.'],
+        [L('dinaantah'), 'The end of the day for reckoning: five-eighths of the way from sunset to the next sunrise. On the top line, after sunset.'],
         [L('ghatikaah'), 'On today\'s Kālas page, a live clock gives the time since sunrise in ghaṭikās, vighaṭīs and tatparas (each sixty of the next; a tatpara is about 0.4 seconds, and the reading moves with each one), from the pañcāṅga\'s own sunrise and sunset, after the ghaṭikā clock at ghatika-clock.web.app. On the dial sunrise is at the top, the day on the right half and the night on the left. Before sunrise the reading continues the previous day\'s night.'],
-        [L('muhurtaah'), 'Day and night are each divided into fifteen named muhūrtas; the Detail page gives the time each ends.'],
-        [L('horaah'), 'Day and night are each divided into twelve horās, each ruled by a graha, the first by the lord of the weekday.'],
+        [L('muhurtaah'), 'Day and night are each divided into fifteen named muhūrtas; the Kālas page lists the time each ends.'],
+        [L('horaah'), 'Day and night are each divided into twelve horās, each ruled by a graha, the first by the lord of the weekday; listed on the Kālas page.'],
       ],
     },
     {
@@ -79,7 +78,6 @@ export function sections(ctx) {
         [L('yogah_amrtaadi'), 'Amṛta, siddha or maraṇa (म॰) yoga, from the weekday and the nakṣatra.'],
         [L('shuulam'), 'The direction in which travel is avoided on this weekday, until the time given, and the parihāra: what to take before setting out if one must.'],
         [L('chandraashtamaraashih'), 'The rāśi eighth from the Moon\'s: a day for caution for those whose janma rāśi it is.'],
-        [L('maudhyam'), 'Grahas in maudhya: too close to the Sun to be seen.'],
       ],
     },
     {
@@ -93,8 +91,8 @@ export function sections(ctx) {
     {
       title: 'On the Detail page',
       items: [
-        [L('pathanam'), 'Right after the day\'s page: the day set out for reading aloud (see Pages under More).'],
-        ['▾', 'Each section below the page (graha-sthiti, sandhyā and śrāddha kālas, horās, tārābala, muhūrtas, festival notes) folds. A folded section stays folded, on every day, until it is opened again.'],
+        [`${L('pathanam')} · ${L('sankalpah')} · ${L('varjayitum')}`, 'Right after the day\'s page, three buttons: the day set out for reading aloud, the day\'s sankalpa, and what is better avoided today (see Pages under More).'],
+        ['▾', 'Each section below the page (graha-sthiti, tārābala, festival notes) folds, as do the lists on the Kālas page (lagnas, horās, muhūrtas, and the sandhyāvandana and śrāddha kālas, which start folded). A folded section stays folded, on every day, until it is opened again.'],
         [L('taaraabalam'), 'Count from a person\'s janma nakṣatra to the day\'s nakṣatra: the count falls on one of nine tārās — janma, sampat, vipat, kṣemam, pratyariḥ, sādhakaḥ, vadhaḥ, mitram, paramamitram. The table has the nakṣatras in three columns, nine apart, so each row shares a tārā and a colour: blues are favourable, greys unfavourable. The day\'s nakṣatra is janma; the other two in its row are anujanma (10th) and trijanma (19th). Your own janma nakṣatra, if chosen in settings, is starred.'],
         [L('grahasthitih'), 'Where each graha is at sunrise, by sidereal rāśi, with degrees within the rāśi, set out in the South Indian chart (Mīna at top left, running clockwise).'],
       ],
@@ -107,7 +105,8 @@ export function sections(ctx) {
         [L('janmadinaani'), 'The day each year on which a birthday by the Indian calendar is kept, by nakṣatra in a solar month or by tithi in a lunar month, for each year held. The nakṣatra (or tithi) should stand three muhūrtas after sunrise, reaching the saṅgava; if it ends within six nāḍīs of sunrise, the previous day is taken; when it comes twice in a month, the later. People can be saved on the phone, each shown with their next janmadina, and all of them added to a calendar with a reminder the evening before.'],
         [SL('dinavishayaah'), 'For the day: paṭhanam and what to avoid.'],
         [L('pathanam'), 'The day set out for reading aloud: each anga with its śloka and devatā, and the phalaśruti. The ślokas are from Śānti Kusumākara.'],
-        [L('varjayitum'), 'The verses on what is better avoided today (oil bath, bathing, cleaning the teeth, shaving, certain foods and so on), selected by the day\'s angas, as in the PDFs.'],
+        [L('sankalpah'), 'The day\'s part of the sankalpa, from the samvatsara to the tithi, as in the PDFs\' sankalpa list, for the first 24 ghaṭikās of the day; a change of month, tithi, nakṣatra, yoga or karaṇa within them is given with its time. One phrase to a line, with buttons for larger or smaller type and to copy it. Also a button on the Detail page.'],
+        [L('varjayitum'), 'The verses on what is better avoided today (oil bath, bathing, cleaning the teeth, shaving, certain foods and so on), selected by the day\'s angas, as in the PDFs. Below them, under ' + L('kartum') + ', what the Mahābhārata, Rāmāyaṇa and Bhāgavata commend for the day\'s tithi and nakṣatra (fasting, bathing, gifts, pūjā, recitation, śrāddha), each with a note in English; tap a heading to open it.'],
         [L('muhurtadinaani'), 'Days suited to an oil bath (abhyaṅga), a haircut or shave (kṣaura) and beginning study (vidyārambha), each a page of its own with the next date shown on the More page, and the window on each day. They follow the rules in the muhūrta configurations: which tithis, nakṣatras and weekdays are allowed, which solar months and festivals to avoid, and which part of the day. A star means the window was shortened by those rules. Months before the current one are folded; only the months scroll.'],
         [ctx.S.muhurta_names?.kshaura || 'kSauram', 'Choosing your janma-nakṣatra tags each nakṣatra with its tārā and greys out days whose whole window has an unfavourable one; the tārābala chip turns the greying off. Days on which chaturthī, ṣaṣṭhī or chaturdaśī falls are marked !mātā, !bhrātā or !bhaginī, as they are avoided by one whose mother, brother or sister is living. Every chip starts selected; turning a weekday or a mark off drops those days.'],
       ],

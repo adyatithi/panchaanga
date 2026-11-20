@@ -1,9 +1,11 @@
 // Vistara: everything the PDF prints for the day, in the PDF's order, followed by the
-// material from the hyperlinked edition (sandhya and shraaddha kaalas, horas, tarabala,
-// muhurtas, the anga shlokas, what to avoid, and the festival notes).
+// material from the hyperlinked edition: the grahas, tarabala and the festival notes. The
+// sandhya and shraaddha kaalas, horas and muhurtas are on the Kalas page; the anga shlokas and
+// what to avoid on their own pages.
 import { h, richText, verseLines } from './util.js';
 import * as data from './data.js';
-import { hero, sunMoon, angaLine, festivalList, footerLines, missing, names, rashiBox } from './parts.js';
+import { iconSvg } from './view-more.js';
+import { hero, sunMoon, angaLine, festivalList, footerTop, footerLines, missing, names, rashiBox } from './parts.js';
 
 const mod = (n, m) => ((n % m) + m) % m;
 
@@ -11,10 +13,6 @@ const mod = (n, m) => ((n % m) + m) % m;
 // until it is opened again.
 function section(ctx, id, title, ...body) {
   return h('section', { class: 'block fold-block' }, ctx.fold('detail-' + id, h('h2', { class: 'block-title' }, title), body));
-}
-
-function pairs(rows) {
-  return h('dl', { class: 'pairs' }, rows.filter(Boolean).map(([k, v]) => [h('dt', null, k), h('dd', null, v)]));
 }
 
 // Taaraabala, as the PDF's table: nakshatras in a fixed 9 x 3 grid (1, 10, 19 in the first row,
@@ -60,12 +58,10 @@ export async function renderVistara(ctx, root) {
     h('section', { class: 'kala-lines' },
       h('div', null,
         h('span', { class: 'kala-group' }, step(L('s_braahma'), k.braahma), step(L('s_sangava'), k.saangava), step(L('s_madhyaahna'), k.madhyaahna),
-          step(L('s_aparaahna'), k.aparaahna), step(L('s_saayaahna'), k.saayaahna)),
-        h('span', { class: 'kala-step' }, L('dinaantah'), '▸', h('span', { class: 'time' }, T(k.dinaanta)))),
+          step(L('s_aparaahna'), k.aparaahna), step(L('s_saayaahna'), k.saayaahna))),
       h('div', null,
         h('span', { class: 'kala-group' }, win(L('praatahsandhyaa'), k.praatas_sandhyaa), win(L('s_maadhyaahnika'), k.maadhyaahnika_sandhyaa),
-          win(L('s_saayam'), k.saayam_sandhyaa)),
-        win(L('s_shayana'), k.shayana))),
+          win(L('s_saayam'), k.saayam_sandhyaa)))),
     h('section', { class: 'angas detail' },
       angaLine(ctx, day, 'tithi', { detail: true }), angaLine(ctx, day, 'nakshatra', { detail: true }),
       angaLine(ctx, day, 'yoga', { detail: true }), angaLine(ctx, day, 'karana', { detail: true }),
@@ -76,15 +72,11 @@ export async function renderVistara(ctx, root) {
 
   // --- the page's footer, line for line ---
   const rashi = day.rashi;
-  const maudhya = day.maudhya.map((g) => S.graha_maudhya[g] || g).sort().join(', ');
   const tm = (t) => h('span', { class: 'time' }, T(t));
   root.append(h('section', { class: 'footer' },
-    h('div', { class: 'footer-top' },
-      meta.india && day.shraaddha && h('span', null, L('shraaddhatithih'), '—', ctx.P[day.shraaddha] || day.shraaddha),
-      h('span', null, day.amritadi.map((a) => S.amritadi[a] || a).join('/'), '-', L('yoga_suffix'))),
+    footerTop(ctx, day, meta),
     footerLines(ctx, day),
     h('div', { class: 'footer-lines' },
-      h('div', null, h('span', { class: 'ft-item' }, L('maudhyam'), '—', maudhya)),
       h('div', { class: 'footer-small' },
         rashi && h('span', { class: 'ft-item' }, L('chandraraashih'), '—', N.rashi(rashi[0]), rashi[1] != null && ['▸', tm(rashi[1])]),
         rashi && h('span', { class: 'ft-item' }, L('chandraashtamaraashih'), '—', N.rashi(mod(rashi[0] - 8, 12) + 1), rashi[1] != null && ['▸', tm(rashi[1])]),
@@ -92,31 +84,11 @@ export async function renderVistara(ctx, root) {
 
   // --- the grahas at sunrise, as the PDF's raashi-box edition prints them ---
   // The anga shlokas and what to avoid are read on their own page: offered right after the day.
-  root.append(h('section', { class: 'block' },
-    h('button', { type: 'button', class: 'more-btn wide', onclick: () => ctx.go({ view: 'pathana' }) },
-      ctx.L('pathanam'), h('span', { 'aria-hidden': 'true' }, ' ›'))));
+  const pageBtn = (view, label) => h('button', { type: 'button', class: 'more-btn icon-btn', onclick: () => ctx.go({ view }) },
+    h('span', { class: 'btn-icon', html: iconSvg(view, 18) }), h('span', null, label));
+  root.append(h('section', { class: 'block page-btns' }, pageBtn('pathana', L('pathanam')), pageBtn('sankalpa', L('sankalpah')), pageBtn('varjya', L('varjayitum'))));
 
   if (day.graha) root.append(section(ctx, 'graha', L('grahasthitih'), rashiBox(ctx, day)));
-
-  // --- the hyperlinked edition's detail ---
-  const sandhya = ['praatas_sandhyaa', 'maadhyaahnika_sandhyaa', 'saayam_sandhyaa'];
-  root.append(section(ctx, 'sandhya', L('sandhyaavandanakaalaah'), pairs(sandhya.map((key, i) => [
-    S.kaala[key],
-    [h('span', { class: 'time muted' }, `(${T(day.sandhya_gauna[i])}▸) `), h('span', { class: 'time' }, `${T(k[key][0])}▸${T(k[key][1])}`)],
-  ]))));
-
-  const shr = ['shraaddhaarambha_mukhya', 'shraaddhaarambha_gauna', 'shraaddha_kaala'];
-  root.append(section(ctx, 'shraaddha', L('shraaddhakaalaah'), pairs(shr.map((key, i) => [
-    S.kaala[key], h('span', { class: 'time' }, `${T(day.shraaddha_kaala[i][0])}▸${T(day.shraaddha_kaala[i][1])}`),
-  ]))));
-
-  const now = ctx.nowOn(day);
-  let start = day.sun[0];
-  root.append(section(ctx, 'hora', L('horaah'), h('div', { class: 'grid-cells' }, day.hora.map(([graha, end]) => {
-    const live = now != null && start <= now && now < end;
-    start = end;
-    return h('div', { class: 'cell' + (live ? ' live' : '') }, h('span', null, S.graha_hora[graha] || graha), h('span', { class: 'time' }, '▸' + T(end)));
-  }))));
 
   // Tarabala: one table per nakshatra of the day, on the same rule the PDF uses for which to print.
   const naks = day.nakshatra;
@@ -129,12 +101,6 @@ export async function renderVistara(ctx, root) {
       end != null && h('span', { class: 'time muted' }, ` ▸${T(end)}`)],
     taraGrid(ctx, N, id)));
   });
-
-  const muh = (list, ends) => h('div', { class: 'grid-cells' }, list.map((name, i) =>
-    h('div', { class: 'cell' }, h('span', null, S.kaala[name] || name), h('span', { class: 'time' }, '▸' + T(ends[i])))));
-  root.append(section(ctx, 'muhurta', L('muhurtaah'),
-    h('h3', { class: 'sub' }, L('ahah')), muh(S.muhurta_day, day.muhurta[0]),
-    h('h3', { class: 'sub' }, L('raatrih')), muh(S.muhurta_night, day.muhurta[1])));
 
   // Festival notes, loaded as they are opened.
   const noted = [...day.fest, ...((day.anadhyayana && day.anadhyayana.list) || [])].filter((e) => e.x);

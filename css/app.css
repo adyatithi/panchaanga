@@ -91,7 +91,7 @@ a { color: var(--blue); }
 }
 .city-btn { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.15; min-width: 0; text-align: left; }
 .city-name { font-size: 1.0625rem; line-height: 1.6; margin-bottom: -.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-.city-sub { font: 400 .75rem/1.2 var(--font-latin); color: var(--ink-3); letter-spacing: .06em; text-transform: uppercase; }
+.city-sub { font: 400 .75rem/1.2 var(--font-latin); color: var(--ink-3); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
 .datenav { display: flex; align-items: center; gap: .15rem; }
 .nav-btn { width: 2.4rem; height: 2.4rem; font: 400 1.6rem/1 var(--font-latin); color: var(--blue); border-radius: 50%; }
 .nav-btn:hover:not(:disabled) { background: var(--blue-wash); }
@@ -170,6 +170,11 @@ a { color: var(--blue); }
 .sm-group { display: flex; gap: .9rem; }
 .sm-item { display: inline-flex; align-items: center; gap: .1rem; font-size: 1.0625rem; }
 .sm-glyph { display: grid; } .sm-mark { font-size: .7rem; margin: 0 .1rem 0 -.05rem; }
+.sm-label { font-size: .8rem; color: var(--muted); margin-right: .15rem; }
+/* With dinaanta the sun's line is full: dinaanta at its right end, the moon on a line of its own, also at the right. */
+.sunmoon > .sm-group:first-child { flex: 1 1 auto; }
+.sm-dinaanta { margin-left: auto; }
+.sunmoon > .sm-group:last-child { margin-left: auto; }
 
 /* ---------- now ---------- */
 .now { padding: .6rem 0; border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair); margin-top: .3rem; display: flex; flex-direction: column; gap: .35rem; }
@@ -487,6 +492,12 @@ dialog.sheet::backdrop { background: rgb(0 0 0 / .45); }
 .reading { text-align: center; }
 .nishiddha.reading p { font-size: 1.1875rem; line-height: 1.85; margin: 0 0 .6rem; }
 .nishiddha.reading { padding-top: 1rem; }
+.vihita { margin-top: 1.5rem; border-top: 1px solid var(--hair); padding-top: 1rem; }
+.vihita-head { text-align: center; font-size: 1.0625rem; font-weight: 500; margin: 0 0 .5rem; }
+.vihita details.fold { border-bottom: 1px solid var(--hair); }
+.vihita-item { margin: .25rem 0 1rem; }
+.vihita-note { margin: 0 0 .25rem; color: var(--ink-2); font-size: .9375rem; }
+.vihita-verse { margin: 0; font-size: 1.0625rem; line-height: 1.8; }
 
 /* ---------- guide ---------- */
 .guide-head { padding: 1.1rem 0 .4rem; }
@@ -723,3 +734,31 @@ details.fold:not([open]) > summary::after { transform: rotate(-90deg); }
 .janma-person-name { color: var(--ink); font-weight: 600; }
 .janma-remove { margin-left: auto; color: var(--ink-3); padding: 0 .3rem; }
 .janma-remove:hover { color: var(--red); }
+
+/* Kalas: the lists under the timeline */
+.kala-lists { margin-top: 1.4rem; }
+.kala-top dl.pairs { margin: .1rem 0 .4rem; }
+.page-btns { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; }
+.page-btns .more-btn { flex: 1 1 9rem; white-space: nowrap; padding: .45rem .5rem; font-size: .95rem; line-height: 1.25; }
+.icon-btn { display: inline-flex; align-items: center; justify-content: center; gap: .35rem; }
+.btn-icon { display: inline-grid; color: var(--ink-2, currentColor); }
+/* Sankalpa */
+.sankalpa-tools { display: flex; gap: .5rem; align-items: center; justify-content: flex-end; margin: .4rem 0 .6rem; }
+.sankalpa { line-height: 1.75; }
+.sankalpa-line { margin: 0 0 .35rem; }
+.sankalpa strong { font-weight: 600; }
+
+/* Feedback, acknowledgements, shannavati */
+.fb .fchips { margin: .4rem 0 .6rem; }
+.fb-input { margin-bottom: .5rem; }
+.fb-text { display: block; resize: vertical; min-height: 8rem; line-height: 1.5; }
+.fb-check { display: flex; align-items: center; gap: .4rem; font-size: .9375rem; margin: .2rem 0 .4rem; }
+.fb-ctx { white-space: pre-wrap; word-break: break-word; font: .75rem/1.45 ui-monospace, monospace; color: var(--ink-2); border: 1px solid var(--hair); padding: .5rem .6rem; margin: 0 0 .6rem; }
+.fb-actions { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; }
+.fb-actions .appeal-btn { margin-top: 0; border: 0; font: inherit; cursor: pointer; }
+.thanks-list { padding-left: 1.1rem; margin: .3rem 0 .8rem; }
+.thanks-list li { margin: .2rem 0; }
+.sh-note { font-size: .875rem; margin: .2rem 0 .6rem; }
+.nightly-tag { color: var(--red); letter-spacing: .04em; }
+.nightly-opt .hint { margin: 0 0 .4rem; }
+.nightly-opt a.more-btn { display: block; text-decoration: none; color: inherit; }

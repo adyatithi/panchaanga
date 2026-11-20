@@ -2,15 +2,16 @@
 // una-shraaddha days) is offered as a feed to subscribe to, which the calendar app keeps current;
 // the feeds are written when the site is published (tools/ics_feeds.py). Every festival at once
 // is built here instead, as a file to import, from the sources chosen in settings.
-import { h } from './util.js';
+import { h, NIGHTLY } from './util.js';
 import { sheet } from './view-misc.js';
 import * as data from './data.js';
 
 // A feed's file name from its key: the same as slug() in tools/ics_feeds.py.
 export const slug = (key) => key.replace(/[^A-Za-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
+// The feeds are generated for the stable site only; the nightly one subscribes to those.
 function feedUrl(ctx, key) {
-  const base = new URL('.', location.href.split('#')[0]);
+  const base = new URL(NIGHTLY ? '..' : '.', location.href.split('#')[0]);
   return new URL(`data/ics/${ctx.settings.script}/${ctx.city.id}/${slug(key)}.ics`, base).href;
 }
 
