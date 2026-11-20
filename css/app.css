@@ -5,6 +5,8 @@
 
 @font-face { font-family: "Alegreya Sans"; src: url("../fonts/AlegreyaSans-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
 @font-face { font-family: "Alegreya Sans"; src: url("../fonts/AlegreyaSans-Bold.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+/* Single-colour emoji, in the icons' colour: only the glyphs the app uses (🙏 and four flowers). */
+@font-face { font-family: "Noto Emoji Mono"; src: url("../fonts/NotoEmoji-subset.ttf") format("truetype"); font-display: block; }
 @font-face { font-family: "Siddhanta"; src: url("../fonts/siddhanta.ttf") format("truetype"); font-display: swap; unicode-range: U+0900-097F, U+1CD0-1CFF, U+A8E0-A8FF, U+200C-200D, U+25CC; }
 @font-face { font-family: "Noto Serif Devanagari Local"; src: url("../fonts/NotoSerifDevanagari-Regular.woff2") format("woff2"); font-display: swap; unicode-range: U+0900-097F, U+1CD0-1CFF, U+A8E0-A8FF, U+200C-200D, U+25CC; }
 /* Tamil and Grantha letterforms are wide; the PDFs set them well below the Devanagari size. */
@@ -70,7 +72,12 @@ body {
   padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px));
 }
 [hidden] { display: none !important; }
-button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+/* Square corners on every control: Safari on iPhone otherwise rounds buttons into ovals and
+   fields into pills. Classes that want a radius (icon buttons, chips) set their own. */
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer;
+  border-radius: 0; -webkit-appearance: none; appearance: none; }
+input, select, textarea { border-radius: 0; }
+input[type="text"], input[type="search"], textarea { -webkit-appearance: none; appearance: none; }
 button:disabled { opacity: .3; cursor: default; }
 a { color: var(--blue); }
 :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 2px; }
@@ -739,6 +746,7 @@ details.fold:not([open]) > summary::after { transform: rotate(-90deg); }
 .kala-lists { margin-top: 1.4rem; }
 .kala-top dl.pairs { margin: .1rem 0 .4rem; }
 .page-btns { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; }
+.page-btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; color: var(--ink-2); }
 .page-btns .more-btn { flex: 1 1 9rem; white-space: nowrap; padding: .45rem .5rem; font-size: .95rem; line-height: 1.25; }
 .icon-btn { display: inline-flex; align-items: center; justify-content: center; gap: .35rem; }
 .btn-icon { display: inline-grid; color: var(--ink-2, currentColor); }
@@ -752,6 +760,11 @@ details.fold:not([open]) > summary::after { transform: rotate(-90deg); }
 .fb .fchips { margin: .4rem 0 .6rem; }
 .fb-input { margin-bottom: .5rem; }
 .fb-text { display: block; resize: vertical; min-height: 8rem; line-height: 1.5; }
+.emoji-icon { display: inline-block; line-height: 1; width: 1.2em; text-align: center; font-family: "Noto Emoji Mono"; color: inherit; font-variant-emoji: text; }
+.sk-option { margin: .6rem 0 0; }
+.sk-status { margin: .3rem 0 0; font-size: .875rem; }
+.sk-option[hidden], .sk-status[hidden] { display: none; }
+.linkish { color: var(--blue); text-decoration: underline; text-underline-offset: 2px; }
 .fb-check { display: flex; align-items: center; gap: .4rem; font-size: .9375rem; margin: .2rem 0 .4rem; }
 .fb-ctx { white-space: pre-wrap; word-break: break-word; font: .75rem/1.45 ui-monospace, monospace; color: var(--ink-2); border: 1px solid var(--hair); padding: .5rem .6rem; margin: 0 0 .6rem; }
 .fb-actions { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; }

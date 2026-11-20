@@ -1,6 +1,6 @@
 // Sharing a day or an observance: as a link, as text (for WhatsApp and the like), or as an image
 // drawn here from the same data the page shows.
-import { h, parseDate, MONTHS, WDAYS } from './util.js';
+import { h, parseDate, MONTHS, WDAYS, tidy } from './util.js';
 import * as data from './data.js';
 import { names } from './parts.js';
 
@@ -361,7 +361,7 @@ function toBlob(canvas) {
   return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
 }
 
-export async function openShare(ctx, sheet, { day, meta, entry, mode, blocks, verses }) {
+export async function openShare(ctx, sheet, { day, meta, entry, mode, blocks, groups }) {
   const { L } = ctx;
   let desc = null;
   if (entry && entry.x) desc = await data.loadDescription(ctx.settings.script, entry.x).catch(() => null);
@@ -369,7 +369,10 @@ export async function openShare(ctx, sheet, { day, meta, entry, mode, blocks, ve
   let sections = null;
   let pageTitle = null;
   if (mode === 'pathana') { pageTitle = L('pathanam'); sections = pathanaSections(ctx, blocks); }
-  if (mode === 'varjya') { pageTitle = L('varjayitum'); sections = [{ head: '', lines: verses.map((v) => v.replace(/\*/g, '')), note: '' }]; }
+  if (mode === 'varjya') {
+    pageTitle = L('varjayitum');
+    sections = groups.map(([head, list]) => ({ head, lines: list.flatMap((v) => tidy(v).replace(/\*/g, '').split(/\n(?=— )/)), note: '' }));
+  }
   const text = sections ? versesText(ctx, day, pageTitle, sections, mode)
     : entry ? festText(ctx, day, entry, desc) : dayText(ctx, day, meta);
   const link = linkFor(ctx, day, sections ? mode : undefined);

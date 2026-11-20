@@ -18,8 +18,6 @@ const ICONS = {
   kshaura: 'M4 15l9-9a2.5 2.5 0 0 1 3.5 3.5L8 18H4zM14 17h6',
   vidyarambha: 'M19 4c-6 1-10 5-12 11l-2 5M7 15c4 0 7-2 9.5-5.5M4 20h16',
   uuna: 'M15 4a8 8 0 1 0 5 13a7 7 0 0 1-5-13z',
-  // The sankalpa: a water vessel (kalasha).
-  sankalpa: 'M8 9h8c1.7 1.4 2.5 3.2 2.5 5.2C18.5 17.4 15.6 20 12 20s-6.5-2.6-6.5-5.8C5.5 12.2 6.3 10.4 8 9zM9.5 9V6.5h5V9M8.5 4.5h7',
   // Shannavati: water poured from cupped hands.
   shannavati: 'M5 9c0 4 3 6 7 6s7-2 7-6zM12 15v2M10 19.5c0-1 2-2.5 2-2.5s2 1.5 2 2.5a2 2 0 0 1-4 0z',
   // Feedback: a speech bubble; contribute: a gift; acknowledgements: a flower.
@@ -30,8 +28,13 @@ const ICONS = {
   janma: 'M12 3c1.6 2 2.2 3.3 2.2 4.3a2.2 2.2 0 0 1-4.4 0c0-1 .6-2.3 2.2-4.3zM4 13h16c0 3.9-3.6 7-8 7s-8-3.1-8-7zM12 13v-2',
 };
 
-// One of the icons above, as inline SVG.
-export const iconSvg = (key, size = 22) => `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${ICONS[key]}"/></svg>`;
+// Icons that are an emoji rather than a drawing, set in a single-colour emoji font (Noto Emoji)
+// in the icons' own colour: the sankalpa's folded hands.
+const EMOJI = { sankalpa: '🙏' };
+// One of the icons above, as inline SVG (or its emoji, at the same size).
+export const iconSvg = (key, size = 22) => EMOJI[key]
+  ? `<span class="emoji-icon" style="font-size:${size}px" aria-hidden="true">${EMOJI[key]}</span>`
+  : `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${ICONS[key]}"/></svg>`;
 
 export async function renderMore(ctx, root) {
   const { L } = ctx;
@@ -87,22 +90,33 @@ export function dayHead(ctx, day, meta, title) {
       `${N.rashi(day.saura.m)} ${ctx.num(day.saura.d)} · ${N.chandramasa(day.chandra)}`));
 }
 
-// What is better avoided today: the nishiddha verses for the day's angas, as in the PDFs.
+// What is better avoided today: the nishiddha verses for the day's angas, as in the PDFs, by the
+// activity they concern (open at first; the vihita below are folded).
+const NISHIDDHA_TOPICS = ['bhojana', 'abhyanga', 'snana', 'dantadhavana', 'kshaura', 'patra_grahana', 'maithuna', 'shraaddha', 'etc'];
 export async function renderVarjya(ctx, root) {
   const got = await ctx.loadDay(ctx.date);
   if (!got) return root.append(missing(ctx));
   const { day, meta } = got;
-  const lines = await data.loadLines(ctx.settings.script).catch(() => ({}));
-  const verses = day.nishiddha.map((id) => lines[id]).filter(Boolean);
-  const head = dayHead(ctx, day, meta, ctx.L('varjayitum'));
-  head.append(h('div', { class: 'share-row' }, shareButton(ctx, () => ctx.openShare({ day, meta, mode: 'varjya', verses }))));
+  const [lines, topics] = await Promise.all([
+    data.loadLines(ctx.settings.script).catch(() => ({})),
+    data.loadNishiddhaTopics().catch(() => ({})),
+  ]);
+  // The day's lines by activity, in the order the rules are gathered, each keeping the day's order.
+  const ids = day.nishiddha.filter((id) => lines[id]);
+  const groups = NISHIDDHA_TOPICS.map((t) => [t, ids.filter((id) => (topics[id] || 'etc') === t).map((id) => lines[id])])
+    .filter(([, list]) => list.length);
+  const { L } = ctx;
+  const head = dayHead(ctx, day, meta, L('varjayitum'));
+  head.append(h('div', { class: 'share-row' }, shareButton(ctx, () => ctx.openShare({ day, meta, mode: 'varjya',
+    groups: groups.map(([t, list]) => [L(`ni_${t}`), list]) }))));
   root.append(head,
-    verses.length
-      ? h('section', { class: 'nishiddha reading' }, verses.map((line) => h('p', null, verseLines(line))))
+    groups.length
+      ? h('section', { class: 'vihita nishiddha-groups' }, groups.map(([t, list]) => ctx.fold(`nishiddha-${t}`,
+        h('span', { class: 'label' }, L(`ni_${t}`)),
+        h('div', { class: 'nishiddha reading' }, list.map((line) => h('p', null, verseLines(line)))))))
       : h('p', { class: 'empty' }, '—'));
   // What is commended today (the vihita rules), by activity, each with its note; folded at first.
   if (day.vihita?.length) {
-    const { L } = ctx;
     root.append(h('section', { class: 'vihita' },
       h('h2', { class: 'vihita-head' }, `॥ ${L('kartum')} ॥`),
       day.vihita.map(([activity, items]) => ctx.foldShut(`vihita-${activity}`,

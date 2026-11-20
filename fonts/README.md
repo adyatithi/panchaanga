@@ -8,6 +8,7 @@
 | `NotoSerifGrantha-Regular.woff2` | Noto Serif Grantha, © Google | SIL Open Font License 1.1 |
 | `NotoSansKannada-Regular.woff2` | Noto Sans Kannada, © Google | SIL Open Font License 1.1 |
 | `Mandali.woff2` | Mandali, © Silicon Andhra | SIL Open Font License 1.1 |
+| `NotoEmoji-subset.ttf` | Noto Emoji (single-colour), © Google; only 🙏 🪷 🌼 🌸 🌺 | SIL Open Font License 1.1 |
 | `siddhanta.ttf` | Siddhanta, © 2011 Mihail Bayaryn | CC BY-NC-ND 3.0 |
 
 Siddhanta's licence allows no derivatives, so its file is the original, unconverted and

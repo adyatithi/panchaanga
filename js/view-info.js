@@ -95,7 +95,7 @@ export function renderThanks(ctx, root) {
     h('section', { class: 'prose' },
       h('h2', { class: 'block-title' }, ctx.L('aakaraah')),
       h('ul', { class: 'thanks-list' }, SOFTWARE.map(([href, name, what]) => h('li', null, link(href, name), h('span', { class: 'muted' }, ' — ' + what)))),
-      h('p', { class: 'muted colophon' }, 'Typefaces: Alegreya Sans, Noto Serif Devanagari, Noto Sans Tamil, Noto Serif Grantha, Noto Sans Kannada and Mandali, ',
+      h('p', { class: 'muted colophon' }, 'Typefaces: Alegreya Sans, Noto Serif Devanagari, Noto Sans Tamil, Noto Serif Grantha, Noto Sans Kannada, Noto Emoji and Mandali, ',
         'under the SIL Open Font License; Siddhanta by Mihail Bayaryn, under ',
         link('https://creativecommons.org/licenses/by-nc-nd/3.0/', 'CC BY-NC-ND 3.0'), ', served unmodified.'),
       h('p', { class: 'muted colophon' }, 'The app itself is plain HTML, CSS and JavaScript, with no framework, and works offline once opened.')));

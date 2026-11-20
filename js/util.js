@@ -111,7 +111,7 @@ export function moonSvg(tithi, size = 16) {
 
 // The nightly build is the same app published under nightly/ beside the stable one. It keeps its
 // own settings (starting from the stable app's), so trying a change never disturbs the stable copy.
-export const NIGHTLY = /\/nightly\//.test(location.pathname);
+export const NIGHTLY = typeof location !== 'undefined' && /\/nightly\//.test(location.pathname);
 const PREFIX = NIGHTLY ? 'adyatithi-nightly.' : 'adyatithi.';
 
 export function store(key, value) {
@@ -126,8 +126,13 @@ export function store(key, value) {
 
 // The rule files' text is Markdown with some TeX habits. This renders the subset that occurs
 // (paragraphs, bullet and numbered lists, bold, links, bare URLs) and tidies the rest.
-function tidy(text) {
-  return String(text)
+// A citation closing a verse, as "…॥ mahAbhAratE 13-136-2 ॥" (in any script and its digits), on a
+// line of its own after the verse's double danda, with an em dash: "…॥" / "— mahAbhAratE 13-136-2".
+export const citeOwnLine = (text) => String(text)
+  .replace(/॥[ \t]*([\p{L}\p{M}]+)[ \t]+(\p{Nd}+(?:-\p{Nd}+)+)[ \t]*॥[ \t]*(?=\n|$)/gu, '॥\n— $1 $2');
+
+export function tidy(text) {
+  return citeOwnLine(text)
     .replace(/\{\}/g, '')
     .replace(/\{(\[[^\]{}]*\])\}/g, '$1')
     .replace(/``/g, '“').replace(/''/g, '”')

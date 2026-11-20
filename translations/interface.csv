@@ -1,4 +1,55 @@
 key,sanskrit (from the app),en,hi,ta,te,kn,notes
+vishayasuuchii,"विषय-सूची","Contents","विषय-सूची","உள்ளடக்கம்","విషయ సూచిక","ಪರಿವಿಡಿ",
+cal_add,,"Add to calendar",,,,,
+jm_menu,,"The day a birthday falls, by nakṣatra or tithi",,,,,
+jm_lead,,"The day each year on which a birthday by the Indian calendar is kept: by nakṣatra in a solar month, or by tithi in a lunar month.",,,,,
+jm_next,,"Next",,,,,
+jm_none,,"Not within the years held.",,,,,
+jm_name,,"Name, to save",,,,,
+jm_save,,"Save",,,,,
+jm_saved,,"Saved",,,,,
+jm_remove,,"Remove",,,,,
+jm_private,,"Saved on this phone only. ""Add to calendar"" downloads every saved janmadina in the years held, each with a reminder the evening before.",,,,,
+fb_lead,,"Found a wrong time, a missing or misplaced festival, or something in the app that does not work? Or have an idea? Write it here: it opens as an issue on GitHub, where it is tracked and answered.",,,,,
+fb_data,,"Pañcāṅga data",,,,,
+fb_app,,"The app",,,,,
+fb_idea,,"Suggestion",,,,,
+fb_title,,"In a few words",,,,,
+fb_text,,"What did you see, and what did you expect? For a festival or a time, the source you follow helps.",,,,,
+fb_ctx,,"Include the city, date, settings and build below",,,,,
+fb_send,,"Open as a GitHub issue",,,,,
+fb_copied,,"Copied.",,,,,
+fb_note,,"Filing an issue needs a GitHub account; nothing is sent until you submit it there. Without one, copy the text and send it to the team.",,,,,
+sh_note,,"The ninety-six occasions for pitṛ-tarpaṇa (ṣaṇṇavati), as they fall in this year from Mēṣa to Mēṣa: the amāvāsyās, saṅkrāntis, manvādis, yugādis, vyatīpātas, vaidhṛtis, the days of the mahālaya pakṣa and the aṣṭakās (with the day before and after). The lunar kinds can hold one more or one fewer in a solar year, and the count follows the days as computed for this city.",,,,,
+abhipraayah,"अभिप्रायः","Feedback","प्रतिक्रिया","கருத்து","అభిప్రాయం","ಪ್ರತಿಕ್ರಿಯೆ",
+yogadaanam,"योगदानम्","Contribute","योगदान","பங்களிப்பு","సహకారం","ಕೊಡುಗೆ",
+kritajnataa,"कृतज्ञता","Acknowledgements","आभार","நன்றியுரை","కృతజ్ఞతలు","ಕೃತಜ್ಞತೆಗಳು",
+nt_title,,"Nightly build",,,,,
+nt_on,,"You are on the nightly build",,,,,
+nt_note,,"New features before they reach everyone: may change or break. It keeps its own settings and offline copy; this one is not touched.",,,,,
+nt_on_note,,"New features being tried before they reach everyone. Something wrong? Tell us under Feedback.",,,,,
+nt_go,,"Try the nightly build",,,,,
+nt_back,,"Back to the stable app",,,,,
+fb_menu,,"Report a mistake or suggest something",,,,,
+yd_menu,,"Jyautiṣa Research Fellowship",,,,,
+sk_copy,,"Copy",,,,,
+sk_larger,,"Larger text",,,,,
+sk_smaller,,"Smaller text",,,,,
+sk_note,,"On the day that is running now, the sankalpa is for this moment: the month, tithi, nakṣatra, yoga and karaṇa current now, one of each, and it changes by itself when one of them ends. Tick the box for the day's part as printed in the PDFs' sankalpa list instead: from sunrise, for the first 24 ghaṭikās of the day (to about four-fifths of the way to sunset), where a change within them is given with the time it ends, in brackets, and the one that follows. Other days show the printed one. The opening (adya brahmaṇaḥ … and so on) and the purpose are as one's own tradition has them.",,,,,
+sk_sunrise,,"Sunrise sankalpa, as printed",,,,,
+sk_live,,"As it is now",,,,,
+sk_until,,"changes at",,,,,
+sk_from_sunrise,,"From sunrise, as printed",,,,,
+sk_before,,"Before sunrise, the sankalpa is still the previous day's.",,,,,
+sk_prev,,"Previous day",,,,,
+jm_rule,,"The day is decided as the texts say: the nakṣatra (or tithi) should stand for three muhūrtas after sunrise, reaching the saṅgava; if it ends earlier than six nāḍīs after sunrise, the previous day is taken. The solar month must hold up to that mark as well: when the saṅkrānti comes after it, the morning's nakṣatra counts for the month that is ending; when it comes between sunrise and the mark, for neither. It is placed by the same festival engine that places the pañcāṅga's festivals.",,,,,
+cal_app,,"Subscribe in your calendar app",,,,,
+cal_google,,"Subscribe in Google Calendar",,,,,
+cal_copy,,"Copy the feed’s address",,,,,
+cal_download,,"Download it once (.ics)",,,,,
+cal_note,,"A subscribed calendar keeps itself up to date as the pañcāṅga is rebuilt each week. Times are {city} time; where there is a window (kṣaura, pradoṣa …) the event is timed to it.",,,,,
+cal_all,,"Every festival of the year, from the festival sources chosen in settings, as a file to import into a calendar. To subscribe instead, choose a festival group first.",,,,,
+cal_all_btn,,"Download every festival of {year} (.ics)",,,,,
 dinam,"दिनम्","Day","दिन","நாள்","రోజు","ದಿನ",
 sankshepah,"सङ्क्षेपः","Brief","संक्षेप","சுருக்கம்","సంక్షిప్తం","ಸಂಕ್ಷಿಪ್ತ",
 kaalaah,"कालाः","Kālas","काल","காலம்","కాలాలు","ಕಾಲಗಳು",
@@ -23,6 +74,7 @@ akshararupam,"अक्षर-रूपम्","Typeface","फ़ॉन्ट","
 samayarupam,"समय-रूपम्","Time","समय","நேரம்","సమయం","ಸಮಯ",
 horaa24,"चतुर्विंशति-होराः","24-hour","24 घंटे","24 மணி","24 గంటలు","24 ಗಂಟೆ",
 horaa12,"द्वादश-होराः","12-hour","12 घंटे","12 மணி","12 గంటలు","12 ಗಂಟೆ",
+horaaplus,,"After midnight as +",,,,,
 varnah,"वर्णः","Theme","रंग","வண்ணம்","రంగు","ಬಣ್ಣ",
 svatah,"स्वतः","Automatic","स्वतः","தானாக","స్వయంచాలకం","ಸ್ವಯಂ",
 shuklam,"शुक्लम्","Light","हल्का","வெளிர்","లేత","ತಿಳಿ",
@@ -41,35 +93,15 @@ sandhyaa,"सन्ध्या","Sandhyā","संध्या","சந்த�
 shubham,"शुभम्","Good","शुभ","சுபம்","శుభం","ಶುಭ",
 ashubham,"अशुभम्","Avoid","वर्ज्य","தவிர்க்க","వర్జ్యం","ವರ್ಜ್ಯ",
 kaalakramah,"कालक्रमः","In order of time","समय के क्रम में","நேர வரிசையில்","కాలక్రమంలో","ಕಾಲಕ್ರಮದಲ್ಲಿ",
+mu_pick,,"Choose your janma-nakṣatra to see each day’s tārābala.",,,,,
+mu_poor,,"Greyed out: the tārā counted from your janma-nakṣatra is unfavourable (janma, vipat, pratyari or vadha) for the whole window.",,,,,
+mu_mixed,,"Unfavourable for part of the window only.",,,,,
+mu_adjusted,,"The window is shorter than the full span, cut by the day’s other rules.",,,,,
+mu_warn,,"Avoided by one whose mother (chaturthī), brother (ṣaṣṭhī) or sister (chaturdaśī) is living: the tithi falls on the day.",,,,,
+mu_filter,,"Every chip starts selected: tap one to drop those days. For tārābala, tapping it stops the greying.",,,,,
+mu_key,,"What the marks mean",,,,,
+mu_count,,"{n} days",,,,,
+mu_count_shown,,"{s} of {n} days",,,,,
+mu_count_tara,,"{g} with good tārābala",,,,,
 mataani,,"Also on this page",,,,,
 guidelead,,"What each part of the pañcāṅga means, and how to read the times.",,,,,
-mu_pick,,"Choose your janma-nakṣatra to see each day’s tārābala.",,,,,"new, 18 Nov 2026"
-mu_poor,,"Greyed out: the tārā counted from your janma-nakṣatra is unfavourable (janma, vipat, pratyari or vadha) for the whole window.",,,,,"new, 18 Nov 2026"
-mu_mixed,,"Unfavourable for part of the window only.",,,,,"new, 18 Nov 2026"
-mu_adjusted,,"The window is shorter than the full span, cut by the day’s other rules.",,,,,"new, 18 Nov 2026"
-mu_warn,,"Avoided by one whose mother (chaturthī), brother (ṣaṣṭhī) or sister (chaturdaśī) is living: the tithi falls on the day.",,,,,"new, 18 Nov 2026"
-mu_filter,,"Every chip starts selected: tap one to drop those days. For tārābala, tapping it stops the greying.",,,,,"new, 18 Nov 2026"
-mu_key,,"What the marks mean",,,,,"new, 18 Nov 2026"
-mu_count,,"{n} days",,,,,"new, 18 Nov 2026; keep {n}"
-mu_count_shown,,"{s} of {n} days",,,,,"new, 18 Nov 2026; keep {s} and {n}"
-mu_count_tara,,"{g} with good tārābala",,,,,"new, 18 Nov 2026; keep {g}"
-horaaplus,,"After midnight as +",,,,,"new, 18 Nov 2026: time format showing 26:30 as +2:30*"
-vishayasuuchii,"विषय-सूची","Contents","विषय-सूची","உள்ளடக்கம்","విషయ సూచిక","ಪರಿವಿಡಿ","new, 18 Nov 2026: Guide contents"
-cal_add,,"Add to calendar",,,,,"new, 18 Nov 2026: calendar feeds; keep {…} as is"
-cal_app,,"Subscribe in your calendar app",,,,,"new, 18 Nov 2026: calendar feeds; keep {…} as is"
-cal_google,,"Subscribe in Google Calendar",,,,,"new, 18 Nov 2026: calendar feeds; keep {…} as is"
-cal_copy,,"Copy the feed’s address",,,,,"new, 18 Nov 2026: calendar feeds; keep {…} as is"
-cal_download,,"Download it once (.ics)",,,,,"new, 18 Nov 2026: calendar feeds; keep {…} as is"
-cal_note,,"A subscribed calendar keeps itself up to date as the pañcāṅga is rebuilt each week. Times are {city} time; where there is a window (kṣaura, pradoṣa …) the event is timed to it.",,,,,"new, 18 Nov 2026: calendar feeds; keep {…} as is"
-cal_all,,"Every festival of the year, from the festival sources chosen in settings, as a file to import into a calendar. To subscribe instead, choose a festival group first.",,,,,"new, 18 Nov 2026: calendar feeds; keep {…} as is"
-cal_all_btn,,"Download every festival of {year} (.ics)",,,,,"new, 18 Nov 2026: calendar feeds; keep {…} as is"
-jm_menu,,"The day a birthday falls, by nakṣatra or tithi",,,,,"new, 18 Nov 2026: janmadina finder"
-jm_lead,,"The day each year on which a birthday by the Indian calendar is kept: by nakṣatra in a solar month, or by tithi in a lunar month.",,,,,"new, 18 Nov 2026: janmadina finder"
-jm_next,,"Next",,,,,"new, 18 Nov 2026: janmadina finder"
-jm_none,,"Not within the years held.",,,,,"new, 18 Nov 2026: janmadina finder"
-jm_name,,"Name, to save",,,,,"new, 18 Nov 2026: janmadina finder"
-jm_save,,"Save",,,,,"new, 18 Nov 2026: janmadina finder"
-jm_saved,,"Saved",,,,,"new, 18 Nov 2026: janmadina finder"
-jm_remove,,"Remove",,,,,"new, 18 Nov 2026: janmadina finder"
-jm_private,,"Saved on this phone only. ""Add to calendar"" downloads every saved janmadina in the years held, each with a reminder the evening before.",,,,,"new, 18 Nov 2026: janmadina finder"
-jm_rule,,"The day is decided as the texts say: the nakṣatra (or tithi) should stand for three muhūrtas after sunrise, reaching the saṅgava; if it ends earlier than six nāḍīs after sunrise, the previous day is taken. It is placed by the same festival engine that places the pañcāṅga's festivals.",,,,,"new, 18 Nov 2026: janmadina finder"
