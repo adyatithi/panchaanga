@@ -758,6 +758,7 @@ details.fold:not([open]) > summary::after { transform: rotate(-90deg); }
 .fb .fchips { margin: .4rem 0 .6rem; }
 .fb-input { margin-bottom: .5rem; }
 .fb-text { display: block; resize: vertical; min-height: 8rem; line-height: 1.5; }
+.emoji-icon { display: inline-block; line-height: 1; width: 1.2em; text-align: center; }
 .sk-option { margin: .6rem 0 0; }
 .sk-status { margin: .3rem 0 0; font-size: .875rem; }
 .sk-option[hidden], .sk-status[hidden] { display: none; }
