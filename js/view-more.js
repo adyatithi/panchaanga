@@ -21,6 +21,10 @@ const ICONS = {
   uuna: 'M15 4a8 8 0 1 0 5 13a7 7 0 0 1-5-13z',
   // Shannavati: water poured from cupped hands.
   shannavati: 'M5 9c0 4 3 6 7 6s7-2 7-6zM12 15v2M10 19.5c0-1 2-2.5 2-2.5s2 1.5 2 2.5a2 2 0 0 1-4 0z',
+  // The blog: a page of text.
+  blog: 'M6 3h9l4 4v14H6zM14 3v5h5M9 12h7M9 15.5h7M9 19h4',
+  // Privacy: a lock.
+  privacy: 'M7.5 11V8a4.5 4.5 0 0 1 9 0v3M5.5 11h13v9h-13zM12 14.5v2',
   // Reminders: a bell.
   smarana: 'M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20.5a2 2 0 0 0 4 0',
   // Feedback: a speech bubble; contribute: a gift; acknowledgements: a flower.
@@ -82,9 +86,11 @@ export async function renderMore(ctx, root) {
       item('smarana', L('smaaranaani'), U('rm_menu'), () => ctx.go({ view: 'smarana', date: null })),
       item('settings', L('vinyaasah'), U('mn_settings'), () => ctx.openSettings()),
       item('guide', L('margadarshika'), U('guidelead'), () => ctx.go({ view: 'guide' })),
+      item('blog', U('blog'), U('mn_blog'), () => ctx.go({ view: 'blog' })),
       item('feedback', L('abhipraayah'), U('fb_menu'), () => ctx.go({ view: 'feedback' })),
       item('contribute', L('yogadaanam'), U('yd_menu'), () => ctx.go({ view: 'contribute' })),
       item('thanks', L('kritajnataa'), U('mn_thanks'), () => ctx.go({ view: 'thanks' })),
+      item('privacy', U('privacy'), U('mn_privacy'), () => ctx.go({ view: 'privacy' })),
       item('about', L('parichayah'), U('mn_about'), () => ctx.go({ view: 'about' }))));
 }
 

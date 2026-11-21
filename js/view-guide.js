@@ -32,7 +32,7 @@ export function sections(ctx) {
         [SL('kaalaah'), 'On today\'s page, the ghaṭikā clock and how much of each anga is left; then every kāla of the day with its times, and the day drawn to scale from the brāhma muhūrta to the next sunrise. Only the drawing scrolls; the clock and the list of kālas fold away.'],
         [SL('maasah'), 'The month as a calendar. Each day shows the solar day, the tithi at sunrise (शु ११ is śukla ekādaśī; अमा and पौर्ण name the new and full moon) with the nakṣatra, and up to two festival icons; a blue dot marks a day whose festivals have no icon. The festivals are listed below. The switch at the top shows the week instead, or a solar month (सौरमासः, from its saṅkramaṇa, as in the PDFs\' sections) or a lunar month (चान्द्रमासः, from śukla prathamā), with ‹ › stepping a whole month.'],
         [SL('parvaani'), 'Every festival of the year, and the year\'s lists, with search.'],
-        [SL('anyat'), 'From the daily to the occasional: the day\'s paṭhanam, saṅkalpa, and vidhi-niṣedhas (what to avoid and what is commended); the lists of days for an oil bath, a haircut, beginning study and the ūna-śrāddhas; the year\'s ṣaṇṇavati-tarpaṇa days, janmadinas and nava-nāyakas; then the app: Reminders, Settings, this guide, Feedback (which opens a prefilled GitHub issue), Contribute, Acknowledgements and About.'],
+        [SL('anyat'), 'From the daily to the occasional: the day\'s paṭhanam, saṅkalpa, and vidhi-niṣedhas (what to avoid and what is commended); the lists of days for an oil bath, a haircut, beginning study and the ūna-śrāddhas; the year\'s ṣaṇṇavati-tarpaṇa days, janmadinas and nava-nāyakas; then the app: Reminders, Settings, this guide, the Adyatithi blog (its posts by section), Feedback (which opens a prefilled GitHub issue), Contribute, Acknowledgements, Privacy (what the app keeps and what it sends) and About.'],
       ],
     },
     {
@@ -125,7 +125,7 @@ export function sections(ctx) {
     {
       title: 'Settings',
       items: [
-        [SL('nagaram'), 'Fifty cities, your own first; the rest open under "All".'],
+        [SL('nagaram'), 'The cities in the app, your own first; the rest open under "All". Below them, Find your place searches every place jyotisha knows: use the nearest city, or, if it is more than 75 km away or keeps another time, request your place, which is added once approved.'],
         [`${SL('bhaashaa')} · ${SL('lipih')}`, 'The language of the app\'s own words (tabs, buttons, this guide), and the script for the pañcāṅga, which is always in Sanskrit.'],
         [SL('samayarupam'), 'Three ways to write times after midnight: 25:30* as printed in the PDFs, +1:30*, or 1:30am*.'],
         [L('janmanakshatram'), 'Your janma nakṣatra: used for tārābala in the kṣaura list, and starred in the Detail page\'s tārābala tables.'],
@@ -135,7 +135,7 @@ export function sections(ctx) {
       title: 'How it is computed',
       items: [
         ['jyotisha', 'All times are computed with the open-source jyotisha library, which uses the Swiss Ephemeris, with the Citrā ayanāṁśa (Spica at 180°). Festivals are assigned by the rules in the adyatithi repository. This is the same code that produces the printed Adyatithi pañcāṅga, and a test checks that the app shows what the PDFs print.'],
-        [L('nagaram'), 'Each city\'s data is computed in advance for three years, and rebuilt every week. Other places will come later.'],
+        [L('nagaram'), 'Each city\'s data is computed in advance for three years, and rebuilt every week. A requested place is added by hand, after a look at the requests.'],
       ],
     },
   ];

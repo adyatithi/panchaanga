@@ -60,7 +60,7 @@ Every festival of the year, and the year's lists, with search.
 
 **अन्यत्**
 
-From the daily to the occasional: the day's paṭhanam, saṅkalpa, and vidhi-niṣedhas (what to avoid and what is commended); the lists of days for an oil bath, a haircut, beginning study and the ūna-śrāddhas; the year's ṣaṇṇavati-tarpaṇa days, janmadinas and nava-nāyakas; then the app: Reminders, Settings, this guide, Feedback (which opens a prefilled GitHub issue), Contribute, Acknowledgements and About.
+From the daily to the occasional: the day's paṭhanam, saṅkalpa, and vidhi-niṣedhas (what to avoid and what is commended); the lists of days for an oil bath, a haircut, beginning study and the ūna-śrāddhas; the year's ṣaṇṇavati-tarpaṇa days, janmadinas and nava-nāyakas; then the app: Reminders, Settings, this guide, the Adyatithi blog (its posts by section), Feedback (which opens a prefilled GitHub issue), Contribute, Acknowledgements, Privacy (what the app keeps and what it sends) and About.
 
 ## The head of the page
 
@@ -266,7 +266,7 @@ The festivals come from separate collections (by deity, region, tradition, templ
 
 **नगरम्**
 
-Fifty cities, your own first; the rest open under "All".
+The cities in the app, your own first; the rest open under "All". Below them, Find your place searches every place jyotisha knows: use the nearest city, or, if it is more than 75 km away or keeps another time, request your place, which is added once approved.
 
 **भाषा · लिपिः**
 
@@ -288,4 +288,4 @@ All times are computed with the open-source jyotisha library, which uses the Swi
 
 **नगरम्**
 
-Each city's data is computed in advance for three years, and rebuilt every week. Other places will come later.
+Each city's data is computed in advance for three years, and rebuilt every week. A requested place is added by hand, after a look at the requests.

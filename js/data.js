@@ -23,6 +23,8 @@ export const loadPhrases = (script) => get(`text/${script}/phr.json`);
 export const loadLines = (script) => get(`text/${script}/lines.json`);
 // Which activity each nishiddha line belongs to (bhojana, snana, ...): one file for every script.
 export const loadNishiddhaTopics = () => get('text/nishiddha-topics.json');
+// Every place in jyotisha's places table: [[id, label, lat, lon, timezone], ...].
+export const loadPlaces = () => get('places.json');
 export const loadDescription = (script, id) => get(`text/${script}/desc-${id[0]}.json`).then((b) => b[id] || null);
 export const loadRepos = () => get('repos.json').catch(() => ({ repos: [], fest: {} }));
 export const loadMeta = (city, kali) => get(`c/${city}/${kali}/meta.json`);

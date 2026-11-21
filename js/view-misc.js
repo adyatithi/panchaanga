@@ -4,6 +4,7 @@ import * as data from './data.js';
 import { descriptionBody } from './view-vistara.js';
 import { names } from './parts.js';
 import { shareButton } from './share.js';
+import { placeFinder } from './places.js';
 import { LANGUAGES } from './i18n.js';
 
 const SCRIPT_NAMES = { devanagari: 'देवनागरी', tamil: 'தமிழ்', grantha: '𑌗𑍍𑌰𑌨𑍍𑌥', telugu: 'తెలుగు', kannada: 'ಕನ್ನಡ', iso: 'Roman (ISO)' };
@@ -78,6 +79,7 @@ export function renderSettings(ctx, root) {
   };
   root.append(h('section', { class: 'settings-page' }, h('h2', { class: 'block-title' }, L('vinyaasah')),
     cityGroup(),
+    placeFinder(ctx),
     group(L('bhaashaa'), 'lang', LANGUAGES),
     group(L('lipih'), 'script', ctx.index.scripts.map((s) => [s, SCRIPT_NAMES[s] || s])),
     settings.script === 'devanagari' && group(L('akshararupam'), 'face', [['noto', 'नोटो सेरिफ्', 'Noto Serif'], ['siddhanta', 'सिद्धान्त', 'Siddhanta (PDF)']]),

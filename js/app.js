@@ -26,11 +26,12 @@ import { renderSankalpa } from './view-sankalpa.js';
 import { renderMuhurta, renderUuna } from './view-muhurta.js';
 import { renderJanma } from './view-janma.js';
 import { renderShannavati } from './view-shannavati.js';
-import { renderFeedback, renderContribute, renderThanks } from './view-info.js';
+import { renderFeedback, renderContribute, renderThanks, renderPrivacy, renderBlog } from './view-info.js';
 import { renderReminders, refreshReminders } from './reminders.js';
+import { noteView, startUsage } from './usage.js';
 
 const VIEWS = ['dina', 'kala', 'masa', 'parva', 'anyat', 'about', 'pathana', 'sankalpa', 'saptaha', 'varjya', 'nava', 'guide',
-  'abhyanga', 'kshaura', 'vidyarambha', 'uuna', 'janma', 'shannavati', 'feedback', 'contribute', 'thanks', 'smarana', 'saura', 'chandra', 'settings'];
+  'abhyanga', 'kshaura', 'vidyarambha', 'uuna', 'janma', 'shannavati', 'feedback', 'contribute', 'thanks', 'smarana', 'saura', 'chandra', 'settings', 'privacy', 'blog'];
 const TABS = [
   ['dina', 'dinam', 'M4 5h16v15H4zM4 9h16M8 3v4M16 3v4'],
   ['kala', 'kaalaah', 'M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18zM12 7v5l3 2'],
@@ -41,9 +42,9 @@ const TABS = [
 // Pages reached from a tab other than their own.
 const TAB_OF = { pathana: 'anyat', sankalpa: 'anyat', varjya: 'anyat', nava: 'anyat', guide: 'anyat', about: 'anyat', saptaha: 'masa',
   abhyanga: 'anyat', kshaura: 'anyat', vidyarambha: 'anyat', uuna: 'anyat', janma: 'anyat',
-  shannavati: 'anyat', feedback: 'anyat', contribute: 'anyat', thanks: 'anyat', smarana: 'anyat', saura: 'masa', chandra: 'masa', settings: 'anyat' };
+  shannavati: 'anyat', feedback: 'anyat', contribute: 'anyat', thanks: 'anyat', smarana: 'anyat', saura: 'masa', chandra: 'masa', settings: 'anyat', privacy: 'anyat', blog: 'anyat' };
 // Pages that show a year rather than a day, so the top bar has no day arrows.
-const NO_DAY_NAV = ['parva', 'about', 'anyat', 'guide', 'nava', 'abhyanga', 'kshaura', 'vidyarambha', 'uuna', 'janma', 'shannavati', 'feedback', 'contribute', 'thanks', 'smarana', 'settings'];
+const NO_DAY_NAV = ['parva', 'about', 'anyat', 'guide', 'nava', 'abhyanga', 'kshaura', 'vidyarambha', 'uuna', 'janma', 'shannavati', 'feedback', 'contribute', 'thanks', 'smarana', 'settings', 'privacy', 'blog'];
 
 const settings = Object.assign(
   { city: 'Chennai', script: 'devanagari', time: '24', theme: 'auto', face: 'noto', repos: {} },
@@ -247,7 +248,7 @@ const RENDERERS = { janma: renderJanma, abhyanga: renderMuhurta, kshaura: render
   dina: renderDina, kala: renderKala, masa: renderMasa, parva: renderParva, about: renderAbout, pathana: renderPathana, sankalpa: renderSankalpa, saptaha: renderSaptaha,
   anyat: renderMore, varjya: renderVarjya, nava: renderNava, guide: renderGuide,
   shannavati: renderShannavati, feedback: renderFeedback, contribute: renderContribute, thanks: renderThanks, smarana: renderReminders,
-  saura: renderSaura, chandra: renderChandra, settings: renderSettings };
+  saura: renderSaura, chandra: renderChandra, settings: renderSettings, privacy: renderPrivacy, blog: renderBlog };
 
 // Each minute on a live page: the page is built again off screen, and if nothing has changed but
 // its live parts (marked data-live), only those are swapped in, so folds, scroll and the rest stay
@@ -302,6 +303,7 @@ async function render({ soft = false } = {}) {
   if (soft && same && patchLive(main.firstElementChild, view)) return;
   // Reminders, if on: resend this phone's list when it is a week old (once a session, in the background).
   refreshReminders(ctx).catch(() => {});
+  noteView(ctx, route.view);
   const pane = view.querySelector('.pane-scroll');
   document.body.classList.toggle('pane', !!pane);
   main.replaceChildren(view);
@@ -352,6 +354,7 @@ async function boot() {
     return;
   }
   if (!index.cities.some((c) => c.id === settings.city)) settings.city = index.cities[0].id;
+  startUsage(index.build?.date);
   // Going to another page (a tap, or the phone's back button) closes any open sheet.
   window.addEventListener('hashchange', () => { document.querySelectorAll('dialog[open]').forEach((d) => d.close()); render(); });
   await render();
