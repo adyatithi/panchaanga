@@ -52,8 +52,8 @@ export function fold(line) {
   out.push(cur);
   return out.join('\r\n ');
 }
-// The UTC instant of a local time in a timezone: minutes after that date's local midnight.
-function utc(date, minutes, tz) {
+// The UTC instant (ms) of a local time in a timezone: minutes after that date's local midnight.
+export function utcMs(date, minutes, tz) {
   const [y, m, d] = date.split('-').map(Number);
   const guess = Date.UTC(y, m - 1, d, 0, minutes);
   const offset = (t) => {
@@ -62,10 +62,11 @@ function utc(date, minutes, tz) {
       .formatToParts(new Date(t)).map((x) => [x.type, x.value]));
     return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second) - t;
   };
-  let t = guess - offset(guess);
-  t = guess - offset(t);
-  return new Date(t).toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z');
+  const t = guess - offset(guess);
+  return guess - offset(t);
 }
+// The same, as an iCalendar UTC time.
+const utc = (date, minutes, tz) => new Date(utcMs(date, minutes, tz)).toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z');
 const ymd = (s) => s.replace(/-/g, '');
 const nextDay = (s) => { const t = new Date(s + 'T00:00:00Z'); t.setUTCDate(t.getUTCDate() + 1); return t.toISOString().slice(0, 10); };
 

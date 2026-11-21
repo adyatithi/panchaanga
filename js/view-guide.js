@@ -32,7 +32,7 @@ export function sections(ctx) {
         [SL('kaalaah'), 'On today\'s page, the ghaṭikā clock and how much of each anga is left; then every kāla of the day with its times, and the day drawn to scale from the brāhma muhūrta to the next sunrise. Only the drawing scrolls; the clock and the list of kālas fold away.'],
         [SL('maasah'), 'The month as a calendar, with the tithi, nakṣatra and festival icons on each day and the festivals listed below it; a switch shows the week instead.'],
         [SL('parvaani'), 'Every festival of the year, and the year\'s lists, with search.'],
-        [SL('anyat'), 'This guide, settings, About, Contribute, Acknowledgements and Feedback (which opens a prefilled GitHub issue); the year\'s nava-nāyakas, ṣaṇṇavati-tarpaṇa days and janmadinas; the day\'s paṭhanam, saṅkalpa and what to avoid; and the lists of days for an oil bath, a haircut, beginning study and the ūna-śrāddhas.'],
+        [SL('anyat'), 'This guide, settings, Reminders, About, Contribute, Acknowledgements and Feedback (which opens a prefilled GitHub issue); the year\'s nava-nāyakas, ṣaṇṇavati-tarpaṇa days and janmadinas; the day\'s paṭhanam, saṅkalpa and what to avoid; and the lists of days for an oil bath, a haircut, beginning study and the ūna-śrāddhas.'],
       ],
     },
     {
@@ -102,6 +102,7 @@ export function sections(ctx) {
       items: [
         [SL('samvatsaravishayaah'), 'For the year: the nava-nāyakas, and the janmadinas.'],
         [L('navanaayakaah'), 'The nine "officers" of the year (rājā, mantrī …), the graha holding each, and the traditional verse on what it portends.'],
+        [L('smaaranaani'), 'Notifications on this phone for the festival groups you choose (as on the Festivals tab) and the ṣaṇṇavati days: the evening before, on the morning of the day, or fifteen minutes before one with a time begins. They are worked out on the phone about two months ahead and kept up to date when the app is opened; a small service sends each when it is due. On iPhone, the app must be on the Home Screen. They are ordinary notifications, not alarms.'],
         [L('janmadinaani'), 'The day each year on which a birthday by the Indian calendar is kept, by nakṣatra in a solar month or by tithi in a lunar month, for each year held. The nakṣatra (or tithi) should stand three muhūrtas after sunrise, reaching the saṅgava; if it ends within six nāḍīs of sunrise, the previous day is taken; when it comes twice in a month, the later. People can be saved on the phone, each shown with their next janmadina, and all of them added to a calendar with a reminder the evening before.'],
         [SL('dinavishayaah'), 'For the day: paṭhanam and what to avoid.'],
         [L('pathanam'), 'The day set out for reading aloud: each anga with its śloka and devatā, and the phalaśruti. The ślokas are from Śānti Kusumākara.'],
