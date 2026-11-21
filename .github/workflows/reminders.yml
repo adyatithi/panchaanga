@@ -56,8 +56,17 @@ jobs:
       - name: Check
         # A secret just set can take a few seconds to reach the Worker.
         run: |
+          ok=
           for i in $(seq 1 12); do
-            curl -fsS https://reminders.adyatithi.workers.dev/key && exit 0
+            curl -fsS https://reminders.adyatithi.workers.dev/key && { ok=1; break; }
             sleep 5
           done
-          exit 1
+          [ -n "$ok" ] || exit 1
+          echo; echo "blog: $(curl -fsS https://reminders.adyatithi.workers.dev/blog | python3 -c 'import json,sys; b=json.load(sys.stdin); print(b.get("source"), b.get("note") or "", [(s["name"], len(s["posts"])) for s in b["sections"]])')"
+      - name: Usage so far
+        env:
+          STATS_KEY: ${{ secrets.STATS_KEY }}
+        # Totals only (no key in the log): phone-days, cities and pages in the last 30 days, and
+        # any error from the Analytics Engine.
+        run: |
+          [ -n "$STATS_KEY" ] && curl -fsS "https://reminders.adyatithi.workers.dev/stats?k=$STATS_KEY&format=json" || echo "no STATS_KEY"

@@ -13,6 +13,7 @@
 //   POST /ping         usage, once a day from each phone: city, script, language, pages opened
 //   GET  /stats?k=…    the usage counts, as a page (for the maintainer; k is the STATS_KEY secret)
 //   POST /request-city { place, nearest, km }: opens (or counts on) a "City request" issue
+//   GET  /blog         the Adyatithi blog's posts by section, kept a day (the app's blog page)
 //
 // t is the time in minutes since 1970 (UTC). What is stored is a subscription and its reminders,
 // nothing else: no name, account or address. A push service that answers 404 or 410 (the reader
@@ -145,6 +146,7 @@ async function handle(request, env) {
   if (path === '/ping' && request.method === 'POST') return ping(request, env);
   if (path === '/stats' && request.method === 'GET') return stats(url, env);
   if (path === '/request-city' && request.method === 'POST') return requestCity(request, env);
+  if (path === '/blog' && request.method === 'GET') return blog(request);
   const keys = await vapidKeys(env.VAPID_JWK);
   if (request.method === 'GET' && path === '/key') return { key: keys.pub };
   if (request.method !== 'POST') return [404, { error: 'not found' }];
@@ -208,25 +210,105 @@ async function stats(url, env) {
   if (!env.STATS_KEY || url.searchParams.get('k') !== env.STATS_KEY) return [404, { error: 'not found' }];
   if (!env.CF_ANALYTICS_TOKEN) return [503, { error: 'no analytics token' }];
   const days = Math.min(365, Math.max(1, Number(url.searchParams.get('days')) || 30));
+  const errors = [];
   const q = async (sql) => {
     const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${env.ACCOUNT_ID}/analytics_engine/sql`,
       { method: 'POST', headers: { Authorization: `Bearer ${env.CF_ANALYTICS_TOKEN}` }, body: sql });
-    const j = await r.json().catch(() => ({}));
-    return j.data || [];
+    const text = await r.text();
+    let j = null;
+    try { j = JSON.parse(text); } catch { /* an error page */ }
+    if (!r.ok || !j || !Array.isArray(j.data)) { errors.push(`${r.status}: ${text.slice(0, 300)}`); return []; }
+    return j.data;
   };
   const since = `timestamp > NOW() - INTERVAL '${days}' DAY`;
   const by = (blob, kind = 'day') => q(`SELECT ${blob} AS k, SUM(_sample_interval) AS n FROM adyatithi_usage WHERE blob1 = '${kind}' AND ${since} GROUP BY k ORDER BY n DESC LIMIT 200`);
   const [perDay, city, script, lang, channel, mode, country, views, reminders] = await Promise.all([
-    q(`SELECT toDate(timestamp) AS k, SUM(_sample_interval) AS n FROM adyatithi_usage WHERE blob1 = 'day' AND ${since} GROUP BY k ORDER BY k DESC`),
+    q(`SELECT formatDateTime(toStartOfInterval(timestamp, INTERVAL '1' DAY), '%Y-%m-%d') AS k, SUM(_sample_interval) AS n FROM adyatithi_usage WHERE blob1 = 'day' AND ${since} GROUP BY k ORDER BY k DESC`),
     by('blob2'), by('blob3'), by('blob4'), by('blob5'), by('blob6'), by('blob7'), by('blob2', 'view'), by('blob9'),
   ]);
+  if (url.searchParams.get('format') === 'json') {
+    return { days, errors, phoneDays: perDay.reduce((a, r) => a + Number(r.n), 0), cities: city.length, pages: views.length };
+  }
   const table = (title, rows) => `<h2>${esc(title)}</h2><table>${rows.map((r) => `<tr><td>${esc(r.k || '—')}</td><td>${esc(r.n)}</td></tr>`).join('')}</table>`;
   const html = `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Adyatithi usage</title>
 <style>body{font:15px/1.4 system-ui,sans-serif;margin:16px;max-width:40rem}h2{font-size:1rem;margin:1.2rem 0 .3rem}td{padding:.1rem .8rem .1rem 0}tr:nth-child(odd){background:#f4f4f4}</style>
-<h1>Adyatithi usage, last ${days} days</h1><p>Phone-days: one per phone per day it opened the app. Pages: opened that day.</p>
+<h1>Adyatithi usage, last ${days} days</h1>${errors.length ? `<p style="color:#b00">Errors from Cloudflare: ${errors.map(esc).join('<br>')}</p>` : ''}<p>Phone-days: one per phone per day it opened the app. Pages: opened that day.</p>
 ${table('Phone-days by date', perDay)}${table('City', city)}${table('Page', views)}${table('Script', script)}${table('Language', lang)}
 ${table('Channel', channel)}${table('Installed app or browser', mode)}${table('Country', country)}${table('Reminders on', reminders)}`;
   return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
+}
+
+// --- The blog ---
+
+const BLOG = 'https://adyatithi.substack.com';
+const UA = { 'User-Agent': 'adyatithi-panchaanga (+https://adyatithi.github.io/panchaanga/)' };
+const tag = (xml, name) => (xml.match(new RegExp(`<${name}[^>]*>([\\s\\S]*?)</${name}>`)) || [])[1] || '';
+const text = (s) => s.replace(/^<!\[CDATA\[|\]\]>$/g, '').replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").trim();
+
+// The posts, by section: from the archive API with its sections; or, if that is refused, from the
+// RSS feed (recent posts, with subtitles) and the sitemap (every post), in one section.
+export async function blogPosts(get) {
+  try {
+    const items = [];
+    for (let offset = 0; offset < 2000;) {
+      const page = await get(`${BLOG}/api/v1/archive?sort=new&limit=50&offset=${offset}`, true);
+      if (!page.length) break;
+      items.push(...page);
+      offset += page.length;
+    }
+    let names = {};
+    try { names = Object.fromEntries((await get(`${BLOG}/api/v1/sections`, true)).map((x) => [x.id, x.name])); } catch { /* none */ }
+    const groups = {};
+    for (const p of items) {
+      const name = p.section_name || names[p.section_id] || 'Posts';
+      (groups[name] = groups[name] || []).push({ t: p.title || '', s: p.subtitle || p.description || '', d: (p.post_date || '').slice(0, 10), u: p.canonical_url || `${BLOG}/p/${p.slug}` });
+    }
+    return { source: 'archive', groups };
+  } catch (e) {
+    const found = new Map();
+    let note = `archive: ${e.message}`;
+    try {
+      const rss = await get(`${BLOG}/feed`);
+      for (const item of rss.split('<item>').slice(1)) {
+        const u = text(tag(item, 'link')).split('?')[0];
+        const d = new Date(text(tag(item, 'pubDate')));
+        found.set(u, { t: text(tag(item, 'title')), s: text(tag(item, 'description')), d: isNaN(d) ? '' : d.toISOString().slice(0, 10), u });
+      }
+    } catch (e2) { note += `; feed: ${e2.message}`; }
+    try {
+      const sm = await get(`${BLOG}/sitemap.xml`);
+      const maps = [sm, ...await Promise.all([...sm.matchAll(/<sitemap>[\s\S]*?<loc>([^<]+)<\/loc>/g)].map((m) => get(m[1]).catch(() => '')))];
+      for (const x of maps) {
+        for (const m of x.matchAll(/<url>[\s\S]*?<loc>([^<]+)<\/loc>(?:[\s\S]*?<lastmod>([^<]+)<\/lastmod>)?[\s\S]*?<\/url>/g)) {
+          const u = m[1].trim();
+          if (!u.includes('/p/') || found.has(u)) continue;
+          const slug = u.replace(/\/$/, '').split('/p/').pop();
+          found.set(u, { t: slug.replace(/-/g, ' ').replace(/^./, (c) => c.toUpperCase()), s: '', d: (m[2] || '').slice(0, 10), u });
+        }
+      }
+    } catch (e3) { note += `; sitemap: ${e3.message}`; }
+    const posts = [...found.values()].sort((a, b) => (a.d < b.d ? 1 : -1));
+    return { source: posts.length ? 'feed' : 'none', note, groups: posts.length ? { Posts: posts } : {} };
+  }
+}
+
+async function blog(request) {
+  const cache = caches.default;
+  const key = new Request('https://reminders.adyatithi.workers.dev/blog');
+  const hit = await cache.match(key);
+  if (hit) return hit;
+  const get = async (u, json = false) => {
+    const r = await fetch(u, { headers: UA });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return json ? r.json() : r.text();
+  };
+  const { source, note, groups } = await blogPosts(get);
+  const newest = (n) => groups[n].map((x) => x.d).sort().at(-1) || '';
+  const order = Object.keys(groups).sort((a, b) => (newest(a) < newest(b) ? 1 : -1));
+  const body = JSON.stringify({ url: BLOG, source, note, sections: order.map((n) => ({ name: n, posts: groups[n] })) });
+  const res = new Response(body, { headers: { 'Content-Type': 'application/json', 'Cache-Control': `public, max-age=${order.length ? 86400 : 600}` } });
+  await cache.put(key, res.clone());
+  return res;
 }
 
 // --- City requests ---
@@ -315,6 +397,12 @@ export default {
     let status = 200, out;
     try {
       out = await handle(request, env);
+      // A page or a cached answer goes out as it is, with the CORS headers.
+      if (out instanceof Response) {
+        const res = new Response(out.body, out);
+        for (const [k, v] of Object.entries(headers)) res.headers.set(k, v);
+        return res;
+      }
       if (Array.isArray(out)) [status, out] = out;
     } catch (e) {
       status = 500; out = { error: 'server error' };

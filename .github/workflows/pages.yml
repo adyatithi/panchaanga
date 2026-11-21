@@ -15,7 +15,7 @@ on:
     workflows: ["Weekly data build", "Nightly pushed"]
     types: [completed]
   schedule:
-    - cron: "43 4 * * 1"   # Mondays: the blog's posts (and the feeds' new month, if any)
+    - cron: "43 4 1 * *"   # the first of each month: the feeds start from the new month
   workflow_dispatch:
 
 permissions:
@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
+      url: ${{ steps.deploy.outputs.page_url || steps.deploy2.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -73,9 +73,6 @@ jobs:
         run: |
           pip install -q tzdata
           python tools/ics_feeds.py data
-      - name: Blog
-        # The Adyatithi blog's posts by section, for the app's blog page; skipped if unreadable.
-        run: python tools/blog.py data/blog.json || echo "blog not read"
       - name: Site
         run: |
           mkdir -p "$RUNNER_TEMP/site"
@@ -88,5 +85,14 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ${{ runner.temp }}/site
+      # The deploy sometimes cannot yet see the artifact just uploaded ("No artifacts named
+      # github-pages"); a second try after a pause finds it.
       - id: deploy
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+      - name: Pause before the second try
+        if: steps.deploy.outcome == 'failure'
+        run: sleep 30
+      - id: deploy2
+        if: steps.deploy.outcome == 'failure'
         uses: actions/deploy-pages@v4

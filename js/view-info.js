@@ -2,6 +2,7 @@
 // and the acknowledgements with the software and typefaces the pañcāṅga is made with.
 import { h, NIGHTLY, MONTHS } from './util.js';
 import { acknowledgements } from './view-misc.js';
+import { SERVICE } from './reminders.js';
 
 // Issues are filed on the public repository the site is published from.
 export const ISSUES = 'https://github.com/adyatithi/panchaanga/issues/new';
@@ -113,11 +114,11 @@ export function renderPrivacy(ctx, root) {
     h('h3', null, U('pv_hosts_h')), h('p', null, U('pv_hosts'))));
 }
 
-// The Adyatithi blog: its posts by section, as tools/blog.py gathers them when the site is
-// published (data/blog.json; the nightly app reads the stable one).
+// The Adyatithi blog: its posts by section, as the reminders service gathers them from the blog
+// (kept there a day; tools/reminders).
 export async function renderBlog(ctx, root) {
   const { U } = ctx;
-  const blog = await fetch(NIGHTLY ? '../data/blog.json' : 'data/blog.json').then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  const blog = await fetch(`${SERVICE}/blog`).then((r) => (r.ok ? r.json() : null)).catch(() => null);
   const url = blog?.url || 'https://adyatithi.substack.com';
   const head = h('section', { class: 'prose blog-head' },
     h('h2', { class: 'block-title' }, U('blog')),

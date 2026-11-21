@@ -126,7 +126,7 @@ globalThis.fetch = async (url, init = {}) => {
   if (u.pathname.endsWith('/issues') && (init.method || 'GET') === 'GET') return { ok: true, json: async () => issues };
   if (u.pathname.endsWith('/issues') && init.method === 'POST') { const b = JSON.parse(init.body); const i = { number: 7, ...b }; issues.push(i); return { ok: true, json: async () => i }; }
   if (/\/issues\/7$/.test(u.pathname)) { issues[0].body = JSON.parse(init.body).body; return { ok: true, json: async () => issues[0] }; }
-  return { ok: false, status: 404 };
+  return { ok: false, status: 404, text: async () => 'not found', json: async () => ({}) };
 };
 const cityEnv = { ...env, GH_TOKEN: 't', GH_REPO: 'adyatithi/panchaanga', SITES: 'https://adyatithi.github.io/panchaanga/' };
 res = await worker.fetch(req('/request-city', { place: 'Madurai', nearest: 'Tiruchirappalli', km: 120 }), cityEnv);
@@ -141,6 +141,22 @@ assert.equal((await res.json()).requests, 2);
 assert.match(issues[0].body, /Requests: 2/);
 res = await worker.fetch(req('/request-city', { place: 'Atlantis' }), cityEnv);
 assert.equal(res.status, 404);
+
+// The stats page and the blog answer as pages, not as JSON of an object.
+res = await worker.fetch(new Request('https://reminders.adyatithi.workers.dev/stats?k=secret'), { ...env, STATS_KEY: 'secret', CF_ANALYTICS_TOKEN: 't', ACCOUNT_ID: 'a' });
+assert.match(res.headers.get('Content-Type'), /text\/html/);
+assert.match(await res.text(), /Errors from Cloudflare/);          // the fake fetch answers 404
+
+// The blog: from the feed and sitemap when the archive is refused.
+const { blogPosts } = await import('./worker.js');
+const RSS = '<rss><channel><item><title><![CDATA[Why two Ekādaśīs?]]></title><link>https://adyatithi.substack.com/p/two?utm=1</link><description><![CDATA[<p>Smārta &amp; Vaiṣṇava</p>]]></description><pubDate>Tue, 10 Nov 2026 05:00:00 GMT</pubDate></item></channel></rss>';
+const SM = '<urlset><url><loc>https://adyatithi.substack.com/p/two</loc><lastmod>2026-11-10</lastmod></url><url><loc>https://adyatithi.substack.com/p/the-ayanamsha</loc><lastmod>2026-09-01</lastmod></url><url><loc>https://adyatithi.substack.com/about</loc></url></urlset>';
+let bp = await blogPosts(async (u) => { if (u.includes('/api/')) throw new Error('HTTP 403'); if (u.endsWith('/feed')) return RSS; if (u.endsWith('sitemap.xml')) return SM; throw new Error('HTTP 404'); });
+assert.equal(bp.source, 'feed');
+assert.deepEqual(bp.groups.Posts.map((p) => [p.t, p.s, p.d]), [['Why two Ekādaśīs?', 'Smārta & Vaiṣṇava', '2026-11-10'], ['The ayanamsha', '', '2026-09-01']]);
+bp = await blogPosts(async (u) => (u.includes('archive') ? (u.endsWith('offset=0') ? [{ title: 'A', section_id: 1, post_date: '2026-11-01T00:00:00Z', slug: 'a' }] : [])
+  : u.includes('sections') ? [{ id: 1, name: 'Festivals' }] : ''));
+assert.deepEqual(Object.keys(bp.groups), ['Festivals']);
 
 Date.now = RealNow;
 console.log('reminders worker: all checks passed');
