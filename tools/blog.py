@@ -2,14 +2,18 @@
 
     python tools/blog.py data/blog.json
 
-Reads the Substack archive (all posts, newest first) and the publication's sections. Run when the
-site is published (.github/workflows/pages.yml), which happens at least weekly. If the blog cannot
-be read, nothing is written and the app's page links to the blog instead.
+Reads the Substack archive (all posts, newest first) and the publication's sections. Substack may
+refuse its API to a build server; then the RSS feed (recent posts, with their subtitles) and the
+sitemap (every post), which are published for readers and indexers, are read instead, without
+sections. Run when the site is published (.github/workflows/pages.yml), at least weekly. If the
+blog cannot be read at all, nothing is written and the app's page links to the blog instead.
 """
 import json
 import re
 import sys
 import urllib.request
+import xml.etree.ElementTree as ET
+from email.utils import parsedate_to_datetime
 
 BLOG = 'https://adyatithi.substack.com'
 UA = {'User-Agent': 'adyatithi-panchaanga (+https://adyatithi.github.io/panchaanga/)'}
@@ -54,11 +58,56 @@ def posts():
     return out
 
 
+def from_feeds():
+    """Posts without the API: the RSS feed's (title, subtitle, date) and the sitemap's other /p/ pages."""
+    found = {}
+    try:
+        rss = ET.fromstring(get(BLOG + '/feed', raw=True))
+        for it in rss.iter('item'):
+            u = (it.findtext('link') or '').split('?')[0]
+            d = it.findtext('pubDate')
+            found[u] = {'t': it.findtext('title') or '', 's': re.sub('<[^>]+>', '', it.findtext('description') or '').strip(),
+                        'd': parsedate_to_datetime(d).date().isoformat() if d else '', 'u': u}
+        print(f'rss: {len(found)} posts')
+    except Exception as e:
+        print(f'rss: {e}')
+    try:
+        ns = {'s': 'http://www.sitemaps.org/schemas/sitemap/0.9'}
+        sm = ET.fromstring(get(BLOG + '/sitemap.xml', raw=True))
+        locs = [(u.findtext('s:loc', namespaces=ns), u.findtext('s:lastmod', namespaces=ns)) for u in sm.findall('s:url', ns)]
+        for sub in [x.findtext('s:loc', namespaces=ns) for x in sm.findall('s:sitemap', ns)]:
+            if sub:
+                sx = ET.fromstring(get(sub, raw=True))
+                locs += [(u.findtext('s:loc', namespaces=ns), u.findtext('s:lastmod', namespaces=ns)) for u in sx.findall('s:url', ns)]
+        n = 0
+        for u, mod in locs:
+            if u and '/p/' in u and u not in found:
+                slug = u.rstrip('/').split('/p/')[-1]
+                found[u] = {'t': slug.replace('-', ' ').capitalize(), 's': '', 'd': (mod or '')[:10], 'u': u}
+                n += 1
+        print(f'sitemap: {n} more posts')
+    except Exception as e:
+        print(f'sitemap: {e}')
+    return sorted(found.values(), key=lambda p: p['d'], reverse=True)
+
+
+def write(path, groups):
+    order = sorted(groups, key=lambda n: max(x['d'] for x in groups[n]), reverse=True)
+    out = {'url': BLOG, 'sections': [{'name': n, 'posts': groups[n]} for n in order]}
+    json.dump(out, open(path, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+    print(f'blog: {sum(len(g) for g in groups.values())} posts in {len(order)} sections: ' + ', '.join(f'{n} ({len(groups[n])})' for n in order))
+
+
 def main(path):
     try:
         items = posts()
     except Exception as e:
-        print(f'blog: not read ({e}); nothing written')
+        print(f'archive: {e}; reading the feed and sitemap instead')
+        fed = from_feeds()
+        if fed:
+            write(path, {'Posts': fed})
+        else:
+            print('blog: not read; nothing written')
         return
     names = sections()
     if items:
@@ -73,10 +122,8 @@ def main(path):
             'd': (p.get('post_date') or '')[:10], 'u': p.get('canonical_url') or f"{BLOG}/p/{p.get('slug')}",
             'paid': p.get('audience') == 'only_paid',
         })
-    order = sorted(groups, key=lambda n: max(x['d'] for x in groups[n]), reverse=True)
-    out = {'url': BLOG, 'sections': [{'name': n, 'posts': groups[n]} for n in order]}
-    json.dump(out, open(path, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
-    print(f'blog: {len(items)} posts in {len(order)} sections: ' + ', '.join(f'{n} ({len(groups[n])})' for n in order))
+    if groups:
+        write(path, groups)
 
 
 if __name__ == '__main__':
