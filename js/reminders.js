@@ -98,7 +98,7 @@ export async function buildItems(ctx, p, now = Date.now()) {
   metas.forEach((meta, i) => {
     for (const g of p.groups) {
       if (g === 'shannavati') {
-        for (const [kind, list] of Object.entries(shannavati(meta, metas[i - 1]))) {
+        for (const [kind, list] of Object.entries(shannavati(meta))) {
           for (const [date, id] of list) add(date, id || kind, null, id ? (ctx.F[id] || id) : ctx.L(kind));
         }
         continue;

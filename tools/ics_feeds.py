@@ -22,54 +22,7 @@ from zoneinfo import ZoneInfo
 
 SITE = 'https://adyatithi.github.io/panchaanga/'
 MUHURTA_FEEDS = ['abhyanga', 'kshaura', 'vidyarambha']
-SKIP_GROUPS = {'anadhyayana'}
-
-# The shannavati days, by kind, from a year's festival ids: as js/view-shannavati.js has it (keep
-# the two the same).
-SH_KINDS = [
-    ('sh_amavasya', lambda i: 'amAvAsyA' in i and not re.search('sOmavatI|khicaDI|mahAbhAratE|bOdhAyana', i)),
-    ('sh_sankranti', lambda i: re.search('saGkramaNa.*puNyakAlaH', i) and not re.match('(sAyana|saGkramaNa-dina|ravi-saGkramaNa)', i)),
-    ('sh_manvadi', lambda i: i.startswith('manvAdiH')),
-    ('sh_yugadi', lambda i: re.fullmatch('(kRta|trEtA|dvApara|kali)yugAdiH', i)),
-    ('sh_vyatipata', lambda i: i.endswith('vyatIpAta-zrAddham')),
-    ('sh_vaidhrti', lambda i: i == 'vaidhRti-zrAddham'),
-    ('sh_mahalaya', None),
-    ('sh_ashtaka', lambda i: re.search('-(aSTakA-pUrvEdyuH|aSTakA-zrAddham|anvaSTakA-zrAddham)$', i)),
-]
-
-
-def shannavati(meta, prev=None):
-    """{kind: [(date, festival id or None)]} for the year in `meta`; `prev`, the year before, for a
-    Mesha sankranti that fell just before this year's file starts."""
-    out = {k: [] for k, _ in SH_KINDS}
-    dates = sorted(d for d in meta['fests'] if meta['start'] <= d < meta['end'])
-    for date in dates:
-        for i in meta['fests'][date]:
-            for k, test in SH_KINDS:
-                if test and test(i):
-                    out[k].append((date, i))
-    seen, sank = set(), []
-    for date, i in out['sh_sankranti']:
-        if i.split('-')[0] not in seen:
-            seen.add(i.split('-')[0])
-            sank.append((date, i))
-    out['sh_sankranti'] = sank
-    if prev and 'mESa' not in seen:
-        frm = (datetime.date.fromisoformat(prev['end']) - datetime.timedelta(days=3)).isoformat()
-        mesha = next((d for d in sorted(prev['fests']) if frm <= d < prev['end']
-                      and 'mESa-saGkramaNa-puNyakAlaH' in prev['fests'][d]), None)
-        if mesha:
-            out['sh_sankranti'].insert(0, (mesha, 'mESa-saGkramaNa-puNyakAlaH'))
-    start = next((d for d in dates if 'mahAlaya-pakSa-ArambhaH' in meta['fests'][d]), None)
-    end = (next((d for d in dates if 'mahAlaya-pakSa-tarpaNa-pUrtiH' in meta['fests'][d]), None)
-           or next((d for d in dates if 'mahAlaya-pakSa-samApanam' in meta['fests'][d]), None))
-    if start and end:
-        d = datetime.date.fromisoformat(start)
-        while d.isoformat() <= end:
-            iso = d.isoformat()
-            out['sh_mahalaya'].append((iso, next((x for x in meta['fests'].get(iso, []) if 'mahAlaya' in x), None)))
-            d += datetime.timedelta(days=1)
-    return out          # off by default in the app, as in the PDFs
+SKIP_GROUPS = {'anadhyayana'}          # off by default in the app, as in the PDFs
 
 
 def slug(key):
@@ -146,11 +99,7 @@ def write_feeds(data_dir, today=None, scripts=None):
             # From the start of the year that holds today (or the first year held).
             current = [y for y in city['years'] if y['start'] <= today.isoformat() < y['end']]
             since = (current or city['years'])[0]['start']
-            held = [y for y in city['years'] if y['end'] > since]
-            metas = [load('c', city['id'], str(y['kali']), 'meta.json') for y in held]
-            # The year before the first, for the shannavati's Mesha sankranti.
-            before = [y for y in city['years'] if held and y['kali'] == held[0]['kali'] - 1]
-            prevs = [load('c', city['id'], str(before[0]['kali']), 'meta.json') if before else None] + metas[:-1]
+            metas = [load('c', city['id'], str(y['kali']), 'meta.json') for y in city['years'] if y['end'] > since]
             day_url = lambda date: f"{SITE}#/{city['id']}/{date}"
             feeds = {}
 
@@ -190,7 +139,8 @@ def write_feeds(data_dir, today=None, scripts=None):
                         feed(key, title).add(f"{city['id']}-{key}-{date}@adyatithi", date, summary, desc,
                                              url=day_url(date), window=[a, b], tz=city['tz'])
                 sh_title = L.get('shannavati', 'shannavati')
-                for kind, items in shannavati(meta, prevs[metas.index(meta)]).items():
+                # The shannavati days, as the exporter computed them with the year.
+                for kind, items in meta['shannavati'].items():
                     for date, fid in items:
                         if date < since:
                             continue
