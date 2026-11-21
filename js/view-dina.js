@@ -24,7 +24,7 @@ function nowStrip(ctx, day) {
   return h('section', { class: 'now' },
     h('div', { class: 'now-head' },
       h('span', { class: 'now-dot', 'aria-hidden': 'true' }),
-      h('span', { class: 'label' }, ctx.L('idaaniim')),
+      h('span', { class: 'label' }, ctx.S.labels.idaaniim ?? ctx.L('idaaniim')),
       h('span', { class: 'time now-clock' }, ctx.T(now))),
     h('div', { class: 'now-angas' },
       h('span', null, N.tithi(tithi), tEnd != null && h('span', { class: 'time muted' }, ` ▸${ctx.T(tEnd)}`)),

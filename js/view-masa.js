@@ -4,6 +4,19 @@ import * as data from './data.js';
 import { names, icon, missing } from './parts.js';
 import { switcher } from './view-saptaha.js';
 
+// The tithi at sunrise, short, before the nakshatra in a cell: amā and pūrṇimā by name (their
+// first syllables), the others as pakṣa and number (शु ११, कृ ३). Syllables are grapheme clusters
+// in an Indic script, letters in Roman.
+const seg = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter() : null;
+const clusters = (s) => (seg ? [...seg.segment(s)].map((x) => x.segment) : [...s]);
+export function tithiShort(ctx, t) {
+  const S = ctx.S.tithi;
+  const roman = !/[^\u0000-\u024F\u1E00-\u1EFF\s-]/.test(S[1]);
+  const take = (name, n) => clusters(name.split('-')[0]).slice(0, roman ? n + 1 : n).join('');
+  if (t === 15 || t === 30) return take(S[t], 2);
+  return `${take(S[t <= 15 ? 1 : 16], 1)}${ctx.num(t <= 15 ? t : t - 15)}`;
+}
+
 export async function renderMasa(ctx, root) {
   const ym = ctx.date.slice(0, 7);
   const days = await ctx.loadMonthDays(ym);
@@ -32,7 +45,7 @@ export async function renderMasa(ctx, root) {
     },
     h('span', { class: 'cal-top' }, h('span', { class: 'cal-date' }, d), moonSvg(tithi, 13)),
     h('span', { class: 'cal-saura' }, ctx.num(day.saura.d)),
-    h('span', { class: 'cal-nak' }, N.nakshatra(day.nakshatra[0][0])),
+    h('span', { class: 'cal-nak' }, `${tithiShort(ctx, tithi)}/${N.nakshatra(day.nakshatra[0][0])}`),
     h('span', { class: 'cal-marks' },
       marks.slice(0, 2).map((i) => icon(i, 14)),
       day.fest.length > 0 && !marks.length && h('span', { class: 'cal-dot' }))));

@@ -29,13 +29,6 @@ function angaText(ctx, day, key) {
   return prefix + parts.join('  ');
 }
 
-// Every tithi of the day with the time it gives way, so that a vrata kept on the second one
-// (an ekadashi beginning after sunrise, say) is not labelled with the first alone.
-function tithis(ctx, day) {
-  const N = names(ctx);
-  return day.tithi.map(([id, end]) => N.tithi(id) + (end != null ? '▸' + ctx.T(end) : '')).join(' ');
-}
-
 function festLine(ctx, e) {
   return ctx.festName(e) + (e.t ? ' ' + ctx.festTimes(e) : '');
 }
@@ -79,13 +72,17 @@ export function dayText(ctx, day, meta) {
   ].filter((x) => x != null).join('\n');
 }
 
+// A festival's verse (its shloka), as lines, without marks.
+const festVerse = (desc) => (desc && desc.s ? tidy(desc.s).replace(/\*/g, '').split('\n').map((l) => l.trim()).filter(Boolean) : []);
+
+// A festival: its name and time, the date, its verse and the first paragraph of its description.
 function festText(ctx, day, entry, desc) {
-  const N = names(ctx);
   const blurb = desc && (desc.d || desc.b) ? String(desc.d || desc.b).split(/\n\s*\n/)[0].replace(/\s+/g, ' ').slice(0, 400) : '';
+  const verse = festVerse(desc);
   return [
     `*${festLine(ctx, entry)}*`,
     `${dateLine(day)} · ${ctx.cityName}`,
-    `${tithis(ctx, day)} · ${N.nakshatra(day.nakshatra[0][0])}`,
+    verse.length ? '' : null, verse.length ? verse.join('\n') : null,
     blurb ? '' : null, blurb || null,
     '',
     linkFor(ctx, day),
@@ -248,7 +245,6 @@ async function drawFest(ctx, day, entry, desc, meta) {
   const name = ctx.festName(entry);
   await ready(name);
   const P = pen(g);
-  const N = names(ctx);
   const H = headLines(ctx, day, meta);
   g.fillStyle = C.paper; g.fillRect(0, 0, W, Hh);
   g.strokeStyle = C.red; g.lineWidth = 3; g.strokeRect(40, 40, W - 80, Hh - 80);
@@ -263,18 +259,21 @@ async function drawFest(ctx, day, entry, desc, meta) {
   let y = P.wrap(name, 100, 370, W - 200, name.length > 28 ? 86 : 104, 'center', 4);
   if (entry.t) { P.set(42, C.blue, true); g.textAlign = 'center'; g.fillText(ctx.festTimes(entry), W / 2, y + 10); y += 70; }
 
-  P.set(40);
-  y = P.wrap(`${tithis(ctx, day)} · ${N.nakshatra(day.nakshatra[0][0])} · ${N.vara(day.wd)}`, 100, y + 50, W - 200, 58, 'center', 3);
-
-  const verse = desc && desc.s ? desc.s.replace(/\*\*/g, '').split('\n').map((l) => l.trim()).filter(Boolean) : [];
+  // The verse first, as many lines as fit (a citation line in blue); then the description in
+  // what room is left.
+  const verse = festVerse(desc);
   const prose = desc && (desc.d || desc.b) ? String(desc.d || desc.b).replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/[*`]/g, '').replace(/\s+/g, ' ') : '';
-  const room = Hh - 170 - y;
-  if (prose && room > 220) {
-    P.set(34, C.ink2, true);
-    y = P.wrap(prose, 110, y + 60, W - 220, 48, 'center', Math.max(2, Math.floor((room - 150) / 48)));
-  } else if (verse.length && room > 200) {
-    P.set(36);
-    verse.slice(0, 4).forEach((l, i) => P.wrap(l, 90, y + 70 + i * 60, W - 180, 56, 'center', 1));
+  const bottom = Hh - 190;
+  y += 110;
+  for (const line of verse) {
+    const cite = /^—/.test(line);
+    P.set(cite ? 32 : 38, cite ? C.ink2 : C.ink);
+    if (y > bottom) break;
+    y = P.wrap(line, 100, y, W - 200, 54, 'center', 2);
+  }
+  if (prose && bottom - y > 160) {
+    P.set(32, C.ink2, true);
+    y = P.wrap(prose, 110, y + 70, W - 220, 46, 'center', Math.max(2, Math.floor((bottom - y - 60) / 46)));
   }
   P.set(34); g.textAlign = 'center';
   g.fillText(ctx.cityName, W / 2, Hh - 130);

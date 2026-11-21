@@ -116,7 +116,7 @@ export function rashiBox(ctx, day) {
     const [row, col] = BOX_CELLS[r];
     const here = Object.entries(day.graha).filter(([, [rr]]) => rr === r);
     const lagna = day.lagna.length && r === day.lagna[0][0] ? true : false;
-    cells.push(h('div', { class: 'rb-cell', style: `grid-row:${row};grid-column:${col}` },
+    cells.push(h('div', { class: 'rb-cell' + (here.length > 3 ? ' crowded' : ''), style: `grid-row:${row};grid-column:${col}` },
       h('span', { class: 'rb-rashi' }, N.rashi(r)),
       h('span', { class: 'rb-grahas' }, here.map(([g, [, deg]]) => h('span', { class: 'rb-graha', title: `${deg}°` },
         (S.graha_box && S.graha_box[g]) || g, h('span', { class: 'rb-deg time' }, ` ${Math.floor(deg)}°`))))));

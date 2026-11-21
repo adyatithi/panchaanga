@@ -17,7 +17,9 @@ const CHROME = new Set(['vishayasuuchii', 'horaaplus', 'sankshepah', 'dinam', 'k
   'anveshanam', 'preshanam', 'chitram', 'lekhah', 'sanketah', 'pratilipih', 'pratiikshasva', 'nopalabhyate', 'nagaram',
   'lipih', 'bhaashaa', 'akshararupam', 'samayarupam', 'horaa24', 'horaa12', 'varnah', 'svatah', 'shuklam', 'shyaamam',
   'parichayah', 'abhipraayah', 'yogadaanam', 'kritajnataa', 'margadarshika', 'adya', 'idaaniim', 'anantaram', 'sheshah', 'parvasrotaamsi', 'atiriktaani',
-  'sarvaani', 'dinavibhaagaah', 'sandhyaa', 'shubham', 'ashubham', 'kaalakramah']);
+  'sarvaani', 'smaaranaani']);
+// (Headings of pañcāṅga content, as on the Kālas tab, are the pañcāṅga's words, in Sanskrit; the
+// tab names, buttons and the app's own pages follow the interface language.)
 import { openShare } from './share.js';
 import { renderPathana } from './view-pathana.js';
 import { renderSankalpa } from './view-sankalpa.js';

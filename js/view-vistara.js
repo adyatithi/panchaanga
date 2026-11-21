@@ -86,7 +86,7 @@ export async function renderVistara(ctx, root) {
   // The anga shlokas and what to avoid are read on their own page: offered right after the day.
   const pageBtn = (view, label) => h('button', { type: 'button', class: 'more-btn page-btn', onclick: () => ctx.go({ view }) },
     h('span', { class: 'btn-icon', html: iconSvg(view, 18) }), h('span', null, label));
-  root.append(h('section', { class: 'block page-btns' }, pageBtn('pathana', L('pathanam')), pageBtn('sankalpa', L('sankalpah')), pageBtn('varjya', L('varjayitum'))));
+  root.append(h('section', { class: 'block page-btns' }, pageBtn('pathana', L('pathanam')), pageBtn('sankalpa', L('sankalpah')), pageBtn('varjya', L('vidhinishedhaah'))));
 
   if (day.graha) root.append(section(ctx, 'graha', L('grahasthitih'), rashiBox(ctx, day)));
 

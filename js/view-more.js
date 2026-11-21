@@ -59,27 +59,32 @@ export async function renderMore(ctx, root) {
   // of days for an undertaking.
   const S = ctx.S.labels;
   const head = (key) => h('h2', { class: 'menu-head' }, S[key] ?? L(key));
+  // From what is used daily to what is used rarely: the day's pages, the lists of days for an
+  // undertaking, the year's, then the app's own (reminders, settings, guide, and about it).
+  const U = ctx.U;
   root.append(
-    h('ul', { class: 'menu' },
-      item('guide', L('margadarshika'), ctx.U('guidelead'), () => ctx.go({ view: 'guide' })),
-      item('settings', L('vinyaasah'), null, () => ctx.openSettings()),
-      item('smarana', L('smaaranaani'), ctx.U('rm_menu'), () => ctx.go({ view: 'smarana', date: null })),
-      item('about', L('parichayah'), null, () => ctx.go({ view: 'about' })),
-      item('contribute', L('yogadaanam'), ctx.U('yd_menu'), () => ctx.go({ view: 'contribute' })),
-      item('thanks', L('kritajnataa'), null, () => ctx.go({ view: 'thanks' })),
-      item('feedback', L('abhipraayah'), ctx.U('fb_menu'), () => ctx.go({ view: 'feedback' }))),
-    head('samvatsaravishayaah'),
-    h('ul', { class: 'menu' }, item('nava', L('navanaayakaah'), null, () => ctx.go({ view: 'nava' })),
-      meta && item('shannavati', L('shannavati'), nextSub(nextOf(Object.values(shannavati(meta)).flat().sort((a, b) => (a[0] < b[0] ? -1 : 1)))),
-        () => ctx.go({ view: 'shannavati', date: null })),
-      item('janma', L('janmadinaani'), ctx.U('jm_menu'), () => ctx.go({ view: 'janma', date: null }))),
     head('dinavishayaah'),
     h('ul', { class: 'menu' },
-      item('pathana', L('pathanam'), null, () => ctx.go({ view: 'pathana' })),
-      item('sankalpa', L('sankalpah'), null, () => ctx.go({ view: 'sankalpa' })),
-      item('varjya', L('varjayitum'), null, () => ctx.go({ view: 'varjya' }))),
+      item('pathana', L('pathanam'), U('mn_pathana'), () => ctx.go({ view: 'pathana' })),
+      item('sankalpa', L('sankalpah'), U('mn_sankalpa'), () => ctx.go({ view: 'sankalpa' })),
+      item('varjya', L('vidhinishedhaah'), U('mn_vidhi'), () => ctx.go({ view: 'varjya' }))),
     lists.length && head('muhurtadinaani'),
-    lists.length && h('ul', { class: 'menu' }, lists));
+    lists.length && h('ul', { class: 'menu' }, lists),
+    head('samvatsaravishayaah'),
+    h('ul', { class: 'menu' },
+      meta && item('shannavati', L('shannavati'), nextSub(nextOf(Object.values(shannavati(meta)).flat().sort((a, b) => (a[0] < b[0] ? -1 : 1)))),
+        () => ctx.go({ view: 'shannavati', date: null })),
+      item('janma', L('janmadinaani'), U('jm_menu'), () => ctx.go({ view: 'janma', date: null })),
+      item('nava', L('navanaayakaah'), U('mn_nava'), () => ctx.go({ view: 'nava' }))),
+    h('h2', { class: 'menu-head' }, U('mn_app')),
+    h('ul', { class: 'menu' },
+      item('smarana', L('smaaranaani'), U('rm_menu'), () => ctx.go({ view: 'smarana', date: null })),
+      item('settings', L('vinyaasah'), U('mn_settings'), () => ctx.openSettings()),
+      item('guide', L('margadarshika'), U('guidelead'), () => ctx.go({ view: 'guide' })),
+      item('feedback', L('abhipraayah'), U('fb_menu'), () => ctx.go({ view: 'feedback' })),
+      item('contribute', L('yogadaanam'), U('yd_menu'), () => ctx.go({ view: 'contribute' })),
+      item('thanks', L('kritajnataa'), U('mn_thanks'), () => ctx.go({ view: 'thanks' })),
+      item('about', L('parichayah'), U('mn_about'), () => ctx.go({ view: 'about' }))));
 }
 
 export function dayHead(ctx, day, meta, title) {
@@ -109,12 +114,12 @@ export async function renderVarjya(ctx, root) {
   const groups = NISHIDDHA_TOPICS.map((t) => [t, ids.filter((id) => (topics[id] || 'etc') === t).map((id) => lines[id])])
     .filter(([, list]) => list.length);
   const { L } = ctx;
-  const head = dayHead(ctx, day, meta, L('varjayitum'));
+  const head = dayHead(ctx, day, meta, L('vidhinishedhaah'));
   head.append(h('div', { class: 'share-row' }, shareButton(ctx, () => ctx.openShare({ day, meta, mode: 'varjya',
     groups: groups.map(([t, list]) => [L(`ni_${t}`), list]) }))));
   root.append(head,
     groups.length
-      ? h('section', { class: 'vihita nishiddha-groups' }, groups.map(([t, list]) => ctx.fold(`nishiddha-${t}`,
+      ? h('section', { class: 'vihita nishiddha-groups' }, h('h2', { class: 'vihita-head' }, `॥ ${L('varjayitum')} ॥`), groups.map(([t, list]) => ctx.fold(`nishiddha-${t}`,
         h('span', { class: 'label' }, L(`ni_${t}`)),
         h('div', { class: 'nishiddha reading' }, list.map((line) => h('p', null, verseLines(line)))))))
       : h('p', { class: 'empty' }, '—'));
