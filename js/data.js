@@ -23,6 +23,8 @@ export const loadPhrases = (script) => get(`text/${script}/phr.json`);
 export const loadLines = (script) => get(`text/${script}/lines.json`);
 // Which activity each nishiddha line belongs to (bhojana, snana, ...): one file for every script.
 export const loadNishiddhaTopics = () => get('text/nishiddha-topics.json');
+// Every place in jyotisha's places table: [[id, label, lat, lon, timezone], ...].
+export const loadPlaces = () => get('places.json');
 export const loadDescription = (script, id) => get(`text/${script}/desc-${id[0]}.json`).then((b) => b[id] || null);
 export const loadRepos = () => get('repos.json').catch(() => ({ repos: [], fest: {} }));
 export const loadMeta = (city, kali) => get(`c/${city}/${kali}/meta.json`);
@@ -68,10 +70,16 @@ export async function loadMonthDays(cityRec, ym) {
 
 // Offline: once the page is up, quietly fetch the whole Kali year for this city and the text
 // for this script, so the service worker has them. Done once per city, year, script and data build.
+// Not on a metered or slow connection, or with the phone's data saver on: then a file is fetched
+// only when a page needs it (and the service worker keeps it from then on).
 const prefetched = new Set();
+export function thrifty() {
+  const c = navigator.connection;
+  return !!c && (c.saveData === true || /(^|-)2g$|^3g$/.test(c.effectiveType || '') || c.type === 'cellular' && c.metered === true);
+}
 export function prefetchYear(cityRec, date, script, build) {
   const yr = yearFor(cityRec, date);
-  if (!yr || !('serviceWorker' in navigator) || !navigator.serviceWorker.controller || navigator.onLine === false) return;
+  if (!yr || !('serviceWorker' in navigator) || !navigator.serviceWorker.controller || navigator.onLine === false || thrifty()) return;
   const key = `${NIGHTLY ? 'nightly.' : ''}pf.${cityRec.id}.${yr.kali}.${script}.${Object.values(build || {}).join('-')}`;
   if (prefetched.has(key)) return;
   prefetched.add(key);

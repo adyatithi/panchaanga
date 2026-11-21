@@ -4,6 +4,7 @@ import * as data from './data.js';
 import { descriptionBody } from './view-vistara.js';
 import { names } from './parts.js';
 import { shareButton } from './share.js';
+import { placeFinder } from './places.js';
 import { LANGUAGES } from './i18n.js';
 
 const SCRIPT_NAMES = { devanagari: 'देवनागरी', tamil: 'தமிழ்', grantha: '𑌗𑍍𑌰𑌨𑍍𑌥', telugu: 'తెలుగు', kannada: 'ಕನ್ನಡ', iso: 'Roman (ISO)' };
@@ -51,16 +52,18 @@ function repoChooser(ctx) {
       h('div', { class: 'repo-list' }, base.map(toggle))));
 }
 
-export function openSettings(ctx) {
+// Settings is a page of its own (#/<city>/settings); the top bar's button and More open it.
+export const openSettings = (ctx) => ctx.go({ view: 'settings', date: null });
+
+export function renderSettings(ctx, root) {
   const { L, settings } = ctx;
   const current = { ...settings, lang: ctx.lang };
-  let dlg;
   const group = (label, key, options, onpick, cls = '') => h('fieldset', { class: 'opt-group' + cls },
     h('legend', null, label),
     h('div', { class: 'opts' }, options.map(([value, text, sub]) => h('button', {
       type: 'button', class: 'opt' + (String(current[key]) === String(value) ? ' active' : ''),
       'aria-pressed': String(current[key]) === String(value),
-      onclick: () => { dlg.close(); onpick ? onpick(value) : ctx.saveSettings({ [key]: value }); },
+      onclick: () => { onpick ? onpick(value) : ctx.saveSettings({ [key]: value }); },
     }, h('span', null, text), sub && h('span', { class: 'opt-sub' }, sub)))));
   // Cities in alphabetical order (by their English names), the chosen one first; one line shows,
   // the rest open with "All".
@@ -74,8 +77,9 @@ export function openSettings(ctx) {
     } }, `${L('sarvaani')} (${ctx.num(sorted.length)}) ▾`));
     return g;
   };
-  dlg = sheet(L('vinyaasah'), [
+  root.append(h('section', { class: 'settings-page' }, h('h2', { class: 'block-title' }, L('vinyaasah')),
     cityGroup(),
+    placeFinder(ctx),
     group(L('bhaashaa'), 'lang', LANGUAGES),
     group(L('lipih'), 'script', ctx.index.scripts.map((s) => [s, SCRIPT_NAMES[s] || s])),
     settings.script === 'devanagari' && group(L('akshararupam'), 'face', [['noto', 'नोटो सेरिफ्', 'Noto Serif'], ['siddhanta', 'सिद्धान्त', 'Siddhanta (PDF)']]),
@@ -86,17 +90,16 @@ export function openSettings(ctx) {
     h('fieldset', { class: 'opt-group' }, h('legend', null, L('janmanakshatram')),
       h('select', {
         class: 'opt-select', 'aria-label': L('janmanakshatram'),
-        onchange: (e) => { dlg.close(); ctx.saveSettings({ janma: Number(e.target.value) || 0 }); },
+        onchange: (e) => { ctx.saveSettings({ janma: Number(e.target.value) || 0 }); },
       }, h('option', { value: 0, selected: !settings.janma }, '—'),
       Array.from({ length: 27 }, (_, i) => h('option', { value: i + 1, selected: Number(settings.janma) === i + 1 },
         names(ctx).nakshatra(i + 1))))),
     repoChooser(ctx),
-    h('button', { type: 'button', class: 'more-btn wide', onclick: () => { dlg.close(); ctx.go({ view: 'about' }); } }, L('parichayah'), ' ›'),
+    h('button', { type: 'button', class: 'more-btn wide', onclick: () => ctx.go({ view: 'about' }) }, L('parichayah'), ' ›'),
     // The nightly build: what is being tried before it reaches everyone (same address, nightly/).
     h('fieldset', { class: 'opt-group nightly-opt' }, h('legend', null, ctx.U(NIGHTLY ? 'nt_on' : 'nt_title')),
       h('p', { class: 'hint' }, ctx.U(NIGHTLY ? 'nt_on_note' : 'nt_note')),
-      h('a', { class: 'more-btn wide', href: (NIGHTLY ? '../' : 'nightly/') + location.hash }, ctx.U(NIGHTLY ? 'nt_back' : 'nt_go'), ' ›')),
-  ]);
+      h('a', { class: 'more-btn wide', href: (NIGHTLY ? '../' : 'nightly/') + location.hash }, ctx.U(NIGHTLY ? 'nt_back' : 'nt_go'), ' ›'))));
 }
 
 export async function openFestival(ctx, entry, day) {

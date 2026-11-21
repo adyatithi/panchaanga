@@ -52,7 +52,7 @@ On today's page, the ghaṭikā clock and how much of each anga is left; then ev
 
 **मासः**
 
-The month as a calendar, with the tithi, nakṣatra and festival icons on each day and the festivals listed below it; a switch shows the week instead.
+The month as a calendar. Each day shows the solar day, the tithi at sunrise (शु ११ is śukla ekādaśī; अमा and पौर्ण name the new and full moon) with the nakṣatra, and up to two festival icons; a blue dot marks a day whose festivals have no icon. The festivals are listed below. The switch at the top shows the week instead, or a solar month (सौरमासः, from its saṅkramaṇa, as in the PDFs' sections) or a lunar month (चान्द्रमासः, from śukla prathamā), with ‹ › stepping a whole month.
 
 **पर्वाणि**
 
@@ -60,7 +60,7 @@ Every festival of the year, and the year's lists, with search.
 
 **अन्यत्**
 
-This guide, settings, Reminders, About, Contribute, Acknowledgements and Feedback (which opens a prefilled GitHub issue); the year's nava-nāyakas, ṣaṇṇavati-tarpaṇa days and janmadinas; the day's paṭhanam, saṅkalpa and what to avoid; and the lists of days for an oil bath, a haircut, beginning study and the ūna-śrāddhas.
+From the daily to the occasional: the day's paṭhanam, saṅkalpa, and vidhi-niṣedhas (what to avoid and what is commended); the lists of days for an oil bath, a haircut, beginning study and the ūna-śrāddhas; the year's ṣaṇṇavati-tarpaṇa days, janmadinas and nava-nāyakas; then the app: Reminders, Settings, this guide, the Adyatithi blog (its posts by section), Feedback (which opens a prefilled GitHub issue), Contribute, Acknowledgements, Privacy (what the app keeps and what it sends) and About.
 
 ## The head of the page
 
@@ -186,7 +186,7 @@ Days suitable for the ūna-māsika śrāddhas, with the nakṣatra in the aftern
 
 ## On the Detail page
 
-**पञ्चाङ्ग-पठनम् · सङ्कल्पः · वर्जयितुम् उचित-विषयाः**
+**पञ्चाङ्ग-पठनम् · सङ्कल्पः · विधि-निषेधाः**
 
 Right after the day's page, three buttons: the day set out for reading aloud, the day's sankalpa, and what is better avoided today (see Pages under More).
 
@@ -214,7 +214,7 @@ The nine "officers" of the year (rājā, mantrī …), the graha holding each, a
 
 **स्मारणानि**
 
-Notifications on this phone for the festival groups you choose (as on the Festivals tab) and the ṣaṇṇavati days: the evening before, on the morning of the day, or fifteen minutes before one with a time begins. They are worked out on the phone about two months ahead and kept up to date when the app is opened; a small service sends each when it is due. On iPhone, the app must be on the Home Screen. They are ordinary notifications, not alarms.
+Notifications on this phone for the festival groups you choose (as on the Festivals tab) and the ṣaṇṇavati days: the evening before, on the morning of the day, or fifteen minutes before one with a time begins. They are worked out on the phone about two months ahead and kept up to date when the app is opened; a small service sends each when it is due. Alarms by ghaṭikā sound at a ghaṭikā of the pañcāṅga day, counted from that day's own sunrise and sunset (28-00 and 58-00 for the sandhyās), every day, on days of the week or on chosen dates, and some minutes early if wanted. On iPhone, the app must be on the Home Screen. They are ordinary notifications, not alarms that ring.
 
 **जन्म-दिनानि**
 
@@ -232,9 +232,9 @@ The day set out for reading aloud: each anga with its śloka and devatā, and th
 
 The day's part of the sankalpa, from the samvatsara to the tithi. On today's page it is the sankalpa for this moment, and changes by itself as the tithi, nakṣatra, yoga, karaṇa or month changes; a box turns it to the one printed in the PDFs' sankalpa list, from sunrise for the first 24 ghaṭikās, with the time of each change within them. One phrase to a line, with buttons for larger or smaller type and to copy it. Also a button on the Detail page.
 
-**वर्जयितुम् उचित-विषयाः**
+**विधि-निषेधाः**
 
-The verses on what is better avoided today (oil bath, bathing, cleaning the teeth, shaving, certain foods and so on), selected by the day's angas, as in the PDFs. Below them, under कर्तुम् उचित-विषयाः, what the Mahābhārata, Rāmāyaṇa and Bhāgavata commend for the day's tithi and nakṣatra (fasting, bathing, gifts, pūjā, recitation, śrāddha), each with a note in English; tap a heading to open it.
+Under वर्जयितुम् उचित-विषयाः, the verses on what is better avoided today, selected by the day's angas as in the PDFs, in sections by what they concern (food, oil bath, bathing, cleaning the teeth, shaving, plucking tulasī, and so on). Below them, under कर्तुम् उचित-विषयाः, what the Mahābhārata, Rāmāyaṇa and Bhāgavata commend for the day's tithi and nakṣatra (fasting, bathing, gifts, pūjā, recitation, śrāddha), each with a note in English; tap a heading to open it.
 
 **मुहूर्त-दिनानि**
 
@@ -266,7 +266,7 @@ The festivals come from separate collections (by deity, region, tradition, templ
 
 **नगरम्**
 
-Fifty cities, your own first; the rest open under "All".
+The cities in the app, your own first; the rest open under "All". Below them, Find your place searches every place jyotisha knows: use the nearest city, or, if it is more than 75 km away or keeps another time, request your place, which is added once approved.
 
 **भाषा · लिपिः**
 
@@ -288,4 +288,4 @@ All times are computed with the open-source jyotisha library, which uses the Swi
 
 **नगरम्**
 
-Each city's data is computed in advance for three years, and rebuilt every week. Other places will come later.
+Each city's data is computed in advance for three years, and rebuilt every week. A requested place is added by hand, after a look at the requests.

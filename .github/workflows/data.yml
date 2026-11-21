@@ -12,9 +12,18 @@ on:
         description: "Recompute the janmadina tables (only after a change to how jyotisha places festivals)"
         type: boolean
         default: false
+      add_city:
+        description: "Add one city (an id from jyotisha's places table): build only it, into the data as it is"
+        type: string
+        default: ""
+      issue:
+        description: "The city-request issue to comment on and close (with add_city)"
+        type: string
+        default: ""
 
 permissions:
   contents: write
+  issues: write
 
 concurrency:
   group: data-build
@@ -83,16 +92,42 @@ jobs:
           PY
 
       - name: Build
+        if: inputs.add_city == ''
         env:
           PYTHONWARNINGS: ignore
         # The janmadina tables are kept from data/ (they change only with jyotisha's festival
         # engine); a new year or city gets one. Tick "Recompute" when starting by hand to redo all.
         run: >-
           adyatithi generate app-data --years ${{ steps.years.outputs.years }} --output-dir "$RUNNER_TEMP/data"
+          --cities "$(grep -v '^#' data-cities.txt | paste -sd, -)"
           --janma-from data ${{ inputs.recompute_janma && '--recompute-janma' || '' }}
           > build.log 2>&1 || (tail -50 build.log; exit 1)
 
+      # Adding a city: build it alone, straight into data/ (the index and text tables are merged),
+      # and add it to data-cities.txt so that the weekly build keeps it.
+      - name: Add city
+        if: inputs.add_city != ''
+        env:
+          PYTHONWARNINGS: ignore
+          CITY: ${{ inputs.add_city }}
+          ISSUE: ${{ inputs.issue }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          grep -qx "$CITY" data-cities.txt && { echo "$CITY is already built"; exit 0; }
+          adyatithi generate app-data --years ${{ steps.years.outputs.years }} --cities "$CITY" --output-dir data --janma-from data > build.log 2>&1 || (tail -50 build.log; exit 1)
+          echo "$CITY" >> data-cities.txt
+          git add -A data data-cities.txt
+          git config user.name "adyatithi data build"
+          git config user.email "actions@users.noreply.github.com"
+          git commit -m "Add city $CITY${ISSUE:+ (#$ISSUE)}"
+          git push
+          if [ -n "$ISSUE" ]; then
+            gh issue comment "$ISSUE" --repo "$GITHUB_REPOSITORY" --body "Added: $CITY is now in the app (Kali ${{ steps.years.outputs.years }}), from the next publish, a few minutes from now."
+            gh issue close "$ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed
+          fi
+
       - name: Publish if changed
+        if: inputs.add_city == ''
         run: |
           cp data/index.json "$RUNNER_TEMP/index.before.json" 2>/dev/null || echo '{}' > "$RUNNER_TEMP/index.before.json"
           rsync -a --delete "$RUNNER_TEMP/data/" data/

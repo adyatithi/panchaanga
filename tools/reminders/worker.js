@@ -10,10 +10,17 @@
 //   POST /unsubscribe  { endpoint }
 //   POST /test         { endpoint }    one notification now, to check that it arrives
 //   GET  /key          { key }         the public key the app subscribes with
+//   POST /ping         usage, once a day from each phone: city, script, language, pages opened
+//   GET  /stats?k=…    the usage counts, as a page (for the maintainer; k is the STATS_KEY secret)
+//   POST /request-city { place, nearest, km }: opens (or counts on) a "City request" issue
 //
 // t is the time in minutes since 1970 (UTC). What is stored is a subscription and its reminders,
 // nothing else: no name, account or address. A push service that answers 404 or 410 (the reader
 // turned notifications off, or removed the app) has its subscription deleted.
+//
+// Usage goes to Workers Analytics Engine (binding USAGE): counts only, with no identifier, address
+// or device detail; the country is Cloudflare's for the request. City requests become GitHub
+// issues (secret GH_TOKEN: issues read and write on GH_REPO), approved by hand with a label.
 //
 // The VAPID key pair is the secret VAPID_JWK (a P-256 private key as JWK), made once by the deploy
 // workflow; its public half is the key the app subscribes with.
@@ -133,7 +140,11 @@ function cors(request, env) {
 }
 
 async function handle(request, env) {
-  const path = new URL(request.url).pathname;
+  const url = new URL(request.url);
+  const path = url.pathname;
+  if (path === '/ping' && request.method === 'POST') return ping(request, env);
+  if (path === '/stats' && request.method === 'GET') return stats(url, env);
+  if (path === '/request-city' && request.method === 'POST') return requestCity(request, env);
   const keys = await vapidKeys(env.VAPID_JWK);
   if (request.method === 'GET' && path === '/key') return { key: keys.pub };
   if (request.method !== 'POST') return [404, { error: 'not found' }];
@@ -165,6 +176,108 @@ async function handle(request, env) {
     return { ok: status < 300, status };
   }
   return [404, { error: 'not found' }];
+}
+
+// --- Usage ---
+
+const word = (v, n = 40) => (typeof v === 'string' && /^[\w .\-]{1,80}$/u.test(v) ? v.slice(0, n) : '');
+
+// One record a day per phone ("day": its choices), and one per page it opened that day ("view").
+async function ping(request, env) {
+  let b;
+  try { b = JSON.parse(await request.text()); } catch { return [400, { error: 'not JSON' }]; }
+  const country = request.cf?.country || '';
+  const city = word(b.city), channel = word(b.channel, 10), v = word(b.v, 10);
+  if (!city) return [400, { error: 'no city' }];
+  if (!env.USAGE) return { ok: true };
+  if (b.first) {
+    env.USAGE.writeDataPoint({ blobs: ['day', city, word(b.script), word(b.lang, 8), channel, word(b.mode, 8), country, v,
+      b.reminders ? 'reminders' : '', String(Math.min(20, Number(b.alarms) || 0))], doubles: [1], indexes: [city] });
+  }
+  for (const view of (Array.isArray(b.views) ? b.views : []).slice(0, 40).map((x) => word(x, 20)).filter(Boolean)) {
+    env.USAGE.writeDataPoint({ blobs: ['view', view, city, channel, country], doubles: [1], indexes: [view] });
+  }
+  return { ok: true };
+}
+
+const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+// The counts for the last 30 days, from the Analytics Engine SQL API (secret CF_ANALYTICS_TOKEN,
+// with Account Analytics read).
+async function stats(url, env) {
+  if (!env.STATS_KEY || url.searchParams.get('k') !== env.STATS_KEY) return [404, { error: 'not found' }];
+  if (!env.CF_ANALYTICS_TOKEN) return [503, { error: 'no analytics token' }];
+  const days = Math.min(365, Math.max(1, Number(url.searchParams.get('days')) || 30));
+  const q = async (sql) => {
+    const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${env.ACCOUNT_ID}/analytics_engine/sql`,
+      { method: 'POST', headers: { Authorization: `Bearer ${env.CF_ANALYTICS_TOKEN}` }, body: sql });
+    const j = await r.json().catch(() => ({}));
+    return j.data || [];
+  };
+  const since = `timestamp > NOW() - INTERVAL '${days}' DAY`;
+  const by = (blob, kind = 'day') => q(`SELECT ${blob} AS k, SUM(_sample_interval) AS n FROM adyatithi_usage WHERE blob1 = '${kind}' AND ${since} GROUP BY k ORDER BY n DESC LIMIT 200`);
+  const [perDay, city, script, lang, channel, mode, country, views, reminders] = await Promise.all([
+    q(`SELECT toDate(timestamp) AS k, SUM(_sample_interval) AS n FROM adyatithi_usage WHERE blob1 = 'day' AND ${since} GROUP BY k ORDER BY k DESC`),
+    by('blob2'), by('blob3'), by('blob4'), by('blob5'), by('blob6'), by('blob7'), by('blob2', 'view'), by('blob9'),
+  ]);
+  const table = (title, rows) => `<h2>${esc(title)}</h2><table>${rows.map((r) => `<tr><td>${esc(r.k || '—')}</td><td>${esc(r.n)}</td></tr>`).join('')}</table>`;
+  const html = `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Adyatithi usage</title>
+<style>body{font:15px/1.4 system-ui,sans-serif;margin:16px;max-width:40rem}h2{font-size:1rem;margin:1.2rem 0 .3rem}td{padding:.1rem .8rem .1rem 0}tr:nth-child(odd){background:#f4f4f4}</style>
+<h1>Adyatithi usage, last ${days} days</h1><p>Phone-days: one per phone per day it opened the app. Pages: opened that day.</p>
+${table('Phone-days by date', perDay)}${table('City', city)}${table('Page', views)}${table('Script', script)}${table('Language', lang)}
+${table('Channel', channel)}${table('Installed app or browser', mode)}${table('Country', country)}${table('Reminders on', reminders)}`;
+  return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
+}
+
+// --- City requests ---
+
+let placesCache = null;
+async function places(env) {
+  if (placesCache && Date.now() - placesCache.at < 3600e3) return placesCache.map;
+  for (const site of (env.SITES || '').split(',')) {
+    const r = await fetch(`${site.trim()}data/places.json`).catch(() => null);
+    if (r && r.ok) {
+      const map = new Map((await r.json()).map((p) => [p[0], p]));
+      placesCache = { at: Date.now(), map };
+      return map;
+    }
+  }
+  return new Map();
+}
+
+async function gh(env, path, init = {}) {
+  const r = await fetch(`https://api.github.com/repos/${env.GH_REPO}${path}`, { ...init, headers: {
+    Authorization: `Bearer ${env.GH_TOKEN}`, Accept: 'application/vnd.github+json', 'User-Agent': 'adyatithi-reminders',
+    'X-GitHub-Api-Version': '2022-11-28', ...(init.body ? { 'Content-Type': 'application/json' } : {}) } });
+  if (!r.ok) throw new Error(`github ${r.status}`);
+  return r.json();
+}
+
+async function requestCity(request, env) {
+  if (!env.GH_TOKEN) return [503, { error: 'not set up' }];
+  let b;
+  try { b = JSON.parse(await request.text()); } catch { return [400, { error: 'not JSON' }]; }
+  const place = (await places(env)).get(typeof b.place === 'string' ? b.place : '');
+  if (!place) return [404, { error: 'unknown place' }];
+  const [id, label, lat, lon, tz] = place;
+  // One count a minute for a place, however many taps.
+  const recent = `rq:${id}`;
+  if (await env.SUBS.get(recent)) return { ok: true, counted: false };
+  await env.SUBS.put(recent, '1', { expirationTtl: 60 });
+  const title = `City request: ${label}`;
+  const open = await gh(env, '/issues?labels=city-request&state=open&per_page=100');
+  const issue = open.find((i) => i.title === title);
+  if (issue) {
+    const n = (Number((issue.body || '').match(/Requests: (\d+)/)?.[1]) || 1) + 1;
+    await gh(env, `/issues/${issue.number}`, { method: 'PATCH', body: JSON.stringify({ body: issue.body.replace(/Requests: \d+/, `Requests: ${n}`) }) });
+    return { ok: true, issue: issue.number, requests: n };
+  }
+  const nearest = word(b.nearest), km = Math.round(Number(b.km) || 0);
+  const body = [`Place: **${label}** (\`${id}\`)`, `Latitude, longitude: ${lat}, ${lon} · time zone ${tz}`,
+    nearest ? `Nearest city in the app: ${nearest}, ${km} km` : '', '', 'Requests: 1', '',
+    'To add it, give this issue the label `approved`: the Add city workflow builds its three years, publishes them and closes the issue.'].join('\n');
+  const made = await gh(env, '/issues', { method: 'POST', body: JSON.stringify({ title, body, labels: ['city-request'] }) });
+  return { ok: true, issue: made.number, requests: 1 };
 }
 
 // --- The run every five minutes ---

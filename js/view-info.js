@@ -1,6 +1,6 @@
 // Three small pages under More: feedback (a prefilled GitHub issue), the appeal to contribute,
 // and the acknowledgements with the software and typefaces the pañcāṅga is made with.
-import { h, NIGHTLY } from './util.js';
+import { h, NIGHTLY, MONTHS } from './util.js';
 import { acknowledgements } from './view-misc.js';
 
 // Issues are filed on the public repository the site is published from.
@@ -99,4 +99,35 @@ export function renderThanks(ctx, root) {
         'under the SIL Open Font License; Siddhanta by Mihail Bayaryn, under ',
         link('https://creativecommons.org/licenses/by-nc-nd/3.0/', 'CC BY-NC-ND 3.0'), ', served unmodified.'),
       h('p', { class: 'muted colophon' }, 'The app itself is plain HTML, CSS and JavaScript, with no framework, and works offline once opened.')));
+}
+
+// What the app keeps on the phone, and what it sends (and where), in full.
+export function renderPrivacy(ctx, root) {
+  const { U } = ctx;
+  root.append(h('section', { class: 'prose privacy' },
+    h('h2', { class: 'block-title' }, U('privacy')),
+    h('p', { class: 'pv-lead' }, U('pv_lead')),
+    h('h3', null, U('pv_phone_h')), h('p', null, U('pv_phone')),
+    h('h3', null, U('pv_sent_h')),
+    h('ul', null, ['pv_usage', 'pv_reminders', 'pv_request', 'pv_feedback'].map((k) => h('li', null, U(k)))),
+    h('h3', null, U('pv_hosts_h')), h('p', null, U('pv_hosts'))));
+}
+
+// The Adyatithi blog: its posts by section, as tools/blog.py gathers them when the site is
+// published (data/blog.json; the nightly app reads the stable one).
+export async function renderBlog(ctx, root) {
+  const { U } = ctx;
+  const blog = await fetch(NIGHTLY ? '../data/blog.json' : 'data/blog.json').then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  const url = blog?.url || 'https://adyatithi.substack.com';
+  const head = h('section', { class: 'prose blog-head' },
+    h('h2', { class: 'block-title' }, U('blog')),
+    h('p', null, U('blog_lead'), ' ', link(url, url.replace(/^https:\/\//, ''))));
+  if (!blog?.sections?.length) return root.append(head, h('p', { class: 'muted' }, U('blog_none')));
+  const date = (d) => { const t = new Date(d + 'T00:00:00Z'); return isNaN(t) ? d : `${t.getUTCDate()} ${MONTHS[t.getUTCMonth()].slice(0, 3)} ${t.getUTCFullYear()}`; };
+  root.append(head, h('section', { class: 'blog' }, blog.sections.map((sec, i) => ctx.foldAs(`blog-${sec.name}`, i > 0,
+    h('span', { class: 'label' }, sec.name, h('span', { class: 'muted' }, ` · ${ctx.num(sec.posts.length)}`)),
+    h('ul', { class: 'blog-posts' }, sec.posts.map((p) => h('li', null,
+      h('a', { href: p.u, target: '_blank', rel: 'noopener', class: 'blog-title' }, p.t),
+      h('span', { class: 'muted blog-date time' }, ` ${date(p.d)}`),
+      p.s && h('p', { class: 'muted blog-sub' }, p.s))))))));
 }

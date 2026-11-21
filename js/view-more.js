@@ -5,6 +5,7 @@ import * as data from './data.js';
 import { missing, names } from './parts.js';
 import { shareButton } from './share.js';
 import { shannavati } from './view-shannavati.js';
+import { yearChips } from './view-parva.js';
 
 const ICONS = {
   guide: 'M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18zM12 11v6M12 7.5v.01',
@@ -20,6 +21,10 @@ const ICONS = {
   uuna: 'M15 4a8 8 0 1 0 5 13a7 7 0 0 1-5-13z',
   // Shannavati: water poured from cupped hands.
   shannavati: 'M5 9c0 4 3 6 7 6s7-2 7-6zM12 15v2M10 19.5c0-1 2-2.5 2-2.5s2 1.5 2 2.5a2 2 0 0 1-4 0z',
+  // The blog: a page of text.
+  blog: 'M6 3h9l4 4v14H6zM14 3v5h5M9 12h7M9 15.5h7M9 19h4',
+  // Privacy: a lock.
+  privacy: 'M7.5 11V8a4.5 4.5 0 0 1 9 0v3M5.5 11h13v9h-13zM12 14.5v2',
   // Reminders: a bell.
   smarana: 'M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20.5a2 2 0 0 0 4 0',
   // Feedback: a speech bubble; contribute: a gift; acknowledgements: a flower.
@@ -59,27 +64,34 @@ export async function renderMore(ctx, root) {
   // of days for an undertaking.
   const S = ctx.S.labels;
   const head = (key) => h('h2', { class: 'menu-head' }, S[key] ?? L(key));
+  // From what is used daily to what is used rarely: the day's pages, the lists of days for an
+  // undertaking, the year's, then the app's own (reminders, settings, guide, and about it).
+  const U = ctx.U;
   root.append(
-    h('ul', { class: 'menu' },
-      item('guide', L('margadarshika'), ctx.U('guidelead'), () => ctx.go({ view: 'guide' })),
-      item('settings', L('vinyaasah'), null, () => ctx.openSettings()),
-      item('smarana', L('smaaranaani'), ctx.U('rm_menu'), () => ctx.go({ view: 'smarana', date: null })),
-      item('about', L('parichayah'), null, () => ctx.go({ view: 'about' })),
-      item('contribute', L('yogadaanam'), ctx.U('yd_menu'), () => ctx.go({ view: 'contribute' })),
-      item('thanks', L('kritajnataa'), null, () => ctx.go({ view: 'thanks' })),
-      item('feedback', L('abhipraayah'), ctx.U('fb_menu'), () => ctx.go({ view: 'feedback' }))),
-    head('samvatsaravishayaah'),
-    h('ul', { class: 'menu' }, item('nava', L('navanaayakaah'), null, () => ctx.go({ view: 'nava' })),
-      meta && item('shannavati', L('shannavati'), nextSub(nextOf(Object.values(shannavati(meta)).flat().sort((a, b) => (a[0] < b[0] ? -1 : 1)))),
-        () => ctx.go({ view: 'shannavati', date: null })),
-      item('janma', L('janmadinaani'), ctx.U('jm_menu'), () => ctx.go({ view: 'janma', date: null }))),
     head('dinavishayaah'),
     h('ul', { class: 'menu' },
-      item('pathana', L('pathanam'), null, () => ctx.go({ view: 'pathana' })),
-      item('sankalpa', L('sankalpah'), null, () => ctx.go({ view: 'sankalpa' })),
-      item('varjya', L('varjayitum'), null, () => ctx.go({ view: 'varjya' }))),
+      item('pathana', L('pathanam'), U('mn_pathana'), () => ctx.go({ view: 'pathana' })),
+      item('sankalpa', L('sankalpah'), U('mn_sankalpa'), () => ctx.go({ view: 'sankalpa' })),
+      item('varjya', L('vidhinishedhaah'), U('mn_vidhi'), () => ctx.go({ view: 'varjya' }))),
     lists.length && head('muhurtadinaani'),
-    lists.length && h('ul', { class: 'menu' }, lists));
+    lists.length && h('ul', { class: 'menu' }, lists),
+    head('samvatsaravishayaah'),
+    h('ul', { class: 'menu' },
+      meta && item('shannavati', L('shannavati'), nextSub(nextOf(Object.values(shannavati(meta)).flat().sort((a, b) => (a[0] < b[0] ? -1 : 1)))),
+        () => ctx.go({ view: 'shannavati', date: null })),
+      item('janma', L('janmadinaani'), U('jm_menu'), () => ctx.go({ view: 'janma', date: null })),
+      item('nava', L('navanaayakaah'), U('mn_nava'), () => ctx.go({ view: 'nava' }))),
+    h('h2', { class: 'menu-head' }, U('mn_app')),
+    h('ul', { class: 'menu' },
+      item('smarana', L('smaaranaani'), U('rm_menu'), () => ctx.go({ view: 'smarana', date: null })),
+      item('settings', L('vinyaasah'), U('mn_settings'), () => ctx.openSettings()),
+      item('guide', L('margadarshika'), U('guidelead'), () => ctx.go({ view: 'guide' })),
+      item('blog', U('blog'), U('mn_blog'), () => ctx.go({ view: 'blog' })),
+      item('feedback', L('abhipraayah'), U('fb_menu'), () => ctx.go({ view: 'feedback' })),
+      item('contribute', L('yogadaanam'), U('yd_menu'), () => ctx.go({ view: 'contribute' })),
+      item('thanks', L('kritajnataa'), U('mn_thanks'), () => ctx.go({ view: 'thanks' })),
+      item('privacy', U('privacy'), U('mn_privacy'), () => ctx.go({ view: 'privacy' })),
+      item('about', L('parichayah'), U('mn_about'), () => ctx.go({ view: 'about' }))));
 }
 
 export function dayHead(ctx, day, meta, title) {
@@ -88,7 +100,8 @@ export function dayHead(ctx, day, meta, title) {
   return h('header', { class: 'pathana-head' },
     h('div', { class: 'pathana-title' }, `॥ ${title} ॥`),
     h('div', { class: 'pathana-date' },
-      h('span', { class: 'time' }, `${WDAYS[day.wd]} ${dt.getUTCDate()} ${MONTHS[dt.getUTCMonth()]} ${dt.getUTCFullYear()}`), h('br'),
+      h('button', { type: 'button', class: 'time date-link', title: ctx.L('dinam'), onclick: () => ctx.go({ view: 'dina', date: day.date }) },
+        `${WDAYS[day.wd]} ${dt.getUTCDate()} ${MONTHS[dt.getUTCMonth()]} ${dt.getUTCFullYear()}`), h('br'),
       `${N.samvatsara(meta.samvatsara)} · ${N.ayana(day.ayana)} · ${N.rtu(day.rtu)}`, h('br'),
       `${N.rashi(day.saura.m)} ${ctx.num(day.saura.d)} · ${N.chandramasa(day.chandra)}`));
 }
@@ -109,12 +122,12 @@ export async function renderVarjya(ctx, root) {
   const groups = NISHIDDHA_TOPICS.map((t) => [t, ids.filter((id) => (topics[id] || 'etc') === t).map((id) => lines[id])])
     .filter(([, list]) => list.length);
   const { L } = ctx;
-  const head = dayHead(ctx, day, meta, L('varjayitum'));
+  const head = dayHead(ctx, day, meta, L('vidhinishedhaah'));
   head.append(h('div', { class: 'share-row' }, shareButton(ctx, () => ctx.openShare({ day, meta, mode: 'varjya',
     groups: groups.map(([t, list]) => [L(`ni_${t}`), list]) }))));
   root.append(head,
     groups.length
-      ? h('section', { class: 'vihita nishiddha-groups' }, groups.map(([t, list]) => ctx.fold(`nishiddha-${t}`,
+      ? h('section', { class: 'vihita nishiddha-groups' }, h('h2', { class: 'vihita-head' }, `॥ ${L('varjayitum')} ॥`), groups.map(([t, list]) => ctx.fold(`nishiddha-${t}`,
         h('span', { class: 'label' }, L(`ni_${t}`)),
         h('div', { class: 'nishiddha reading' }, list.map((line) => h('p', null, verseLines(line)))))))
       : h('p', { class: 'empty' }, '—'));
@@ -157,6 +170,7 @@ export async function renderNava(ctx, root) {
     h('header', { class: 'pathana-head' },
       h('div', { class: 'pathana-title' }, `॥ ${L('navanaayakaah')} ॥`),
       h('div', { class: 'pathana-date' }, `${N.samvatsara(meta.samvatsara)} – ${meta.vatsara[ctx.settings.script]}`),
+      yearChips(ctx, yr),
       h('p', { class: 'nava-line' }, `${L('asminsamvatsare')} ` +
         sthaanas.map((s) => `${T.sthaana[s]} ${T.graha1[meta.nava[s]]}`).join(', ') + '।')),
     h('section', { class: 'pathana-cards' }, cards));

@@ -4,6 +4,7 @@ import { h, parseDate, WDAYS } from './util.js';
 import * as data from './data.js';
 import { missing } from './parts.js';
 import { yearHead } from './view-parva.js';
+import { calButton, subscribeSheet } from './calendar.js';
 
 // Each kind: a label key and a test on a festival id. The amāvāsyās are the month's own entry
 // (not the sōmavatī, bōdhāyana or itihāsa notes on it); the saṅkrāntis are the nirayaṇa ones of
@@ -24,7 +25,17 @@ export const KINDS = [
 // day the next one starts (its Mēṣa saṅkrānti), so that last day is left to the next year.
 // The saṅkrāntis are one per rāśi, from Mēṣa: the first of each in the year, and a Mēṣa that fell
 // the day before the year's file starts (abroad, mostly) taken from the previous year's.
+// Kept per year for the session: More asks for it on each visit (its "next" line), and the page.
+const memo = new WeakMap();
 export function shannavati(meta, prev) {
+  const hit = memo.get(meta);
+  if (hit && hit.prev === prev) return hit.out;
+  const out = computeShannavati(meta, prev);
+  memo.set(meta, { prev, out });
+  return out;
+}
+
+function computeShannavati(meta, prev) {
   const out = Object.fromEntries(KINDS.map(([k]) => [k, []]));
   const dates = Object.keys(meta.fests).filter((d) => d >= meta.start && d < meta.end).sort();
   for (const date of dates) {
@@ -89,6 +100,8 @@ export async function renderShannavati(ctx, root) {
   root.append(
     h('div', { class: 'pane-top' }, yearHead(ctx, meta, yr, true),
       h('div', { class: 'title-row' },
-        h('h2', { class: 'block-title mu-title' }, L('shannavati'), h('span', { class: 'mu-count' }, ctx.num(total))))),
+        h('h2', { class: 'block-title mu-title' }, L('shannavati'), h('span', { class: 'mu-count' }, ctx.num(total))),
+        // A calendar feed of these days (tools/ics_feeds.py computes them the same way).
+        calButton(ctx, () => subscribeSheet(ctx, 'shannavati', L('shannavati'))))),
     scroll);
 }

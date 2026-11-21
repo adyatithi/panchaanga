@@ -12,6 +12,14 @@ id = "5011ed102bf04202a7aa1f3d290360f6"    # "adyatithi-push"
 [triggers]
 crons = ["*/5 * * * *"]
 
+[[analytics_engine_datasets]]
+binding = "USAGE"
+dataset = "adyatithi_usage"
+
 [vars]
 # Pages allowed to subscribe (the stable and nightly apps share the first origin).
 ORIGINS = "https://adyatithi.github.io,http://localhost:8765"
+ACCOUNT_ID = "4936037c42de3d8088f9b439f24076f5"
+GH_REPO = "adyatithi/panchaanga"
+# Where data/places.json is read from, in order (stable, then nightly).
+SITES = "https://adyatithi.github.io/panchaanga/,https://adyatithi.github.io/panchaanga/nightly/"

@@ -221,7 +221,7 @@ export async function renderKala(ctx, root) {
 
   const progress = now != null ? await cues(ctx, day, now).catch(() => null) : null;
   const prev = now != null ? (await ctx.loadDay(addDays(day.date, -1)).catch(() => null))?.day : null;
-  const kaalaList = h('div', { class: 'kaala-sum' }, summary.map((i) => h('div', {
+  const kaalaList = h('div', { class: 'kaala-sum', 'data-live': '' }, summary.map((i) => h('div', {
     class: `ks-item ${i.quality || ''}${now != null && i.start <= now && now < i.end ? ' live' : ''}`,
   }, h('span', { class: 'ks-name' }, i.label), h('span', { class: 'time ks-time' }, `${T(i.start)}–${T(i.end)}`))));
 
@@ -232,7 +232,7 @@ export async function renderKala(ctx, root) {
   const shraaddhaKaalas = pairs(['shraaddhaarambha_mukhya', 'shraaddhaarambha_gauna', 'shraaddha_kaala'].map((key, i) => [S.kaala[key],
     h('span', { class: 'time' }, `${T(day.shraaddha_kaala[i][0])}▸${T(day.shraaddha_kaala[i][1])}`)]));
   // Lagnas, horas and muhurtas below the timeline: [name, end] cells, the current one marked.
-  const cells = (rows, from) => h('div', { class: 'grid-cells' }, rows.map(([name, end], i) => {
+  const cells = (rows, from) => h('div', { class: 'grid-cells', 'data-live': '' }, rows.map(([name, end], i) => {
     const start = i ? rows[i - 1][1] : from;
     return h('div', { class: 'cell' + (now != null && start <= now && now < end ? ' live' : '') },
       h('span', null, name), h('span', { class: 'time' }, '▸' + T(end)));
@@ -240,16 +240,21 @@ export async function renderKala(ctx, root) {
   const listBlock = (id, title, ...body) => h('section', { class: 'block fold-block' },
     ctx.fold('kala-' + id, h('h2', { class: 'block-title' }, title), ...body));
 
+  // What moves with the time ("now", the clock, the time left, the live kāla and the timeline's
+  // now-line) is marked data-live: each minute only those are swapped in, unless more has changed.
+  const nowFold = now != null && ctx.fold('kala-now',
+    h('span', { class: 'now-head' }, h('span', { class: 'now-dot', 'aria-hidden': 'true' }), h('span', { class: 'label' }, ctx.S.labels.idaaniim ?? ctx.L('idaaniim')),
+      h('span', { class: 'time now-clock' }, ctx.T(now))),
+    h('section', { class: 'now kala-now' }, ghatikaClock(ctx, day, prev), progress));
+  if (nowFold) nowFold.dataset.live = '';
+  timeline.dataset.live = '';
   // The top stays in place (now, the ghatika clock, the kaalas); only the timeline scrolls.
   root.classList.add('pane-view');
   root.append(
     h('div', { class: 'pane-top kala-top' },
       sunMoon(ctx, day),
-      now != null && ctx.fold('kala-now',
-        h('span', { class: 'now-head' }, h('span', { class: 'now-dot', 'aria-hidden': 'true' }), h('span', { class: 'label' }, ctx.L('idaaniim')),
-          h('span', { class: 'time now-clock' }, ctx.T(now))),
-        h('section', { class: 'now kala-now' }, ghatikaClock(ctx, day, prev), progress)),
-      ctx.fold('kala-list', h('span', { class: 'label' }, L('kaalaah')), kaalaList),
+      nowFold,
+      ctx.fold('kala-list', h('span', { class: 'label' }, ctx.S.labels.kaalaah ?? L('kaalaah')), kaalaList),
       ctx.foldShut('kala-sandhya', h('span', { class: 'label' }, L('sandhyaavandanakaalaah')), sandhyaKaalas),
       ctx.foldShut('kala-shraaddha', h('span', { class: 'label' }, L('shraaddhakaalaah')), shraaddhaKaalas)),
     h('div', { class: 'pane-scroll kala-scroll' },
@@ -269,7 +274,7 @@ export async function renderKala(ctx, root) {
   // run into the next one; this needs their rendered heights, so it runs after layout.
   requestAnimationFrame(() => {
     let bottom = -Infinity;
-    root.querySelectorAll('.tl-mark').forEach((el) => {
+    timeline.querySelectorAll('.tl-mark').forEach((el) => {
       const top = Math.max(parseFloat(el.style.top), bottom + 3);
       el.style.top = `${top}px`;
       bottom = top + el.offsetHeight;

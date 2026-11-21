@@ -41,6 +41,18 @@ jobs:
           else
             node make-vapid.js | npx --yes wrangler@4 secret put VAPID_JWK
           fi
+      - name: Other secrets (each when set as a repository secret)
+        # CLOUDFLARE_ANALYTICS_TOKEN (Account Analytics: Read) and STATS_KEY for the usage page;
+        # GH_ISSUES_TOKEN (Issues: read and write on this repository) for city requests.
+        env:
+          CF_ANALYTICS_TOKEN: ${{ secrets.CLOUDFLARE_ANALYTICS_TOKEN }}
+          STATS_KEY: ${{ secrets.STATS_KEY }}
+          GH_ISSUES_TOKEN: ${{ secrets.GH_ISSUES_TOKEN }}
+        run: |
+          put() { if [ -n "$2" ]; then printf '%s' "$2" | npx --yes wrangler@4 secret put "$1" > /dev/null && echo "set $1"; else echo "not set: $1"; fi; }
+          put CF_ANALYTICS_TOKEN "$CF_ANALYTICS_TOKEN"
+          put STATS_KEY "$STATS_KEY"
+          put GH_TOKEN "$GH_ISSUES_TOKEN"
       - name: Check
         # A secret just set can take a few seconds to reach the Worker.
         run: |

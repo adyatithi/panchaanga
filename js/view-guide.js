@@ -30,9 +30,9 @@ export function sections(ctx) {
       items: [
         [SL('dinam'), 'The day: the head of the page, sun and moon, the five angas and the day\'s festivals. A switch at the top shows it brief or in detail; the detail is the full PDF page, followed by the detail of the hyperlinked edition. The app remembers which you chose.'],
         [SL('kaalaah'), 'On today\'s page, the ghaṭikā clock and how much of each anga is left; then every kāla of the day with its times, and the day drawn to scale from the brāhma muhūrta to the next sunrise. Only the drawing scrolls; the clock and the list of kālas fold away.'],
-        [SL('maasah'), 'The month as a calendar, with the tithi, nakṣatra and festival icons on each day and the festivals listed below it; a switch shows the week instead.'],
+        [SL('maasah'), 'The month as a calendar. Each day shows the solar day, the tithi at sunrise (शु ११ is śukla ekādaśī; अमा and पौर्ण name the new and full moon) with the nakṣatra, and up to two festival icons; a blue dot marks a day whose festivals have no icon. The festivals are listed below. The switch at the top shows the week instead, or a solar month (सौरमासः, from its saṅkramaṇa, as in the PDFs\' sections) or a lunar month (चान्द्रमासः, from śukla prathamā), with ‹ › stepping a whole month.'],
         [SL('parvaani'), 'Every festival of the year, and the year\'s lists, with search.'],
-        [SL('anyat'), 'This guide, settings, Reminders, About, Contribute, Acknowledgements and Feedback (which opens a prefilled GitHub issue); the year\'s nava-nāyakas, ṣaṇṇavati-tarpaṇa days and janmadinas; the day\'s paṭhanam, saṅkalpa and what to avoid; and the lists of days for an oil bath, a haircut, beginning study and the ūna-śrāddhas.'],
+        [SL('anyat'), 'From the daily to the occasional: the day\'s paṭhanam, saṅkalpa, and vidhi-niṣedhas (what to avoid and what is commended); the lists of days for an oil bath, a haircut, beginning study and the ūna-śrāddhas; the year\'s ṣaṇṇavati-tarpaṇa days, janmadinas and nava-nāyakas; then the app: Reminders, Settings, this guide, the Adyatithi blog (its posts by section), Feedback (which opens a prefilled GitHub issue), Contribute, Acknowledgements, Privacy (what the app keeps and what it sends) and About.'],
       ],
     },
     {
@@ -91,7 +91,7 @@ export function sections(ctx) {
     {
       title: 'On the Detail page',
       items: [
-        [`${L('pathanam')} · ${L('sankalpah')} · ${L('varjayitum')}`, 'Right after the day\'s page, three buttons: the day set out for reading aloud, the day\'s sankalpa, and what is better avoided today (see Pages under More).'],
+        [`${L('pathanam')} · ${L('sankalpah')} · ${L('vidhinishedhaah')}`, 'Right after the day\'s page, three buttons: the day set out for reading aloud, the day\'s sankalpa, and what is better avoided today (see Pages under More).'],
         ['▾', 'Each section below the page (graha-sthiti, tārābala, festival notes) folds, as do the lists on the Kālas page (lagnas, horās, muhūrtas, and the sandhyāvandana and śrāddha kālas, which start folded). A folded section stays folded, on every day, until it is opened again.'],
         [L('taaraabalam'), 'Count from a person\'s janma nakṣatra to the day\'s nakṣatra: the count falls on one of nine tārās — janma, sampat, vipat, kṣemam, pratyariḥ, sādhakaḥ, vadhaḥ, mitram, paramamitram. The table has the nakṣatras in three columns, nine apart, so each row shares a tārā and a colour: blues are favourable, greys unfavourable. The day\'s nakṣatra is janma; the other two in its row are anujanma (10th) and trijanma (19th). Your own janma nakṣatra, if chosen in settings, is starred.'],
         [L('grahasthitih'), 'Where each graha is at sunrise, by sidereal rāśi, with degrees within the rāśi, set out in the South Indian chart (Mīna at top left, running clockwise).'],
@@ -102,12 +102,12 @@ export function sections(ctx) {
       items: [
         [SL('samvatsaravishayaah'), 'For the year: the nava-nāyakas, and the janmadinas.'],
         [L('navanaayakaah'), 'The nine "officers" of the year (rājā, mantrī …), the graha holding each, and the traditional verse on what it portends.'],
-        [L('smaaranaani'), 'Notifications on this phone for the festival groups you choose (as on the Festivals tab) and the ṣaṇṇavati days: the evening before, on the morning of the day, or fifteen minutes before one with a time begins. They are worked out on the phone about two months ahead and kept up to date when the app is opened; a small service sends each when it is due. On iPhone, the app must be on the Home Screen. They are ordinary notifications, not alarms.'],
+        [L('smaaranaani'), 'Notifications on this phone for the festival groups you choose (as on the Festivals tab) and the ṣaṇṇavati days: the evening before, on the morning of the day, or fifteen minutes before one with a time begins. They are worked out on the phone about two months ahead and kept up to date when the app is opened; a small service sends each when it is due. Alarms by ghaṭikā sound at a ghaṭikā of the pañcāṅga day, counted from that day\'s own sunrise and sunset (28-00 and 58-00 for the sandhyās), every day, on days of the week or on chosen dates, and some minutes early if wanted. On iPhone, the app must be on the Home Screen. They are ordinary notifications, not alarms that ring.'],
         [L('janmadinaani'), 'The day each year on which a birthday by the Indian calendar is kept, by nakṣatra in a solar month or by tithi in a lunar month, for each year held. The nakṣatra (or tithi) should stand three muhūrtas after sunrise, reaching the saṅgava; if it ends within six nāḍīs of sunrise, the previous day is taken; when it comes twice in a month, the later. People can be saved on the phone, each shown with their next janmadina, and all of them added to a calendar with a reminder the evening before.'],
         [SL('dinavishayaah'), 'For the day: paṭhanam and what to avoid.'],
         [L('pathanam'), 'The day set out for reading aloud: each anga with its śloka and devatā, and the phalaśruti. The ślokas are from Śānti Kusumākara.'],
         [L('sankalpah'), 'The day\'s part of the sankalpa, from the samvatsara to the tithi. On today\'s page it is the sankalpa for this moment, and changes by itself as the tithi, nakṣatra, yoga, karaṇa or month changes; a box turns it to the one printed in the PDFs\' sankalpa list, from sunrise for the first 24 ghaṭikās, with the time of each change within them. One phrase to a line, with buttons for larger or smaller type and to copy it. Also a button on the Detail page.'],
-        [L('varjayitum'), 'The verses on what is better avoided today (oil bath, bathing, cleaning the teeth, shaving, certain foods and so on), selected by the day\'s angas, as in the PDFs. Below them, under ' + L('kartum') + ', what the Mahābhārata, Rāmāyaṇa and Bhāgavata commend for the day\'s tithi and nakṣatra (fasting, bathing, gifts, pūjā, recitation, śrāddha), each with a note in English; tap a heading to open it.'],
+        [L('vidhinishedhaah'), 'Under ' + L('varjayitum') + ', the verses on what is better avoided today, selected by the day\'s angas as in the PDFs, in sections by what they concern (food, oil bath, bathing, cleaning the teeth, shaving, plucking tulasī, and so on). Below them, under ' + L('kartum') + ', what the Mahābhārata, Rāmāyaṇa and Bhāgavata commend for the day\'s tithi and nakṣatra (fasting, bathing, gifts, pūjā, recitation, śrāddha), each with a note in English; tap a heading to open it.'],
         [L('muhurtadinaani'), 'Days suited to an oil bath (abhyaṅga), a haircut or shave (kṣaura) and beginning study (vidyārambha), each a page of its own with the next date shown on the More page, and the window on each day. They follow the rules in the muhūrta configurations: which tithis, nakṣatras and weekdays are allowed, which solar months and festivals to avoid, and which part of the day. A star means the window was shortened by those rules. Months before the current one are folded; only the months scroll.'],
         [ctx.S.muhurta_names?.kshaura || 'kSauram', 'Choosing your janma-nakṣatra tags each nakṣatra with its tārā and greys out days whose whole window has an unfavourable one; the tārābala chip turns the greying off. Days on which chaturthī, ṣaṣṭhī or chaturdaśī falls are marked !mātā, !bhrātā or !bhaginī, as they are avoided by one whose mother, brother or sister is living. Every chip starts selected; turning a weekday or a mark off drops those days.'],
       ],
@@ -125,7 +125,7 @@ export function sections(ctx) {
     {
       title: 'Settings',
       items: [
-        [SL('nagaram'), 'Fifty cities, your own first; the rest open under "All".'],
+        [SL('nagaram'), 'The cities in the app, your own first; the rest open under "All". Below them, Find your place searches every place jyotisha knows: use the nearest city, or, if it is more than 75 km away or keeps another time, request your place, which is added once approved.'],
         [`${SL('bhaashaa')} · ${SL('lipih')}`, 'The language of the app\'s own words (tabs, buttons, this guide), and the script for the pañcāṅga, which is always in Sanskrit.'],
         [SL('samayarupam'), 'Three ways to write times after midnight: 25:30* as printed in the PDFs, +1:30*, or 1:30am*.'],
         [L('janmanakshatram'), 'Your janma nakṣatra: used for tārābala in the kṣaura list, and starred in the Detail page\'s tārābala tables.'],
@@ -135,7 +135,7 @@ export function sections(ctx) {
       title: 'How it is computed',
       items: [
         ['jyotisha', 'All times are computed with the open-source jyotisha library, which uses the Swiss Ephemeris, with the Citrā ayanāṁśa (Spica at 180°). Festivals are assigned by the rules in the adyatithi repository. This is the same code that produces the printed Adyatithi pañcāṅga, and a test checks that the app shows what the PDFs print.'],
-        [L('nagaram'), 'Each city\'s data is computed in advance for three years, and rebuilt every week. Other places will come later.'],
+        [L('nagaram'), 'Each city\'s data is computed in advance for three years, and rebuilt every week. A requested place is added by hand, after a look at the requests.'],
       ],
     },
   ];

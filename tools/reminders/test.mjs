@@ -108,5 +108,39 @@ assert.equal(store.size, 0);
 res = await worker.fetch(req('/subscribe', { subscription: { endpoint: 'http://insecure', keys: {} }, items }), env);
 assert.equal(res.status, 400);
 assert.equal(cleanItems([{ t: 'x', title: 'a' }, { t: min(now) + 5 }, ...Array.from({ length: 200 }, (_, i) => ({ t: min(now) + i + 1, title: 'n' }))], now).length, 150);
+// Usage: a day record and one per page; nothing else is written.
+const points = [];
+env.USAGE = { writeDataPoint: (p) => points.push(p) };
+res = await worker.fetch(req('/ping', { city: 'Chennai', script: 'devanagari', lang: 'en', channel: 'nightly', mode: 'app', first: true, views: ['dina', 'kala', '<bad>'], v: 'v43' }), env);
+assert.equal(res.status, 200);
+assert.deepEqual(points.map((p) => p.blobs.slice(0, 3)), [['day', 'Chennai', 'devanagari'], ['view', 'dina', 'Chennai'], ['view', 'kala', 'Chennai']]);
+res = await worker.fetch(new Request('https://reminders.adyatithi.workers.dev/stats?k=wrong'), { ...env, STATS_KEY: 'secret' });
+assert.equal(res.status, 404);
+
+// City requests: a known place opens an issue; a second request (after the minute) counts on it.
+const issues = [];
+const site = { 'https://adyatithi.github.io/panchaanga/data/places.json': [['Madurai', 'Madurai', 9.92, 78.12, 'Asia/Calcutta']] };
+globalThis.fetch = async (url, init = {}) => {
+  if (site[url]) return { ok: true, status: 200, json: async () => site[url] };
+  const u = new URL(url);
+  if (u.pathname.endsWith('/issues') && (init.method || 'GET') === 'GET') return { ok: true, json: async () => issues };
+  if (u.pathname.endsWith('/issues') && init.method === 'POST') { const b = JSON.parse(init.body); const i = { number: 7, ...b }; issues.push(i); return { ok: true, json: async () => i }; }
+  if (/\/issues\/7$/.test(u.pathname)) { issues[0].body = JSON.parse(init.body).body; return { ok: true, json: async () => issues[0] }; }
+  return { ok: false, status: 404 };
+};
+const cityEnv = { ...env, GH_TOKEN: 't', GH_REPO: 'adyatithi/panchaanga', SITES: 'https://adyatithi.github.io/panchaanga/' };
+res = await worker.fetch(req('/request-city', { place: 'Madurai', nearest: 'Tiruchirappalli', km: 120 }), cityEnv);
+assert.deepEqual(await res.json(), { ok: true, issue: 7, requests: 1 });
+assert.equal(issues[0].title, 'City request: Madurai');
+assert.deepEqual(issues[0].labels, ['city-request']);
+res = await worker.fetch(req('/request-city', { place: 'Madurai' }), cityEnv);
+assert.equal((await res.json()).counted, false);                    // within the minute
+store.delete('rq:Madurai');
+res = await worker.fetch(req('/request-city', { place: 'Madurai' }), cityEnv);
+assert.equal((await res.json()).requests, 2);
+assert.match(issues[0].body, /Requests: 2/);
+res = await worker.fetch(req('/request-city', { place: 'Atlantis' }), cityEnv);
+assert.equal(res.status, 404);
+
 Date.now = RealNow;
 console.log('reminders worker: all checks passed');

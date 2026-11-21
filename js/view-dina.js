@@ -21,10 +21,10 @@ function nowStrip(ctx, day) {
   const chip = (k, isNow) => h('span', { class: `chip ${k.quality} ${isNow ? 'is-now' : ''}` },
     h('span', { class: 'chip-name' }, k.label),
     h('span', { class: 'time' }, isNow ? `▸${ctx.T(k.end)}` : `${ctx.T(k.start)}–${ctx.T(k.end)}`));
-  return h('section', { class: 'now' },
+  return h('section', { class: 'now', 'data-live': '' },
     h('div', { class: 'now-head' },
       h('span', { class: 'now-dot', 'aria-hidden': 'true' }),
-      h('span', { class: 'label' }, ctx.L('idaaniim')),
+      h('span', { class: 'label' }, ctx.S.labels.idaaniim ?? ctx.L('idaaniim')),
       h('span', { class: 'time now-clock' }, ctx.T(now))),
     h('div', { class: 'now-angas' },
       h('span', null, N.tithi(tithi), tEnd != null && h('span', { class: 'time muted' }, ` ▸${ctx.T(tEnd)}`)),

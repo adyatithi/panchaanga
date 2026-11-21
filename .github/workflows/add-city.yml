@@ -1,0 +1,54 @@
+# A city request (an issue labelled city-request, opened by the app's "Request this place" through
+# the reminders service) is approved by hand: giving it the label `approved` runs this, which
+# checks the place and starts the data build for that one city (data.yml, add_city). The build
+# commits it, adds it to data-cities.txt, comments on the issue and closes it; the site is then
+# published with it.
+name: Add city
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: read
+  actions: write
+  issues: write
+
+jobs:
+  add:
+    if: github.event.label.name == 'approved' && contains(github.event.issue.labels.*.name, 'city-request')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Place
+        id: place
+        env:
+          BODY: ${{ github.event.issue.body }}
+        # The place's id is in the issue as (`Id`); it must be in the places table, not built yet,
+        # and the app must stay within its size (MAX cities: the site has a 1 GB limit).
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os, re, sys
+          MAX = 120
+          m = re.search(r"\(`([^`]+)`\)", os.environ["BODY"] or "")
+          places = {p[0] for p in json.load(open("data/places.json"))}
+          built = [l.strip() for l in open("data-cities.txt") if l.strip() and not l.startswith("#")]
+          if not m or m.group(1) not in places:
+              print("error=No known place in the issue (expected the place's id as (`Id`)).")
+          elif m.group(1) in built:
+              print(f"error={m.group(1)} is already in the app.")
+          elif len(built) >= MAX:
+              print(f"error=The app has {len(built)} cities, its limit; raise MAX in add-city.yml first.")
+          else:
+              print(f"city={m.group(1)}")
+          PY
+      - name: Build it
+        if: steps.place.outputs.city != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run data.yml --repo "$GITHUB_REPOSITORY" -f add_city="${{ steps.place.outputs.city }}" -f issue="${{ github.event.issue.number }}"
+      - name: Cannot add
+        if: steps.place.outputs.error != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "Not added: ${{ steps.place.outputs.error }}"

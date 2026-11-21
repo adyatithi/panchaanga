@@ -3,9 +3,9 @@ import { h, store, NIGHTLY, nowIn, isDate, addDays, addMonths, parseDate, fmtTim
 import * as data from './data.js';
 import { renderDina } from './view-dina.js';
 import { renderKala } from './view-kala.js';
-import { renderMasa } from './view-masa.js';
+import { renderMasa, renderSaura, renderChandra, monthSpan, monthName } from './view-masa.js';
 import { renderParva } from './view-parva.js';
-import { openSettings, renderAbout, openFestival, sheet } from './view-misc.js';
+import { openSettings, renderSettings, renderAbout, openFestival, sheet } from './view-misc.js';
 import { dayIcons } from './parts.js';
 import { renderSaptaha } from './view-saptaha.js';
 import { renderMore, renderVarjya, renderNava } from './view-more.js';
@@ -17,18 +17,21 @@ const CHROME = new Set(['vishayasuuchii', 'horaaplus', 'sankshepah', 'dinam', 'k
   'anveshanam', 'preshanam', 'chitram', 'lekhah', 'sanketah', 'pratilipih', 'pratiikshasva', 'nopalabhyate', 'nagaram',
   'lipih', 'bhaashaa', 'akshararupam', 'samayarupam', 'horaa24', 'horaa12', 'varnah', 'svatah', 'shuklam', 'shyaamam',
   'parichayah', 'abhipraayah', 'yogadaanam', 'kritajnataa', 'margadarshika', 'adya', 'idaaniim', 'anantaram', 'sheshah', 'parvasrotaamsi', 'atiriktaani',
-  'sarvaani', 'dinavibhaagaah', 'sandhyaa', 'shubham', 'ashubham', 'kaalakramah']);
+  'sarvaani', 'smaaranaani']);
+// (Headings of pañcāṅga content, as on the Kālas tab, are the pañcāṅga's words, in Sanskrit; the
+// tab names, buttons and the app's own pages follow the interface language.)
 import { openShare } from './share.js';
 import { renderPathana } from './view-pathana.js';
 import { renderSankalpa } from './view-sankalpa.js';
 import { renderMuhurta, renderUuna } from './view-muhurta.js';
 import { renderJanma } from './view-janma.js';
 import { renderShannavati } from './view-shannavati.js';
-import { renderFeedback, renderContribute, renderThanks } from './view-info.js';
+import { renderFeedback, renderContribute, renderThanks, renderPrivacy, renderBlog } from './view-info.js';
 import { renderReminders, refreshReminders } from './reminders.js';
+import { noteView, startUsage } from './usage.js';
 
 const VIEWS = ['dina', 'kala', 'masa', 'parva', 'anyat', 'about', 'pathana', 'sankalpa', 'saptaha', 'varjya', 'nava', 'guide',
-  'abhyanga', 'kshaura', 'vidyarambha', 'uuna', 'janma', 'shannavati', 'feedback', 'contribute', 'thanks', 'smarana'];
+  'abhyanga', 'kshaura', 'vidyarambha', 'uuna', 'janma', 'shannavati', 'feedback', 'contribute', 'thanks', 'smarana', 'saura', 'chandra', 'settings', 'privacy', 'blog'];
 const TABS = [
   ['dina', 'dinam', 'M4 5h16v15H4zM4 9h16M8 3v4M16 3v4'],
   ['kala', 'kaalaah', 'M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18zM12 7v5l3 2'],
@@ -39,9 +42,9 @@ const TABS = [
 // Pages reached from a tab other than their own.
 const TAB_OF = { pathana: 'anyat', sankalpa: 'anyat', varjya: 'anyat', nava: 'anyat', guide: 'anyat', about: 'anyat', saptaha: 'masa',
   abhyanga: 'anyat', kshaura: 'anyat', vidyarambha: 'anyat', uuna: 'anyat', janma: 'anyat',
-  shannavati: 'anyat', feedback: 'anyat', contribute: 'anyat', thanks: 'anyat', smarana: 'anyat' };
+  shannavati: 'anyat', feedback: 'anyat', contribute: 'anyat', thanks: 'anyat', smarana: 'anyat', saura: 'masa', chandra: 'masa', settings: 'anyat', privacy: 'anyat', blog: 'anyat' };
 // Pages that show a year rather than a day, so the top bar has no day arrows.
-const NO_DAY_NAV = ['parva', 'about', 'anyat', 'guide', 'nava', 'abhyanga', 'kshaura', 'vidyarambha', 'uuna', 'janma', 'shannavati', 'feedback', 'contribute', 'thanks', 'smarana'];
+const NO_DAY_NAV = ['parva', 'about', 'anyat', 'guide', 'nava', 'abhyanga', 'kshaura', 'vidyarambha', 'uuna', 'janma', 'shannavati', 'feedback', 'contribute', 'thanks', 'smarana', 'settings', 'privacy', 'blog'];
 
 const settings = Object.assign(
   { city: 'Chennai', script: 'devanagari', time: '24', theme: 'auto', face: 'noto', repos: {} },
@@ -53,6 +56,7 @@ const topbar = document.getElementById('topbar');
 const tabbar = document.getElementById('tabbar');
 let index = null;
 let renderToken = 0;
+let stepNow = null;   // the top bar's ‹ › for the page shown (the keyboard's arrows use it too)
 
 function applyChrome() {
   const root = document.documentElement;
@@ -192,10 +196,22 @@ function renderTopbar(ctx) {
   const monthView = ctx.route.view === 'masa';
   const weekView = ctx.route.view === 'saptaha';
   const yearView = NO_DAY_NAV.includes(ctx.route.view);
-  const step = (n) => go({ date: clampDate(city, monthView ? addMonths(date, n) : addDays(date, weekView ? 7 * n : n)) });
+  // A solar or lunar month steps to the first day of the next or previous one.
+  const spanKind = ['saura', 'chandra'].includes(ctx.route.view) ? ctx.route.view : null;
+  const step = async (n) => {
+    if (!spanKind) return go({ date: clampDate(city, monthView ? addMonths(date, n) : addDays(date, weekView ? 7 * n : n)) });
+    const s = await monthSpan(ctx, date, spanKind);
+    if (!s) return;
+    let target = n > 0 ? addDays(s.end, 1) : addDays(s.start, -1);
+    if (n < 0) { const p = await monthSpan(ctx, target, spanKind); if (p) target = p.start; }
+    go({ date: clampDate(city, target) });
+  };
+  stepNow = step;
   const label = monthView
     ? `${MONTHS[dt.getUTCMonth()]} ${dt.getUTCFullYear()}`
-    : `${WDAYS[dt.getUTCDay()]} ${dt.getUTCDate()} ${MONTHS[dt.getUTCMonth()].slice(0, 3)}`;
+    : spanKind ? h('span', { class: 'span-label' }, '…')
+      : `${WDAYS[dt.getUTCDay()]} ${dt.getUTCDate()} ${MONTHS[dt.getUTCMonth()].slice(0, 3)}`;
+  if (spanKind) monthName(ctx, date, spanKind).then((name) => { label.textContent = name; });
   const isToday = date === ctx.now.date;
   const picker = h('input', {
     type: 'date', id: 'date-picker', class: 'date-input', value: date, min: ctx.range?.start, max: ctx.range?.end,
@@ -231,9 +247,27 @@ function renderTabbar(ctx) {
 const RENDERERS = { janma: renderJanma, abhyanga: renderMuhurta, kshaura: renderMuhurta, vidyarambha: renderMuhurta, uuna: renderUuna,
   dina: renderDina, kala: renderKala, masa: renderMasa, parva: renderParva, about: renderAbout, pathana: renderPathana, sankalpa: renderSankalpa, saptaha: renderSaptaha,
   anyat: renderMore, varjya: renderVarjya, nava: renderNava, guide: renderGuide,
-  shannavati: renderShannavati, feedback: renderFeedback, contribute: renderContribute, thanks: renderThanks, smarana: renderReminders };
+  shannavati: renderShannavati, feedback: renderFeedback, contribute: renderContribute, thanks: renderThanks, smarana: renderReminders,
+  saura: renderSaura, chandra: renderChandra, settings: renderSettings, privacy: renderPrivacy, blog: renderBlog };
 
-async function render() {
+// Each minute on a live page: the page is built again off screen, and if nothing has changed but
+// its live parts (marked data-live), only those are swapped in, so folds, scroll and the rest stay
+// as they are. Otherwise (an anga or kāla has changed) the page is redrawn as usual.
+function patchLive(old, fresh) {
+  if (!old) return false;
+  const a = old.querySelectorAll('[data-live]'), b = fresh.querySelectorAll('[data-live]');
+  if (!a.length || a.length !== b.length) return false;
+  const rest = (v) => {
+    const c = v.cloneNode(true);
+    c.querySelectorAll('[data-live]').forEach((e) => e.replaceWith(document.createComment('live')));
+    return c.innerHTML;
+  };
+  if (rest(old) !== rest(fresh)) return false;
+  a.forEach((e, i) => e.replaceWith(b[i]));
+  return true;
+}
+
+async function render({ soft = false } = {}) {
   const token = ++renderToken;
   const route = parseRoute();
   if (route.city !== settings.city) {
@@ -266,8 +300,10 @@ async function render() {
     view.replaceChildren(h('p', { class: 'empty' }, ctx.L('nopalabhyate')));
   }
   if (token !== renderToken) return;
+  if (soft && same && patchLive(main.firstElementChild, view)) return;
   // Reminders, if on: resend this phone's list when it is a week old (once a session, in the background).
   refreshReminders(ctx).catch(() => {});
+  noteView(ctx, route.view);
   const pane = view.querySelector('.pane-scroll');
   document.body.classList.toggle('pane', !!pane);
   main.replaceChildren(view);
@@ -305,6 +341,7 @@ document.addEventListener('keydown', (e) => {
   const city = cityRec(r.city);
   const base = r.date || clampDate(city, nowIn(city.tz).date);
   const n = e.key === 'ArrowLeft' ? -1 : 1;
+  if (stepNow && !NO_DAY_NAV.includes(r.view)) return stepNow(n);
   go({ date: clampDate(city, r.view === 'masa' ? addMonths(base, n) : addDays(base, r.view === 'saptaha' ? 7 * n : n)) });
 });
 
@@ -317,13 +354,14 @@ async function boot() {
     return;
   }
   if (!index.cities.some((c) => c.id === settings.city)) settings.city = index.cities[0].id;
+  startUsage(index.build?.date);
   // Going to another page (a tap, or the phone's back button) closes any open sheet.
   window.addEventListener('hashchange', () => { document.querySelectorAll('dialog[open]').forEach((d) => d.close()); render(); });
   await render();
   // Keep "now" honest while the page stays open.
   setInterval(() => {
     const live = ['dina', 'kala'].includes(parseRoute().view);
-    if (live && !document.hidden && !document.querySelector('dialog[open]')) render();
+    if (live && !document.hidden && !document.querySelector('dialog[open]')) render({ soft: true });
   }, 60000);
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
     navigator.serviceWorker.register('sw.js').catch(() => {});
