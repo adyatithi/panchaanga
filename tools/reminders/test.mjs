@@ -171,5 +171,23 @@ assert.equal((await res.json()).duplicate, true);
 res = await worker.fetch(req('/feedback', { kind: 'app', text: 'short' }), cityEnv);
 assert.equal(res.status, 400);
 
+// The blog list is kept: a refresh within the hour reuses it; a failed refresh keeps the old one.
+const { refreshBlog } = await import('./worker.js');
+let calls = 0;
+globalThis.fetch = async (u) => { calls++; if (u.includes('/api/')) return { ok: false, status: 429 };
+  if (u.endsWith('/feed')) return { ok: true, text: async () => RSS }; if (u.endsWith('sitemap.xml')) return { ok: true, text: async () => SM }; return { ok: false, status: 404 }; };
+let kept = await refreshBlog(env, now);
+assert.equal(kept.source, 'feed');
+assert.equal(kept.sections[0].posts.length, 2);
+const c1 = calls;
+await refreshBlog(env, now + 30 * 60e3);
+assert.equal(calls, c1);                                             // within the hour: no fetch
+globalThis.fetch = async () => ({ ok: false, status: 429 });
+kept = await refreshBlog(env, now + 2 * 3600e3);
+assert.equal(kept.sections[0].posts.length, 2);                      // refused: the old list stays
+res = await worker.fetch(new Request('https://reminders.adyatithi.workers.dev/blog', { headers: { Origin: 'https://adyatithi.github.io' } }), env);
+assert.equal(res.headers.get('Access-Control-Allow-Origin'), 'https://adyatithi.github.io');
+assert.equal((await res.json()).sections[0].posts.length, 2);
+
 Date.now = RealNow;
 console.log('reminders worker: all checks passed');

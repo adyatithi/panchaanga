@@ -148,7 +148,7 @@ async function handle(request, env) {
   if (path === '/ping' && request.method === 'POST') return ping(request, env);
   if (path === '/stats' && request.method === 'GET') return stats(url, env);
   if (path === '/request-city' && request.method === 'POST') return requestCity(request, env);
-  if (path === '/blog' && request.method === 'GET') return blog(request);
+  if (path === '/blog' && request.method === 'GET') return blog(env);
   if (path === '/feedback' && request.method === 'POST') return feedback(request, env);
   const keys = await vapidKeys(env.VAPID_JWK);
   if (request.method === 'GET' && path === '/key') return { key: keys.pub };
@@ -295,11 +295,14 @@ export async function blogPosts(get) {
   }
 }
 
-async function blog(request) {
-  const cache = caches.default;
-  const key = new Request('https://reminders.adyatithi.workers.dev/blog');
-  const hit = await cache.match(key);
-  if (hit) return hit;
+// The list is kept in KV ('blog'), refreshed by the five-minute run: from the whole archive once a
+// day, from the feed (a partial list) once an hour; a failed refresh keeps the list there was. The
+// blog page only reads it, so a reader never waits on Substack, nor adds to its rate limit.
+// (Cloudflare's response cache does not work for a workers.dev Worker, so KV it is.)
+export async function refreshBlog(env, now = Date.now()) {
+  const kept = await env.SUBS.get('blog', 'json');
+  const age = kept ? now - kept.at : Infinity;
+  if (kept && age < (kept.source === 'archive' ? 86400e3 : 3600e3)) return kept;
   const get = async (u, json = false) => {
     const r = await fetch(u, { headers: UA });
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -308,13 +311,22 @@ async function blog(request) {
   const { source, note, groups } = await blogPosts(get);
   const newest = (n) => groups[n].map((x) => x.d).sort().at(-1) || '';
   const order = Object.keys(groups).sort((a, b) => (newest(a) < newest(b) ? 1 : -1));
-  const body = JSON.stringify({ url: BLOG, source, note, sections: order.map((n) => ({ name: n, posts: groups[n] })) });
-  // The whole archive is kept a day; a partial list (feed only) an hour, so the archive is tried
-  // again soon; nothing at all, ten minutes.
-  const ttl = source === 'archive' ? 86400 : order.length ? 3600 : 600;
-  const res = new Response(body, { headers: { 'Content-Type': 'application/json', 'Cache-Control': `public, max-age=${ttl}` } });
-  await cache.put(key, res.clone());
-  return res;
+  // A worse answer than the one kept (nothing, or the feed in place of the archive) only renews
+  // the time, so that the next try waits its turn.
+  if (kept && (!order.length || (source !== 'archive' && kept.source === 'archive'))) {
+    const again = { ...kept, at: now, note };
+    await env.SUBS.put('blog', JSON.stringify(again));
+    return again;
+  }
+  const fresh = { at: now, url: BLOG, source, note, sections: order.map((n) => ({ name: n, posts: groups[n] })) };
+  await env.SUBS.put('blog', JSON.stringify(fresh));
+  return fresh;
+}
+
+async function blog(env) {
+  const kept = await env.SUBS.get('blog', 'json');
+  // The first reader before any run has filled it starts the first refresh.
+  return kept || refreshBlog(env);
 }
 
 // --- Feedback ---
@@ -446,5 +458,6 @@ export default {
   },
   async scheduled(controller, env, ctx) {
     ctx.waitUntil(run(env, controller.scheduledTime));
+    ctx.waitUntil(refreshBlog(env).catch((e) => console.log(`blog: ${e.message}`)));
   },
 };
