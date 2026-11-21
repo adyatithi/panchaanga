@@ -52,7 +52,7 @@ On today's page, the ghaṭikā clock and how much of each anga is left; then ev
 
 **मासः**
 
-The month as a calendar. Each day shows the solar day, the tithi at sunrise (शु ११ is śukla ekādaśī; अमा and पौर्ण name the new and full moon) with the nakṣatra, and up to two festival icons; a blue dot marks a day whose festivals have no icon. The festivals are listed below; a switch shows the week instead.
+The month as a calendar. Each day shows the solar day, the tithi at sunrise (शु ११ is śukla ekādaśī; अमा and पौर्ण name the new and full moon) with the nakṣatra, and up to two festival icons; a blue dot marks a day whose festivals have no icon. The festivals are listed below. The switch at the top shows the week instead, or a solar month (सौरमासः, from its saṅkramaṇa, as in the PDFs' sections) or a lunar month (चान्द्रमासः, from śukla prathamā), with ‹ › stepping a whole month.
 
 **पर्वाणि**
 

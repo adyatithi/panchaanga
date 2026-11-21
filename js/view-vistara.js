@@ -97,8 +97,8 @@ export async function renderVistara(ctx, root) {
   shown.forEach(([id, end], i) => {
     const from = i > 0 ? shown[i - 1][1] : null;
     root.append(section(ctx, 'tara' + i, [L('taaraabalam'), ' — ', N.nakshatra(id),
-      from != null && h('span', { class: 'time muted' }, ` ${T(from)}▸`),
-      end != null && h('span', { class: 'time muted' }, ` ▸${T(end)}`)],
+      // From and to as one range (06:48▸29:53*), or the one end there is.
+      (from != null || end != null) && h('span', { class: 'time muted' }, ` ${from != null ? T(from) : ''}▸${end != null ? T(end) : ''}`)],
     taraGrid(ctx, N, id)));
   });
 

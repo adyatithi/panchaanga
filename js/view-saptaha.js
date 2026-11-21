@@ -42,10 +42,10 @@ export async function renderSaptaha(ctx, root) {
     h('ol', { class: 'wk' }, rows));
 }
 
-// Month | week switch, at the top of both views.
+// Month | week | solar month | lunar month, at the top of each view.
 export function switcher(ctx, current) {
-  return h('div', { class: 'seg no-swipe', role: 'tablist' },
-    [['masa', ctx.L('maasah')], ['saptaha', ctx.L('saptaahah')]].map(([view, label]) => h('button', {
+  return h('div', { class: 'seg seg4 no-swipe', role: 'tablist' },
+    [['masa', ctx.L('maasah')], ['saptaha', ctx.L('saptaahah')], ['saura', ctx.U('sw_saura')], ['chandra', ctx.U('sw_chandra')]].map(([view, label]) => h('button', {
       type: 'button', role: 'tab', class: 'seg-btn' + (view === current ? ' active' : ''), 'aria-selected': view === current,
       onclick: () => ctx.go({ view }),
     }, label)));

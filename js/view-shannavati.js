@@ -4,6 +4,7 @@ import { h, parseDate, WDAYS } from './util.js';
 import * as data from './data.js';
 import { missing } from './parts.js';
 import { yearHead } from './view-parva.js';
+import { calButton, subscribeSheet } from './calendar.js';
 
 // Each kind: a label key and a test on a festival id. The amāvāsyās are the month's own entry
 // (not the sōmavatī, bōdhāyana or itihāsa notes on it); the saṅkrāntis are the nirayaṇa ones of
@@ -89,6 +90,8 @@ export async function renderShannavati(ctx, root) {
   root.append(
     h('div', { class: 'pane-top' }, yearHead(ctx, meta, yr, true),
       h('div', { class: 'title-row' },
-        h('h2', { class: 'block-title mu-title' }, L('shannavati'), h('span', { class: 'mu-count' }, ctx.num(total))))),
+        h('h2', { class: 'block-title mu-title' }, L('shannavati'), h('span', { class: 'mu-count' }, ctx.num(total))),
+        // A calendar feed of these days (tools/ics_feeds.py computes them the same way).
+        calButton(ctx, () => subscribeSheet(ctx, 'shannavati', L('shannavati'))))),
     scroll);
 }

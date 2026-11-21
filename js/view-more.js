@@ -5,6 +5,7 @@ import * as data from './data.js';
 import { missing, names } from './parts.js';
 import { shareButton } from './share.js';
 import { shannavati } from './view-shannavati.js';
+import { yearChips } from './view-parva.js';
 
 const ICONS = {
   guide: 'M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18zM12 11v6M12 7.5v.01',
@@ -93,7 +94,8 @@ export function dayHead(ctx, day, meta, title) {
   return h('header', { class: 'pathana-head' },
     h('div', { class: 'pathana-title' }, `॥ ${title} ॥`),
     h('div', { class: 'pathana-date' },
-      h('span', { class: 'time' }, `${WDAYS[day.wd]} ${dt.getUTCDate()} ${MONTHS[dt.getUTCMonth()]} ${dt.getUTCFullYear()}`), h('br'),
+      h('button', { type: 'button', class: 'time date-link', title: ctx.L('dinam'), onclick: () => ctx.go({ view: 'dina', date: day.date }) },
+        `${WDAYS[day.wd]} ${dt.getUTCDate()} ${MONTHS[dt.getUTCMonth()]} ${dt.getUTCFullYear()}`), h('br'),
       `${N.samvatsara(meta.samvatsara)} · ${N.ayana(day.ayana)} · ${N.rtu(day.rtu)}`, h('br'),
       `${N.rashi(day.saura.m)} ${ctx.num(day.saura.d)} · ${N.chandramasa(day.chandra)}`));
 }
@@ -162,6 +164,7 @@ export async function renderNava(ctx, root) {
     h('header', { class: 'pathana-head' },
       h('div', { class: 'pathana-title' }, `॥ ${L('navanaayakaah')} ॥`),
       h('div', { class: 'pathana-date' }, `${N.samvatsara(meta.samvatsara)} – ${meta.vatsara[ctx.settings.script]}`),
+      yearChips(ctx, yr),
       h('p', { class: 'nava-line' }, `${L('asminsamvatsare')} ` +
         sthaanas.map((s) => `${T.sthaana[s]} ${T.graha1[meta.nava[s]]}`).join(', ') + '।')),
     h('section', { class: 'pathana-cards' }, cards));

@@ -129,8 +129,14 @@ export function yearHead(ctx, meta, yr, compact = false) {
     h('header', { class: 'year-head' + (compact ? ' compact' : '') },
       h('div', { class: 'year-name' }, `${N.samvatsara(meta.samvatsara)} – ${meta.vatsara[ctx.settings.script]}`),
       !compact && h('div', { class: 'year-sub' }, `${L('kali')} ${ctx.num(meta.kali_running)} · ${meta.start.slice(0, 4)}–${meta.end.slice(0, 4)} · ${ctx.cityName}`),
-      ctx.city.years.length > 1 && h('div', { class: 'year-switch no-swipe' }, ctx.city.years.map((yy) => h('button', {
-        type: 'button', class: 'pchip' + (yy.kali === yr.kali ? ' active' : ''),
-        onclick: () => ctx.go({ date: yy.start <= ctx.now.date && ctx.now.date <= yy.end ? null : yy.start }),
-      }, `${N.samvatsara(yy.samvatsara)} ${yy.start.slice(0, 4)}–${yy.end.slice(2, 4)}`)))));
+      yearChips(ctx, yr)));
+}
+
+// The years held for the city, as chips; the current year's opens on today.
+export function yearChips(ctx, yr) {
+  const N = names(ctx);
+  return ctx.city.years.length > 1 && h('div', { class: 'year-switch no-swipe' }, ctx.city.years.map((yy) => h('button', {
+    type: 'button', class: 'pchip' + (yy.kali === yr.kali ? ' active' : ''),
+    onclick: () => ctx.go({ date: yy.start <= ctx.now.date && ctx.now.date <= yy.end ? null : yy.start }),
+  }, `${N.samvatsara(yy.samvatsara)} ${yy.start.slice(0, 4)}–${yy.end.slice(2, 4)}`)));
 }
