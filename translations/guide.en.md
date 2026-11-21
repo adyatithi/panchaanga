@@ -214,7 +214,7 @@ The nine "officers" of the year (rājā, mantrī …), the graha holding each, a
 
 **स्मारणानि**
 
-Notifications on this phone for the festival groups you choose (as on the Festivals tab) and the ṣaṇṇavati days: the evening before, on the morning of the day, or fifteen minutes before one with a time begins. They are worked out on the phone about two months ahead and kept up to date when the app is opened; a small service sends each when it is due. On iPhone, the app must be on the Home Screen. They are ordinary notifications, not alarms.
+Notifications on this phone for the festival groups you choose (as on the Festivals tab) and the ṣaṇṇavati days: the evening before, on the morning of the day, or fifteen minutes before one with a time begins. They are worked out on the phone about two months ahead and kept up to date when the app is opened; a small service sends each when it is due. Alarms by ghaṭikā sound at a ghaṭikā of the pañcāṅga day, counted from that day's own sunrise and sunset (28-00 and 58-00 for the sandhyās), every day, on days of the week or on chosen dates, and some minutes early if wanted. On iPhone, the app must be on the Home Screen. They are ordinary notifications, not alarms that ring.
 
 **जन्म-दिनानि**
 
