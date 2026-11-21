@@ -244,9 +244,20 @@ ${table('Channel', channel)}${table('Installed app or browser', mode)}${table('C
 // --- The blog ---
 
 const BLOG = 'https://adyatithi.substack.com';
+const BLOG_V = 2;   // the stored list's version: raise it when the way posts are read changes
 const UA = { 'User-Agent': 'adyatithi-panchaanga (+https://adyatithi.github.io/panchaanga/)' };
 const tag = (xml, name) => (xml.match(new RegExp(`<${name}[^>]*>([\\s\\S]*?)</${name}>`)) || [])[1] || '';
-const text = (s) => s.replace(/^<!\[CDATA\[|\]\]>$/g, '').replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").trim();
+// Markup out, then every entity decoded: &amp; first (Substack's feed escapes some twice, as
+// &amp;#257;), then numeric ones (&#257; &#x101;) and the common named ones.
+const NAMED = { lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', ndash: '–', mdash: '—', hellip: '…', rsquo: '’', lsquo: '‘', rdquo: '”', ldquo: '“', middot: '·' };
+const decode = (s) => {
+  let t = s;
+  for (let i = 0; i < 3 && t.includes('&amp;'); i++) t = t.replace(/&amp;/g, '&');
+  return t.replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
+    .replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(Number(d)))
+    .replace(/&([a-z]+);/gi, (m, n) => NAMED[n.toLowerCase()] ?? m);
+};
+const text = (s) => decode(s.replace(/^<!\[CDATA\[|\]\]>$/g, '').replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim();
 
 // The posts, by section: from the archive API with its sections; or, if that is refused, from the
 // RSS feed (recent posts, with subtitles) and the sitemap (every post), in one section.
@@ -300,7 +311,8 @@ export async function blogPosts(get) {
 // blog page only reads it, so a reader never waits on Substack, nor adds to its rate limit.
 // (Cloudflare's response cache does not work for a workers.dev Worker, so KV it is.)
 export async function refreshBlog(env, now = Date.now()) {
-  const kept = await env.SUBS.get('blog', 'json');
+  let kept = await env.SUBS.get('blog', 'json');
+  if (kept && kept.v !== BLOG_V) kept = null;          // made by an earlier version: replace it
   const age = kept ? now - kept.at : Infinity;
   if (kept && age < (kept.source === 'archive' ? 86400e3 : 3600e3)) return kept;
   const get = async (u, json = false) => {
@@ -318,15 +330,15 @@ export async function refreshBlog(env, now = Date.now()) {
     await env.SUBS.put('blog', JSON.stringify(again));
     return again;
   }
-  const fresh = { at: now, url: BLOG, source, note, sections: order.map((n) => ({ name: n, posts: groups[n] })) };
+  const fresh = { v: BLOG_V, at: now, url: BLOG, source, note, sections: order.map((n) => ({ name: n, posts: groups[n] })) };
   await env.SUBS.put('blog', JSON.stringify(fresh));
   return fresh;
 }
 
 async function blog(env) {
   const kept = await env.SUBS.get('blog', 'json');
-  // The first reader before any run has filled it starts the first refresh.
-  return kept || refreshBlog(env);
+  // The first reader before any run has filled it (or after a new version) starts a refresh.
+  return kept && kept.v === BLOG_V ? kept : refreshBlog(env);
 }
 
 // --- Feedback ---

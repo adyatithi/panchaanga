@@ -149,11 +149,11 @@ assert.match(await res.text(), /Errors from Cloudflare/);          // the fake f
 
 // The blog: from the feed and sitemap when the archive is refused.
 const { blogPosts } = await import('./worker.js');
-const RSS = '<rss><channel><item><title><![CDATA[Why two Ekādaśīs?]]></title><link>https://adyatithi.substack.com/p/two?utm=1</link><description><![CDATA[<p>Smārta &amp; Vaiṣṇava</p>]]></description><pubDate>Tue, 10 Nov 2026 05:00:00 GMT</pubDate></item></channel></rss>';
+const RSS = '<rss><channel><item><title><![CDATA[Rama Ek&#257;da&#347;&#299;]]></title><link>https://adyatithi.substack.com/p/rama</link><description>K&amp;#257;rtika &amp;#183; Padma Pur&amp;#257;&amp;#7751;a</description><pubDate>Wed, 04 Nov 2026 05:00:00 GMT</pubDate></item><item><title><![CDATA[Why two Ekādaśīs?]]></title><link>https://adyatithi.substack.com/p/two?utm=1</link><description><![CDATA[<p>Smārta &amp; Vaiṣṇava</p>]]></description><pubDate>Tue, 10 Nov 2026 05:00:00 GMT</pubDate></item></channel></rss>';
 const SM = '<urlset><url><loc>https://adyatithi.substack.com/p/two</loc><lastmod>2026-11-10</lastmod></url><url><loc>https://adyatithi.substack.com/p/the-ayanamsha</loc><lastmod>2026-09-01</lastmod></url><url><loc>https://adyatithi.substack.com/about</loc></url></urlset>';
 let bp = await blogPosts(async (u) => { if (u.includes('/api/')) throw new Error('HTTP 403'); if (u.endsWith('/feed')) return RSS; if (u.endsWith('sitemap.xml')) return SM; throw new Error('HTTP 404'); });
 assert.equal(bp.source, 'feed');
-assert.deepEqual(bp.groups.Posts.map((p) => [p.t, p.s, p.d]), [['Why two Ekādaśīs?', 'Smārta & Vaiṣṇava', '2026-11-10'], ['The ayanamsha', '', '2026-09-01']]);
+assert.deepEqual(bp.groups.Posts.map((p) => [p.t, p.s, p.d]), [['Why two Ekādaśīs?', 'Smārta & Vaiṣṇava', '2026-11-10'], ['Rama Ekādaśī', 'Kārtika · Padma Purāṇa', '2026-11-04'], ['The ayanamsha', '', '2026-09-01']]);
 bp = await blogPosts(async (u) => (u.includes('archive') ? (u.endsWith('offset=0') ? [{ title: 'A', section_id: 1, post_date: '2026-11-01T00:00:00Z', slug: 'a' }] : [])
   : u.includes('sections') ? [{ id: 1, name: 'Festivals' }] : ''));
 assert.deepEqual(Object.keys(bp.groups), ['Festivals']);
@@ -178,16 +178,16 @@ globalThis.fetch = async (u) => { calls++; if (u.includes('/api/')) return { ok:
   if (u.endsWith('/feed')) return { ok: true, text: async () => RSS }; if (u.endsWith('sitemap.xml')) return { ok: true, text: async () => SM }; return { ok: false, status: 404 }; };
 let kept = await refreshBlog(env, now);
 assert.equal(kept.source, 'feed');
-assert.equal(kept.sections[0].posts.length, 2);
+assert.equal(kept.sections[0].posts.length, 3);
 const c1 = calls;
 await refreshBlog(env, now + 30 * 60e3);
 assert.equal(calls, c1);                                             // within the hour: no fetch
 globalThis.fetch = async () => ({ ok: false, status: 429 });
 kept = await refreshBlog(env, now + 2 * 3600e3);
-assert.equal(kept.sections[0].posts.length, 2);                      // refused: the old list stays
+assert.equal(kept.sections[0].posts.length, 3);                      // refused: the old list stays
 res = await worker.fetch(new Request('https://reminders.adyatithi.workers.dev/blog', { headers: { Origin: 'https://adyatithi.github.io' } }), env);
 assert.equal(res.headers.get('Access-Control-Allow-Origin'), 'https://adyatithi.github.io');
-assert.equal((await res.json()).sections[0].posts.length, 2);
+assert.equal((await res.json()).sections[0].posts.length, 3);
 
 Date.now = RealNow;
 console.log('reminders worker: all checks passed');
