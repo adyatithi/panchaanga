@@ -306,7 +306,10 @@ async function blog(request) {
   const newest = (n) => groups[n].map((x) => x.d).sort().at(-1) || '';
   const order = Object.keys(groups).sort((a, b) => (newest(a) < newest(b) ? 1 : -1));
   const body = JSON.stringify({ url: BLOG, source, note, sections: order.map((n) => ({ name: n, posts: groups[n] })) });
-  const res = new Response(body, { headers: { 'Content-Type': 'application/json', 'Cache-Control': `public, max-age=${order.length ? 86400 : 600}` } });
+  // The whole archive is kept a day; a partial list (feed only) an hour, so the archive is tried
+  // again soon; nothing at all, ten minutes.
+  const ttl = source === 'archive' ? 86400 : order.length ? 3600 : 600;
+  const res = new Response(body, { headers: { 'Content-Type': 'application/json', 'Cache-Control': `public, max-age=${ttl}` } });
   await cache.put(key, res.clone());
   return res;
 }
