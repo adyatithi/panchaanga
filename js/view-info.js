@@ -154,8 +154,12 @@ export async function renderBlog(ctx, root) {
   const date = (d) => { const t = new Date(d + 'T00:00:00Z'); return isNaN(t) ? d : `${t.getUTCDate()} ${MONTHS[t.getUTCMonth()].slice(0, 3)} ${t.getUTCFullYear()}`; };
   root.append(head, h('section', { class: 'blog' }, blog.sections.map((sec, i) => ctx.foldAs(`blog-${sec.name}`, i > 0,
     h('span', { class: 'label' }, sec.name, h('span', { class: 'muted' }, ` · ${ctx.num(sec.posts.length)}`)),
+    // A card per post: its cover image (where the blog gives one), title, date and subtitle.
     h('ul', { class: 'blog-posts' }, sec.posts.map((p) => h('li', null,
-      h('a', { href: p.u, target: '_blank', rel: 'noopener', class: 'blog-title' }, p.t),
-      h('span', { class: 'muted blog-date time' }, ` ${date(p.d)}`),
-      p.s && h('p', { class: 'muted blog-sub' }, p.s))))))));
+      h('a', { href: p.u, target: '_blank', rel: 'noopener', class: 'blog-card' + (p.i ? '' : ' no-img') },
+        p.i && h('img', { class: 'blog-img', src: p.i, alt: '', loading: 'lazy', decoding: 'async', referrerpolicy: 'no-referrer' }),
+        h('span', { class: 'blog-text' },
+          h('span', { class: 'blog-title' }, p.t),
+          h('span', { class: 'muted blog-date time' }, date(p.d)),
+          p.s && h('span', { class: 'muted blog-sub' }, p.s))))))))));
 }

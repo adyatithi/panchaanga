@@ -2,7 +2,7 @@
 // Everything is served stale-while-revalidate, so a visit online refreshes what a later visit offline will see.
 // The stable site and the nightly one (under nightly/) share an origin, so each keeps to its own
 // caches, and the stable worker leaves the nightly pages, which have their own worker, alone.
-const VERSION = 'v48';
+const VERSION = 'v49';
 const NIGHTLY = /\/nightly\/$/.test(new URL(self.registration.scope).pathname);
 const FAMILY = NIGHTLY ? 'adyatithi-nightly-' : 'adyatithi-';
 const CACHE = FAMILY + VERSION;

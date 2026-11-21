@@ -75,7 +75,7 @@ export const T = {
     pv_request: 'A city request, only when you make one: the place\'s name and the nearest city in the app. It becomes a public issue on GitHub, counted with others\' requests for the same place.',
     pv_feedback: 'Feedback, only when you send it: what you write, and, if the box is ticked, the city, date, settings, build and the browser\'s description of itself. It is posted as a public issue on GitHub by the app\'s service, with no name; or, if you choose, by you under your own GitHub account.',
     pv_hosts_h: 'Where the app comes from',
-    pv_hosts: 'The app and its data are served by GitHub Pages; the reminder and usage service runs on Cloudflare. Like every website, their servers see the internet address a request comes from; we do not keep it. The fonts are part of the app, so no font service is asked. There are no cookies, no advertising and no tracking from site to site. A calendar you subscribe to fetches its feed from GitHub Pages, as any calendar does.',
+    pv_hosts: 'The app and its data are served by GitHub Pages; the reminder and usage service runs on Cloudflare. Like every website, their servers see the internet address a request comes from; we do not keep it. The fonts are part of the app, so no font service is asked. There are no cookies, no advertising and no tracking from site to site. A calendar you subscribe to fetches its feed from GitHub Pages, as any calendar does. The blog page shows the posts\' pictures from Substack\'s own servers.',
     sw_saura: 'Saura', sw_chandra: 'Chāndra',
     smaaranaani: 'Reminders', mn_app: 'The app',
     mn_pathana: 'Read the pañcāṅga for the day, with the ślokas for each aṅga', mn_sankalpa: 'The day\'s saṅkalpa, as it stands now',

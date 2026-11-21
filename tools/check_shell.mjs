@@ -2,6 +2,7 @@
 // SHELL (so the app opens offline), and everything in SHELL exists. Run before publishing.
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 
 const dir = process.argv[2] || path.join(path.dirname(new URL(import.meta.url).pathname), '..');
 const sw = fs.readFileSync(path.join(dir, 'sw.js'), 'utf8');
@@ -21,5 +22,11 @@ const problems = [];
 for (const f of seen) if (!shell.has(f)) problems.push(`not in SHELL: ${f}`);
 for (const f of fs.readdirSync(path.join(dir, 'js'))) if (f.endsWith('.js') && !shell.has(`js/${f}`)) problems.push(`not in SHELL: js/${f}`);
 for (const f of shell) if (f !== './' && !fs.existsSync(path.join(dir, f))) problems.push(`in SHELL but missing: ${f}`);
+// Every module parses as the browser will read it (as a module: a plain `node --check` reads a .js
+// file as a script and can miss a slip such as an unclosed bracket in a module).
+for (const f of fs.readdirSync(path.join(dir, 'js')).filter((f) => f.endsWith('.js'))) {
+  const r = spawnSync(process.execPath, ['--input-type=module', '--check'], { input: fs.readFileSync(path.join(dir, 'js', f)) });
+  if (r.status !== 0) problems.push(`does not parse: js/${f}\n${String(r.stderr).split('\n').slice(0, 4).join('\n')}`);
+}
 if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
-console.log(`shell: ${shell.size} entries, ${seen.size} modules, all present`);
+console.log(`shell: ${shell.size} entries, ${seen.size} modules, all present and parsing`);
