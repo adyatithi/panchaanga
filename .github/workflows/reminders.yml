@@ -31,7 +31,9 @@ jobs:
       - name: Test
         run: node test.mjs
       - name: Deploy
-        run: npx --yes wrangler@4 deploy
+        # Once more after a pause if it fails: on the very first deploy Cloudflare can report the
+        # Worker just uploaded as not existing yet.
+        run: npx --yes wrangler@4 deploy || (sleep 20 && npx --yes wrangler@4 deploy)
       - name: VAPID key (first deploy only)
         run: |
           if npx --yes wrangler@4 secret list | grep -q '"VAPID_JWK"'; then
