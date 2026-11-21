@@ -14,6 +14,8 @@
 //   GET  /stats?k=…    the usage counts, as a page (for the maintainer; k is the STATS_KEY secret)
 //   POST /request-city { place, nearest, km }: opens (or counts on) a "City request" issue
 //   GET  /blog         the Adyatithi blog's posts by section, kept a day (the app's blog page)
+//   POST /feedback     { kind, title, text, context }: a public GitHub issue, for readers without
+//                      a GitHub account (the same text once a day; at most FEEDBACK_PER_DAY a day)
 //
 // t is the time in minutes since 1970 (UTC). What is stored is a subscription and its reminders,
 // nothing else: no name, account or address. A push service that answers 404 or 410 (the reader
@@ -147,6 +149,7 @@ async function handle(request, env) {
   if (path === '/stats' && request.method === 'GET') return stats(url, env);
   if (path === '/request-city' && request.method === 'POST') return requestCity(request, env);
   if (path === '/blog' && request.method === 'GET') return blog(request);
+  if (path === '/feedback' && request.method === 'POST') return feedback(request, env);
   const keys = await vapidKeys(env.VAPID_JWK);
   if (request.method === 'GET' && path === '/key') return { key: keys.pub };
   if (request.method !== 'POST') return [404, { error: 'not found' }];
@@ -312,6 +315,34 @@ async function blog(request) {
   const res = new Response(body, { headers: { 'Content-Type': 'application/json', 'Cache-Control': `public, max-age=${ttl}` } });
   await cache.put(key, res.clone());
   return res;
+}
+
+// --- Feedback ---
+
+const FEEDBACK_PER_DAY = 30;
+const KINDS = { data: 'Pañcāṅga data', app: 'The app', idea: 'Suggestion' };
+
+async function feedback(request, env) {
+  if (!env.GH_TOKEN) return [503, { error: 'not set up' }];
+  let b;
+  try { b = JSON.parse(await request.text()); } catch { return [400, { error: 'not JSON' }]; }
+  const kind = KINDS[b.kind] ? b.kind : 'app';
+  const text = typeof b.text === 'string' ? b.text.trim().slice(0, 4000) : '';
+  if (text.length < 10) return [400, { error: 'too short' }];
+  const title = (typeof b.title === 'string' && b.title.trim() ? b.title.trim() : KINDS[kind]).slice(0, 120);
+  const context = typeof b.context === 'string' ? b.context.slice(0, 1500) : '';
+  // The same words once a day (a double tap, a resend); and a ceiling for the whole day.
+  const day = new Date().toISOString().slice(0, 10);
+  const seen = `fbs:${(await sha256hex(kind + title + text)).slice(0, 24)}`;
+  if (await env.SUBS.get(seen)) return { ok: true, duplicate: true };
+  const countKey = `fbn:${day}`;
+  const n = Number(await env.SUBS.get(countKey)) || 0;
+  if (n >= FEEDBACK_PER_DAY) return [429, { error: 'too many today' }];
+  const body = [text, context ? `\n---\n${context}` : '', '\n_Sent from the app, without a GitHub account._'].join('\n');
+  const made = await gh(env, '/issues', { method: 'POST', body: JSON.stringify({ title: `[${kind}] ${title}`, body, labels: ['feedback', kind] }) });
+  await env.SUBS.put(seen, '1', { expirationTtl: 86400 });
+  await env.SUBS.put(countKey, String(n + 1), { expirationTtl: 2 * 86400 });
+  return { ok: true, issue: made.number, url: made.html_url };
 }
 
 // --- City requests ---

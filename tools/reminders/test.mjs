@@ -158,5 +158,18 @@ bp = await blogPosts(async (u) => (u.includes('archive') ? (u.endsWith('offset=0
   : u.includes('sections') ? [{ id: 1, name: 'Festivals' }] : ''));
 assert.deepEqual(Object.keys(bp.groups), ['Festivals']);
 
+// Feedback: an issue, once for the same words, refused when too short.
+issues.length = 0;
+res = await worker.fetch(req('/feedback', { kind: 'data', title: 'Wrong sunrise', text: 'Sunrise in Chennai looks a minute early.', context: 'City: Chennai' }), cityEnv);
+const fb = await res.json();
+assert.equal(fb.issue, 7);
+assert.equal(issues[0].title, '[data] Wrong sunrise');
+assert.deepEqual(issues[0].labels, ['feedback', 'data']);
+assert.match(issues[0].body, /City: Chennai/);
+res = await worker.fetch(req('/feedback', { kind: 'data', title: 'Wrong sunrise', text: 'Sunrise in Chennai looks a minute early.' }), cityEnv);
+assert.equal((await res.json()).duplicate, true);
+res = await worker.fetch(req('/feedback', { kind: 'app', text: 'short' }), cityEnv);
+assert.equal(res.status, 400);
+
 Date.now = RealNow;
 console.log('reminders worker: all checks passed');

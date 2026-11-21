@@ -44,6 +44,23 @@ export function renderFeedback(ctx, root) {
     const url = `${ISSUES}?${new URLSearchParams({ title: heading(), body: body() })}`;
     window.open(url, '_blank', 'noopener');
   };
+  // Sent by the app's service as a public issue, for those without a GitHub account.
+  const send = async (e) => {
+    const button = e.currentTarget;
+    if (text.value.trim().length < 10) { status.textContent = U('fb_short'); return; }
+    button.disabled = true;
+    status.textContent = U('rm_saving');
+    try {
+      const r = await fetch(`${SERVICE}/feedback`, { method: 'POST', headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ kind, title: title.value.trim(), text: text.value.trim(), context: withCtx.checked ? context(ctx) : '' }) });
+      const out = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(out.error || r.status);
+      status.replaceChildren(U('fb_sent'), ' ', out.url ? link(out.url, `#${out.issue}`) : '');
+      title.value = ''; text.value = '';
+    } catch (err) {
+      status.textContent = String(err.message) === 'too many today' ? U('fb_busy') : U('fb_failed');
+    } finally { button.disabled = false; }
+  };
   const copy = async () => {
     try { await navigator.clipboard.writeText(`${heading()}\n\n${body()}`); status.textContent = U('fb_copied'); }
     catch { status.textContent = '—'; }
@@ -56,7 +73,8 @@ export function renderFeedback(ctx, root) {
     h('label', { class: 'fb-check', for: 'fb-ctx' }, withCtx, ' ', U('fb_ctx')),
     preview,
     h('div', { class: 'fb-actions' },
-      h('button', { type: 'button', class: 'appeal-btn fb-send', onclick: open }, U('fb_send')),
+      h('button', { type: 'button', class: 'appeal-btn fb-send', onclick: send }, U('fb_post')),
+      h('button', { type: 'button', class: 'cal-btn', onclick: open }, U('fb_send')),
       h('button', { type: 'button', class: 'cal-btn', onclick: copy }, U('sk_copy'))),
     status,
     h('p', { class: 'muted' }, U('fb_note'))));
@@ -64,6 +82,15 @@ export function renderFeedback(ctx, root) {
 }
 
 export function renderContribute(ctx, root) {
+  // As on the PDFs' contribute page: the work, then the appeal.
+  root.append(h('section', { class: 'prose contribute-intro' },
+    h('p', { class: 'about-shloka' }, '॥ ज्योतिषाम् अयनम् ॥'),
+    h('h2', { class: 'block-title' }, 'The Journey of Light'),
+    h('p', { class: 'about-tag' }, 'Preserving the Ancient Science of Time'),
+    h('p', null, 'For centuries, jyautiṣa śāstra has guided countless individuals in harmonising their lives with cosmic rhythms. ' +
+      'This pañcāṅga continues that noble tradition. Creating an accurate daily pañcāṅga demands deep knowledge of astronomical ' +
+      'calculations, mastery of traditional texts, modern computational expertise, and hundreds of hours of careful verification.'),
+    h('p', null, 'This work is offered to you freely — vidyā-dāna — knowledge as sacred gift.')));
   root.append(h('section', { class: 'appeal' },
     h('h2', null, 'Give Back · Preserve the Tradition'),
     h('p', null, 'If this panchanga has enriched your life, please support the next generation of scholars.'),
