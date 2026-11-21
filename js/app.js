@@ -249,7 +249,24 @@ const RENDERERS = { janma: renderJanma, abhyanga: renderMuhurta, kshaura: render
   shannavati: renderShannavati, feedback: renderFeedback, contribute: renderContribute, thanks: renderThanks, smarana: renderReminders,
   saura: renderSaura, chandra: renderChandra, settings: renderSettings };
 
-async function render() {
+// Each minute on a live page: the page is built again off screen, and if nothing has changed but
+// its live parts (marked data-live), only those are swapped in, so folds, scroll and the rest stay
+// as they are. Otherwise (an anga or kāla has changed) the page is redrawn as usual.
+function patchLive(old, fresh) {
+  if (!old) return false;
+  const a = old.querySelectorAll('[data-live]'), b = fresh.querySelectorAll('[data-live]');
+  if (!a.length || a.length !== b.length) return false;
+  const rest = (v) => {
+    const c = v.cloneNode(true);
+    c.querySelectorAll('[data-live]').forEach((e) => e.replaceWith(document.createComment('live')));
+    return c.innerHTML;
+  };
+  if (rest(old) !== rest(fresh)) return false;
+  a.forEach((e, i) => e.replaceWith(b[i]));
+  return true;
+}
+
+async function render({ soft = false } = {}) {
   const token = ++renderToken;
   const route = parseRoute();
   if (route.city !== settings.city) {
@@ -282,6 +299,7 @@ async function render() {
     view.replaceChildren(h('p', { class: 'empty' }, ctx.L('nopalabhyate')));
   }
   if (token !== renderToken) return;
+  if (soft && same && patchLive(main.firstElementChild, view)) return;
   // Reminders, if on: resend this phone's list when it is a week old (once a session, in the background).
   refreshReminders(ctx).catch(() => {});
   const pane = view.querySelector('.pane-scroll');
@@ -340,7 +358,7 @@ async function boot() {
   // Keep "now" honest while the page stays open.
   setInterval(() => {
     const live = ['dina', 'kala'].includes(parseRoute().view);
-    if (live && !document.hidden && !document.querySelector('dialog[open]')) render();
+    if (live && !document.hidden && !document.querySelector('dialog[open]')) render({ soft: true });
   }, 60000);
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
     navigator.serviceWorker.register('sw.js').catch(() => {});

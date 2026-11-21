@@ -25,7 +25,17 @@ export const KINDS = [
 // day the next one starts (its Mēṣa saṅkrānti), so that last day is left to the next year.
 // The saṅkrāntis are one per rāśi, from Mēṣa: the first of each in the year, and a Mēṣa that fell
 // the day before the year's file starts (abroad, mostly) taken from the previous year's.
+// Kept per year for the session: More asks for it on each visit (its "next" line), and the page.
+const memo = new WeakMap();
 export function shannavati(meta, prev) {
+  const hit = memo.get(meta);
+  if (hit && hit.prev === prev) return hit.out;
+  const out = computeShannavati(meta, prev);
+  memo.set(meta, { prev, out });
+  return out;
+}
+
+function computeShannavati(meta, prev) {
   const out = Object.fromEntries(KINDS.map(([k]) => [k, []]));
   const dates = Object.keys(meta.fests).filter((d) => d >= meta.start && d < meta.end).sort();
   for (const date of dates) {

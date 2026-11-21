@@ -20,7 +20,19 @@ export function tithiShort(ctx, t) {
 // The days of the solar (saura) or lunar (chandra) month that holds `date`: the run of days around
 // it that share the month (sunrise to sunrise), from the month files on either side. Null where
 // there is no data.
-export async function monthSpan(ctx, date, kind) {
+// Kept for the session (the view and the top bar both ask), per city, date, kind and the
+// festival sources chosen (which shape the day records).
+const spans = new Map();
+export function monthSpan(ctx, date, kind) {
+  const key = `${ctx.city.id}|${date}|${kind}|${[...ctx.enabled].sort().join(',')}`;
+  if (!spans.has(key)) {
+    if (spans.size > 60) spans.clear();
+    spans.set(key, findSpan(ctx, date, kind).catch((e) => { spans.delete(key); throw e; }));
+  }
+  return spans.get(key);
+}
+
+async function findSpan(ctx, date, kind) {
   const [y, m] = date.slice(0, 7).split('-').map(Number);
   const ym = (n) => new Date(Date.UTC(y, m - 1 + n, 1)).toISOString().slice(0, 7);
   const all = (await Promise.all([-1, 0, 1].map((n) => ctx.loadMonthDays(ym(n)).catch(() => [])))).flat();
