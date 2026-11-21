@@ -147,9 +147,19 @@ export async function renderBlog(ctx, root) {
   const { U } = ctx;
   const blog = await fetch(`${SERVICE}/blog`).then((r) => (r.ok ? r.json() : null)).catch(() => null);
   const url = blog?.url || 'https://adyatithi.substack.com';
+  // Subscribing by e-mail on Substack, or the feed's address for a feed reader (copied: opened on a
+  // phone it would only show its XML).
+  const feed = `${url}/feed`;
+  const copied = h('span', { class: 'muted blog-copied', role: 'status' });
   const head = h('section', { class: 'prose blog-head' },
     h('h2', { class: 'block-title' }, U('blog')),
-    h('p', null, U('blog_lead'), ' ', link(url, url.replace(/^https:\/\//, ''))));
+    h('p', null, U('blog_lead'), ' ', link(url, url.replace(/^https:\/\//, ''))),
+    h('div', { class: 'fb-actions' },
+      h('a', { class: 'appeal-btn blog-sub-btn', href: `${url}/subscribe`, target: '_blank', rel: 'noopener' }, U('blog_subscribe')),
+      h('a', { class: 'cal-btn', href: feed, onclick: async (e) => {
+        try { await navigator.clipboard.writeText(feed); e.preventDefault(); copied.textContent = U('blog_rss_copied'); } catch { /* opens the feed instead */ }
+      } }, U('blog_rss')),
+      copied));
   if (!blog?.sections?.length) return root.append(head, h('p', { class: 'muted' }, U('blog_none')));
   const date = (d) => { const t = new Date(d + 'T00:00:00Z'); return isNaN(t) ? d : `${t.getUTCDate()} ${MONTHS[t.getUTCMonth()].slice(0, 3)} ${t.getUTCFullYear()}`; };
   root.append(head, h('section', { class: 'blog' }, blog.sections.map((sec, i) => ctx.foldAs(`blog-${sec.name}`, i > 0,

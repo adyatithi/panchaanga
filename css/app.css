@@ -779,6 +779,9 @@ details.fold:not([open]) > summary::after { transform: rotate(-90deg); }
 .pl-note { margin: .2rem 0 .35rem; font-size: .875rem; }
 .pl-status { font-size: .8125rem; }
 .pl-input { margin-top: .3rem; }
+.blog-head .fb-actions { align-items: center; flex-wrap: wrap; }
+.blog-sub-btn, .blog-head a.cal-btn { text-decoration: none; }
+.blog-copied { font-size: .8125rem; }
 .blog-posts { list-style: none; padding: 0; margin: .3rem 0 .8rem; }
 .blog-posts li { border-bottom: 1px solid var(--hair); }
 .blog-card { display: grid; grid-template-columns: 6.5rem 1fr; gap: .75rem; padding: .7rem 0; color: inherit; text-decoration: none; align-items: start; }

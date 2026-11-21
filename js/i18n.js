@@ -64,6 +64,7 @@ export const T = {
     pl_error: 'Could not send the request; try again when online.', pl_none: 'No place by that name in the list.',
     pl_other: 'Not in the list? Ask for it on GitHub', pl_issue_body: 'Place (town, district, state or country):\n\nNearest large town:\n\nLatitude and longitude, if you know them:\n',
     blog: 'The Adyatithi blog', mn_blog: 'Articles on the pañcāṅga and its festivals, by section',
+    blog_subscribe: 'Subscribe', blog_rss: 'RSS feed', blog_rss_copied: 'Feed address copied: paste it into your feed reader.',
     blog_lead: 'Posts from', blog_none: 'The list of posts could not be loaded; read them on the blog itself.',
     privacy: 'Privacy', mn_privacy: 'What the app keeps, and what it sends',
     pv_lead: 'Nothing that identifies you leaves your phone.',
