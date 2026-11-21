@@ -147,15 +147,29 @@ export async function renderBlog(ctx, root) {
   const { U } = ctx;
   const blog = await fetch(`${SERVICE}/blog`).then((r) => (r.ok ? r.json() : null)).catch(() => null);
   const url = blog?.url || 'https://adyatithi.substack.com';
+  // Subscribing by e-mail on Substack, or the feed's address for a feed reader (copied: opened on a
+  // phone it would only show its XML).
+  const feed = `${url}/feed`;
+  const copied = h('span', { class: 'muted blog-copied', role: 'status' });
   const head = h('section', { class: 'prose blog-head' },
     h('h2', { class: 'block-title' }, U('blog')),
-    h('p', null, U('blog_lead'), ' ', link(url, url.replace(/^https:\/\//, ''))));
+    h('p', null, U('blog_lead'), ' ', link(url, url.replace(/^https:\/\//, ''))),
+    h('div', { class: 'fb-actions' },
+      h('a', { class: 'appeal-btn blog-sub-btn', href: `${url}/subscribe`, target: '_blank', rel: 'noopener' }, U('blog_subscribe')),
+      h('a', { class: 'cal-btn', href: feed, onclick: async (e) => {
+        try { await navigator.clipboard.writeText(feed); e.preventDefault(); copied.textContent = U('blog_rss_copied'); } catch { /* opens the feed instead */ }
+      } }, U('blog_rss')),
+      copied));
   if (!blog?.sections?.length) return root.append(head, h('p', { class: 'muted' }, U('blog_none')));
   const date = (d) => { const t = new Date(d + 'T00:00:00Z'); return isNaN(t) ? d : `${t.getUTCDate()} ${MONTHS[t.getUTCMonth()].slice(0, 3)} ${t.getUTCFullYear()}`; };
   root.append(head, h('section', { class: 'blog' }, blog.sections.map((sec, i) => ctx.foldAs(`blog-${sec.name}`, i > 0,
     h('span', { class: 'label' }, sec.name, h('span', { class: 'muted' }, ` · ${ctx.num(sec.posts.length)}`)),
+    // A card per post: its cover image (where the blog gives one), title, date and subtitle.
     h('ul', { class: 'blog-posts' }, sec.posts.map((p) => h('li', null,
-      h('a', { href: p.u, target: '_blank', rel: 'noopener', class: 'blog-title' }, p.t),
-      h('span', { class: 'muted blog-date time' }, ` ${date(p.d)}`),
-      p.s && h('p', { class: 'muted blog-sub' }, p.s))))))));
+      h('a', { href: p.u, target: '_blank', rel: 'noopener', class: 'blog-card' + (p.i ? '' : ' no-img') },
+        p.i && h('img', { class: 'blog-img', src: p.i, alt: '', loading: 'lazy', decoding: 'async', referrerpolicy: 'no-referrer' }),
+        h('span', { class: 'blog-text' },
+          h('span', { class: 'blog-title' }, p.t),
+          h('span', { class: 'muted blog-date time' }, date(p.d)),
+          p.s && h('span', { class: 'muted blog-sub' }, p.s))))))))));
 }
