@@ -60,7 +60,7 @@ Every festival of the year, and the year's lists, with search.
 
 **अन्यत्**
 
-This guide, settings, About, Contribute, Acknowledgements and Feedback (which opens a prefilled GitHub issue); the year's nava-nāyakas, ṣaṇṇavati-tarpaṇa days and janmadinas; the day's paṭhanam, saṅkalpa and what to avoid; and the lists of days for an oil bath, a haircut, beginning study and the ūna-śrāddhas.
+This guide, settings, Reminders, About, Contribute, Acknowledgements and Feedback (which opens a prefilled GitHub issue); the year's nava-nāyakas, ṣaṇṇavati-tarpaṇa days and janmadinas; the day's paṭhanam, saṅkalpa and what to avoid; and the lists of days for an oil bath, a haircut, beginning study and the ūna-śrāddhas.
 
 ## The head of the page
 
@@ -211,6 +211,10 @@ For the year: the nava-nāyakas, and the janmadinas.
 **नवनायकाः**
 
 The nine "officers" of the year (rājā, mantrī …), the graha holding each, and the traditional verse on what it portends.
+
+**स्मारणानि**
+
+Notifications on this phone for the festival groups you choose (as on the Festivals tab) and the ṣaṇṇavati days: the evening before, on the morning of the day, or fifteen minutes before one with a time begins. They are worked out on the phone about two months ahead and kept up to date when the app is opened; a small service sends each when it is due. On iPhone, the app must be on the Home Screen. They are ordinary notifications, not alarms.
 
 **जन्म-दिनानि**
 

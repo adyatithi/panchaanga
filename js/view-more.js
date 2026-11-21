@@ -20,6 +20,8 @@ const ICONS = {
   uuna: 'M15 4a8 8 0 1 0 5 13a7 7 0 0 1-5-13z',
   // Shannavati: water poured from cupped hands.
   shannavati: 'M5 9c0 4 3 6 7 6s7-2 7-6zM12 15v2M10 19.5c0-1 2-2.5 2-2.5s2 1.5 2 2.5a2 2 0 0 1-4 0z',
+  // Reminders: a bell.
+  smarana: 'M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20.5a2 2 0 0 0 4 0',
   // Feedback: a speech bubble; contribute: a gift; acknowledgements: a flower.
   feedback: 'M4 5h16v11H9l-4 4v-4H4zM8 9h8M8 12h5',
   contribute: 'M4 10h16v4H4zM6 14v6h12v-6M12 10v10M12 10c-2-4-6-4-6-1.5S10 10 12 10zm0 0c2-4 6-4 6-1.5S14 10 12 10z',
@@ -61,6 +63,7 @@ export async function renderMore(ctx, root) {
     h('ul', { class: 'menu' },
       item('guide', L('margadarshika'), ctx.U('guidelead'), () => ctx.go({ view: 'guide' })),
       item('settings', L('vinyaasah'), null, () => ctx.openSettings()),
+      item('smarana', L('smaaranaani'), ctx.U('rm_menu'), () => ctx.go({ view: 'smarana', date: null })),
       item('about', L('parichayah'), null, () => ctx.go({ view: 'about' })),
       item('contribute', L('yogadaanam'), ctx.U('yd_menu'), () => ctx.go({ view: 'contribute' })),
       item('thanks', L('kritajnataa'), null, () => ctx.go({ view: 'thanks' })),

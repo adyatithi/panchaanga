@@ -1,0 +1,51 @@
+# Deploys the reminders Worker (tools/reminders) to Cloudflare when it changes on main or nightly
+# (there is one Worker, which both the stable and the nightly app use; a change is tried on nightly). The first
+# deploy also makes its VAPID key pair: generated here and piped straight into a Worker secret, so
+# the private key is never printed or stored anywhere else.
+# Needs the repository secrets CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID.
+name: Reminders worker
+
+on:
+  push:
+    branches: [main, nightly]
+    paths: ["tools/reminders/**", ".github/workflows/reminders.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools/reminders
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Test
+        run: node test.mjs
+      - name: Deploy
+        # Once more after a pause if it fails: on the very first deploy Cloudflare can report the
+        # Worker just uploaded as not existing yet.
+        run: npx --yes wrangler@4 deploy || (sleep 20 && npx --yes wrangler@4 deploy)
+      - name: VAPID key (first deploy only)
+        run: |
+          if npx --yes wrangler@4 secret list | grep -q '"VAPID_JWK"'; then
+            echo "VAPID_JWK is set"
+          else
+            node make-vapid.js | npx --yes wrangler@4 secret put VAPID_JWK
+          fi
+      - name: Check
+        # A secret just set can take a few seconds to reach the Worker.
+        run: |
+          for i in $(seq 1 12); do
+            curl -fsS https://reminders.adyatithi.workers.dev/key && exit 0
+            sleep 5
+          done
+          exit 1

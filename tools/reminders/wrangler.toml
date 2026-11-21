@@ -1,0 +1,17 @@
+# The reminders Worker, served at https://reminders.adyatithi.workers.dev (no custom domain).
+# Deployed by .github/workflows/reminders.yml; the account comes from CLOUDFLARE_ACCOUNT_ID.
+name = "reminders"
+main = "worker.js"
+compatibility_date = "2025-06-01"
+workers_dev = true
+
+[[kv_namespaces]]
+binding = "SUBS"
+id = "5011ed102bf04202a7aa1f3d290360f6"    # "adyatithi-push"
+
+[triggers]
+crons = ["*/5 * * * *"]
+
+[vars]
+# Pages allowed to subscribe (the stable and nightly apps share the first origin).
+ORIGINS = "https://adyatithi.github.io,http://localhost:8765"
