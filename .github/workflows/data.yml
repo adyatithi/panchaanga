@@ -120,7 +120,11 @@ jobs:
           git config user.name "adyatithi data build"
           git config user.email "actions@users.noreply.github.com"
           git commit -m "Add city $CITY${ISSUE:+ (#$ISSUE)}"
-          git push
+          for i in 1 2 3; do
+            git push && break
+            git pull --rebase -X theirs --no-edit origin main
+            [ "$i" = 3 ] && exit 1
+          done
           if [ -n "$ISSUE" ]; then
             gh issue comment "$ISSUE" --repo "$GITHUB_REPOSITORY" --body "Added: $CITY is now in the app (Kali ${{ steps.years.outputs.years }}), from the next publish, a few minutes from now."
             gh issue close "$ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed
@@ -148,4 +152,10 @@ jobs:
           git config user.name "adyatithi data build"
           git config user.email "actions@users.noreply.github.com"
           git commit -m "Weekly data build ($(date -u +%F)): Kali ${{ steps.years.outputs.years }}"
-          git push
+          # A publish may have moved main while this ran (hours): take it in, keeping this build's data
+          # where both touched a file, and try again.
+          for i in 1 2 3; do
+            git push && exit 0
+            git pull --rebase -X theirs --no-edit origin main
+          done
+          exit 1
