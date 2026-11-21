@@ -42,4 +42,10 @@ jobs:
             node make-vapid.js | npx --yes wrangler@4 secret put VAPID_JWK
           fi
       - name: Check
-        run: curl -fsS https://reminders.adyatithi.workers.dev/key
+        # A secret just set can take a few seconds to reach the Worker.
+        run: |
+          for i in $(seq 1 12); do
+            curl -fsS https://reminders.adyatithi.workers.dev/key && exit 0
+            sleep 5
+          done
+          exit 1
