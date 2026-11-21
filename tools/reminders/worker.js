@@ -244,7 +244,7 @@ ${table('Channel', channel)}${table('Installed app or browser', mode)}${table('C
 // --- The blog ---
 
 const BLOG = 'https://adyatithi.substack.com';
-const BLOG_V = 2;   // the stored list's version: raise it when the way posts are read changes
+const BLOG_V = 3;   // the stored list's version: raise it when the way posts are read changes
 const UA = { 'User-Agent': 'adyatithi-panchaanga (+https://adyatithi.github.io/panchaanga/)' };
 const tag = (xml, name) => (xml.match(new RegExp(`<${name}[^>]*>([\\s\\S]*?)</${name}>`)) || [])[1] || '';
 // Markup out, then every entity decoded: &amp; first (Substack's feed escapes some twice, as
@@ -259,8 +259,19 @@ const decode = (s) => {
 };
 const text = (s) => decode(s.replace(/^<!\[CDATA\[|\]\]>$/g, '').replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim();
 
-// The posts, by section: from the archive API with its sections; or, if that is refused, from the
-// RSS feed (recent posts, with subtitles) and the sitemap (every post), in one section.
+// Without the archive's sections, a post's section is guessed from its title, as the blog's own
+// sections go: Ekādaśī, Puṇyakāla, and Pañcāṅga for the rest.
+const fold = (t) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+export function sectionOf(title) {
+  const t = fold(title);
+  if (/ekadas|ekadash/.test(t)) return 'Ekādaśī';
+  if (/punyakal/.test(t)) return 'Puṇyakāla';
+  return 'Pañcāṅga';
+}
+
+// The posts, by section, each with its cover image where the source gives one: from the archive API
+// with its sections; or, if that is refused, from the RSS feed (recent posts, with subtitles and
+// images) and the sitemap (every post), sorted into sections by title.
 export async function blogPosts(get) {
   try {
     const items = [];
@@ -275,7 +286,7 @@ export async function blogPosts(get) {
     const groups = {};
     for (const p of items) {
       const name = p.section_name || names[p.section_id] || 'Posts';
-      (groups[name] = groups[name] || []).push({ t: p.title || '', s: p.subtitle || p.description || '', d: (p.post_date || '').slice(0, 10), u: p.canonical_url || `${BLOG}/p/${p.slug}` });
+      (groups[name] = groups[name] || []).push({ t: p.title || '', s: p.subtitle || p.description || '', d: (p.post_date || '').slice(0, 10), u: p.canonical_url || `${BLOG}/p/${p.slug}`, i: p.cover_image || '' });
     }
     return { source: 'archive', groups };
   } catch (e) {
@@ -286,7 +297,8 @@ export async function blogPosts(get) {
       for (const item of rss.split('<item>').slice(1)) {
         const u = text(tag(item, 'link')).split('?')[0];
         const d = new Date(text(tag(item, 'pubDate')));
-        found.set(u, { t: text(tag(item, 'title')), s: text(tag(item, 'description')), d: isNaN(d) ? '' : d.toISOString().slice(0, 10), u });
+        const img = (item.match(/<enclosure[^>]*url="([^"]+)"[^>]*type="image/) || item.match(/<media:content[^>]*url="([^"]+)"/) || [])[1] || '';
+        found.set(u, { t: text(tag(item, 'title')), s: text(tag(item, 'description')), d: isNaN(d) ? '' : d.toISOString().slice(0, 10), u, i: decode(img) });
       }
     } catch (e2) { note += `; feed: ${e2.message}`; }
     try {
@@ -297,12 +309,14 @@ export async function blogPosts(get) {
           const u = m[1].trim();
           if (!u.includes('/p/') || found.has(u)) continue;
           const slug = u.replace(/\/$/, '').split('/p/').pop();
-          found.set(u, { t: slug.replace(/-/g, ' ').replace(/^./, (c) => c.toUpperCase()), s: '', d: (m[2] || '').slice(0, 10), u });
+          found.set(u, { t: slug.replace(/-/g, ' ').replace(/^./, (c) => c.toUpperCase()), s: '', d: (m[2] || '').slice(0, 10), u, i: '' });
         }
       }
     } catch (e3) { note += `; sitemap: ${e3.message}`; }
     const posts = [...found.values()].sort((a, b) => (a.d < b.d ? 1 : -1));
-    return { source: posts.length ? 'feed' : 'none', note, groups: posts.length ? { Posts: posts } : {} };
+    const groups = {};
+    for (const p of posts) (groups[sectionOf(p.t)] = groups[sectionOf(p.t)] || []).push(p);
+    return { source: posts.length ? 'feed' : 'none', note, groups };
   }
 }
 
