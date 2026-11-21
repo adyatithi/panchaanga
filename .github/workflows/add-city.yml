@@ -51,4 +51,6 @@ jobs:
         if: steps.place.outputs.error != ''
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "Not added: ${{ steps.place.outputs.error }}"
+          ERROR: ${{ steps.place.outputs.error }}
+        run: |
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "Not added: $ERROR"

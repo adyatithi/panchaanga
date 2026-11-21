@@ -60,7 +60,7 @@ Every festival of the year, and the year's lists, with search.
 
 **अन्यत्**
 
-From the daily to the occasional: the day's paṭhanam, saṅkalpa, and vidhi-niṣedhas (what to avoid and what is commended); the lists of days for an oil bath, a haircut, beginning study and the ūna-śrāddhas; the year's ṣaṇṇavati-tarpaṇa days, janmadinas and nava-nāyakas; then the app: Reminders, Settings, this guide, the Adyatithi blog (its posts by section), Feedback (which opens a prefilled GitHub issue), Contribute, Acknowledgements, Privacy (what the app keeps and what it sends) and About.
+From the daily to the occasional: the day's paṭhanam, saṅkalpa, and vidhi-niṣedhas (what to avoid and what is commended); the lists of days for an oil bath, a haircut, beginning study and the ūna-śrāddhas; the year's ṣaṇṇavati-tarpaṇa days, janmadinas and nava-nāyakas; then the app: Reminders, Settings, this guide, the Adyatithi blog (its posts by section), Feedback (sent as a GitHub issue, or opened there under your own account), Contribute, Acknowledgements, Privacy (what the app keeps and what it sends) and About.
 
 ## The head of the page
 

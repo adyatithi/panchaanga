@@ -15,7 +15,7 @@ on:
     workflows: ["Weekly data build", "Nightly pushed"]
     types: [completed]
   schedule:
-    - cron: "43 4 * * 1"   # Mondays: the blog's posts (and the feeds' new month, if any)
+    - cron: "43 4 1 * *"   # the first of each month: the feeds start from the new month
   workflow_dispatch:
 
 permissions:
@@ -73,12 +73,6 @@ jobs:
         run: |
           pip install -q tzdata
           python tools/ics_feeds.py data
-      - name: Blog
-        # The Adyatithi blog's posts by section, for the app's blog page; skipped if unreadable.
-        run: |
-          python tools/blog.py data/blog.json > blog.log 2>&1 || true
-          cat blog.log
-          echo "::notice title=Blog::$(tail -n 4 blog.log | tr '\n' ' ' | cut -c1-900)"
       - name: Site
         run: |
           mkdir -p "$RUNNER_TEMP/site"

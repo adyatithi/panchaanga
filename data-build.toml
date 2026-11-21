@@ -4,8 +4,8 @@
 
 [jyotisha]
 repository = "jyotisham/jyotisha"
-# master, with the month-at-kaala (#209) and bOdhAyana-amAvAsyA (#211) fixes.
-commit = "005b8106c67d0e173e24f2968fe2a5743cf8bdb7"
+# master, with the month-at-kaala (#209), bOdhAyana-amAvAsyA (#211) and places (#212, #213: Seattle) fixes.
+commit = "2f5b5e040cfc3a04f814b91dc980fc8832cd5699"
 
 [adyatithi]
 repository = "jyotisham/adyatithi"
