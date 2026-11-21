@@ -75,7 +75,10 @@ jobs:
           python tools/ics_feeds.py data
       - name: Blog
         # The Adyatithi blog's posts by section, for the app's blog page; skipped if unreadable.
-        run: python tools/blog.py data/blog.json || echo "blog not read"
+        run: |
+          python tools/blog.py data/blog.json > blog.log 2>&1 || true
+          cat blog.log
+          echo "::notice title=Blog::$(tail -n 4 blog.log | tr '\n' ' ' | cut -c1-900)"
       - name: Site
         run: |
           mkdir -p "$RUNNER_TEMP/site"
