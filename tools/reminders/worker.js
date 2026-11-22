@@ -351,7 +351,8 @@ export async function refreshBlog(env, now = Date.now()) {
     }
   }
   if (!found && kept) {
-    const again = { ...kept, at: now, note };
+    // Refused: keep the list, and try again in an hour (the next six-hourly try, five hours early).
+    const again = { ...kept, v: BLOG_V, at: now - (kept.source === 'archive' ? 23 : 5) * 3600e3, note };
     await env.SUBS.put('blog', JSON.stringify(again));
     return again;
   }
