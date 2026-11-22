@@ -244,7 +244,7 @@ ${table('Channel', channel)}${table('Installed app or browser', mode)}${table('C
 // --- The blog ---
 
 const BLOG = 'https://adyatithi.substack.com';
-const BLOG_V = 3;   // the stored list's version: raise it when the way posts are read changes
+const BLOG_V = 4;   // the stored list's version: raise it when the way posts are read changes
 const UA = { 'User-Agent': 'adyatithi-panchaanga (+https://adyatithi.github.io/panchaanga/)' };
 const tag = (xml, name) => (xml.match(new RegExp(`<${name}[^>]*>([\\s\\S]*?)</${name}>`)) || [])[1] || '';
 // Markup out, then every entity decoded: &amp; first (Substack's feed escapes some twice, as
@@ -309,7 +309,7 @@ export async function blogPosts(get) {
           const u = m[1].trim();
           if (!u.includes('/p/') || found.has(u)) continue;
           const slug = u.replace(/\/$/, '').split('/p/').pop();
-          found.set(u, { t: slug.replace(/-/g, ' ').replace(/^./, (c) => c.toUpperCase()), s: '', d: (m[2] || '').slice(0, 10), u, i: '' });
+          found.set(u, { t: slug.replace(/-/g, ' ').replace(/^./, (c) => c.toUpperCase()), s: '', d: (m[2] || '').slice(0, 10), u, i: '', g: 1 });
         }
       }
     } catch (e3) { note += `; sitemap: ${e3.message}`; }
@@ -325,26 +325,49 @@ export async function blogPosts(get) {
 // blog page only reads it, so a reader never waits on Substack, nor adds to its rate limit.
 // (Cloudflare's response cache does not work for a workers.dev Worker, so KV it is.)
 export async function refreshBlog(env, now = Date.now()) {
-  let kept = await env.SUBS.get('blog', 'json');
-  if (kept && kept.v !== BLOG_V) kept = null;          // made by an earlier version: replace it
-  const age = kept ? now - kept.at : Infinity;
-  if (kept && age < (kept.source === 'archive' ? 86400e3 : 3600e3)) return kept;
+  const kept = await env.SUBS.get('blog', 'json');
+  // A list made by an earlier version is refreshed at once (still merged with, not dropped).
+  const age = kept && kept.v === BLOG_V ? now - kept.at : Infinity;
+  if (kept && age < (kept.source === 'archive' ? 86400e3 : 6 * 3600e3)) return kept;
   const get = async (u, json = false) => {
     const r = await fetch(u, { headers: UA });
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     return json ? r.json() : r.text();
   };
   const { source, note, groups } = await blogPosts(get);
-  const newest = (n) => groups[n].map((x) => x.d).sort().at(-1) || '';
-  const order = Object.keys(groups).sort((a, b) => (newest(a) < newest(b) ? 1 : -1));
-  // A worse answer than the one kept (nothing, or the feed in place of the archive) only renews
-  // the time, so that the next try waits its turn.
-  if (kept && (!order.length || (source !== 'archive' && kept.source === 'archive'))) {
-    const again = { ...kept, at: now, note };
+  // Merged with the list kept, post by post (by address): what this answer lacks (an image, a
+  // subtitle, a real title where only the sitemap answered) is taken from what was kept, and posts
+  // it does not mention stay. A refusal (nothing at all) only renews the time.
+  const all = new Map();
+  for (const sec of kept?.sections || []) for (const p of sec.posts) all.set(p.u, { ...p, sec: sec.name });
+  let found = 0;
+  for (const [name, list] of Object.entries(groups)) {
+    for (const p of list) {
+      found++;
+      const o = all.get(p.u);
+      const better = o && !o.g;
+      all.set(p.u, { ...p, t: p.g && better ? o.t : p.t, g: p.g && !better ? 1 : 0, s: p.s || o?.s || '', i: p.i || o?.i || '',
+        sec: source === 'archive' ? name : null });
+    }
+  }
+  if (!found && kept) {
+    // Refused: keep the list, and try again in an hour (the next six-hourly try, five hours early).
+    const again = { ...kept, v: BLOG_V, at: now - (kept.source === 'archive' ? 23 : 5) * 3600e3, note };
     await env.SUBS.put('blog', JSON.stringify(again));
     return again;
   }
-  const fresh = { v: BLOG_V, at: now, url: BLOG, source, note, sections: order.map((n) => ({ name: n, posts: groups[n] })) };
+  // Sections: the archive's own where it gave them; else from the (possibly corrected) title.
+  const bySec = {};
+  for (const p of all.values()) {
+    const name = p.sec || sectionOf(p.t);
+    delete p.sec;
+    (bySec[name] = bySec[name] || []).push(p);
+  }
+  for (const list of Object.values(bySec)) list.sort((a, b) => (a.d < b.d ? 1 : -1));
+  const newest = (n) => bySec[n][0]?.d || '';
+  const order = Object.keys(bySec).sort((a, b) => (newest(a) < newest(b) ? 1 : -1));
+  const fresh = { v: BLOG_V, at: now, url: BLOG, source: source === 'archive' || kept?.source !== 'archive' ? source : kept.source,
+    note, sections: order.map((n) => ({ name: n, posts: bySec[n] })) };
   await env.SUBS.put('blog', JSON.stringify(fresh));
   return fresh;
 }
@@ -352,7 +375,7 @@ export async function refreshBlog(env, now = Date.now()) {
 async function blog(env) {
   const kept = await env.SUBS.get('blog', 'json');
   // The first reader before any run has filled it (or after a new version) starts a refresh.
-  return kept && kept.v === BLOG_V ? kept : refreshBlog(env);
+  return kept && kept.v === BLOG_V ? kept : refreshBlog(env).catch(() => kept);
 }
 
 // --- Feedback ---
