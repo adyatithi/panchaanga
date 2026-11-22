@@ -188,8 +188,15 @@ const c1 = calls;
 await refreshBlog(env, now + 30 * 60e3);
 assert.equal(calls, c1);                                             // within the hour: no fetch
 globalThis.fetch = async () => ({ ok: false, status: 429 });
-kept = await refreshBlog(env, now + 2 * 3600e3);
+kept = await refreshBlog(env, now + 7 * 3600e3);
 assert.equal(kept.sections.reduce((n, x) => n + x.posts.length, 0), 3);   // refused: the old list stays
+// Only the sitemap answers: the kept image, subtitle and title stay.
+globalThis.fetch = async (u) => (u.endsWith('sitemap.xml') ? { ok: true, text: async () => SM.replace('/p/two<', '/p/rama<') } : { ok: false, status: 429 });
+kept = await refreshBlog(env, now + 14 * 3600e3);
+const rama = kept.sections.flatMap((x) => x.posts).find((p) => p.u.endsWith('/p/rama'));
+assert.equal(rama.t, 'Rama Ekādaśī');
+assert.equal(rama.i, 'https://substackcdn.com/image/rama.jpg');
+assert.equal(rama.s, 'Kārtika · Padma Purāṇa');
 res = await worker.fetch(new Request('https://reminders.adyatithi.workers.dev/blog', { headers: { Origin: 'https://adyatithi.github.io' } }), env);
 assert.equal(res.headers.get('Access-Control-Allow-Origin'), 'https://adyatithi.github.io');
 assert.equal((await res.json()).sections.reduce((n, x) => n + x.posts.length, 0), 3);
