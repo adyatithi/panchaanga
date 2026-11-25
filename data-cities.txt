@@ -50,3 +50,4 @@ Melbourne
 Houston
 Chicago
 Seattle
+Durban
