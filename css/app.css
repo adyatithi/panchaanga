@@ -654,6 +654,15 @@ body.pane #main > .view { flex: 1 1 auto; min-height: 0; }
 .mu-title .mu-count { font-size: .875rem; font-family: var(--font-latin), var(--font); }
 .janma-pick { padding: .35rem .6rem; margin-bottom: .35rem; }
 .janma-pick .fchip-poor { margin-left: auto; }
+.bala-pick { flex-direction: column; align-items: stretch; gap: .35rem; }
+.bala-field { display: flex; align-items: center; gap: .6rem; }
+.bala-field .janma-label { min-width: 7.5rem; }
+.bala-ask, .bala-warn { margin: 0; font-size: .875rem; }
+.bala-warn { color: var(--red); }
+.bala-warn .linkish { color: var(--blue); text-decoration: underline; padding: 0; }
+.bala-now { margin: .5rem 0 .2rem; display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; }
+.bala-ashtama { margin-bottom: .8rem; }
+.bala-ashtama .rows li { padding: .45rem 0; }
 .mu-filters { margin: .2rem 0 .3rem; }
 .mu-filters .fchips { margin: 0; }
 details.mu-notes { margin: .1rem 0 .5rem; }

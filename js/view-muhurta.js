@@ -6,6 +6,7 @@ import * as data from './data.js';
 import { names, missing } from './parts.js';
 import { yearHead } from './view-parva.js';
 import { calButton, subscribeSheet } from './calendar.js';
+import { taaraOf as taaraFrom, setJanma } from './view-bala.js';
 
 export const MUHURTA_VIEWS = ['abhyanga', 'kshaura', 'vidyarambha'];
 
@@ -47,12 +48,7 @@ export async function renderMuhurta(ctx, root) {
   // taaraabala is on, a day whose whole window falls in unfavourable taaraas (janma, vipat,
   // pratyari, vadha) is greyed out. The muhurta command leaves such days out; here they stay.
   const janma = m.taarabala ? Number(ctx.settings.janma) || 0 : 0;
-  function taaraOf(nak) {
-    const count = ((nak - janma) % 27 + 27) % 27 + 1;      // 1 … 27
-    const taaraa = (count - 1) % 9 + 1;                    // 1 janma … 9 paramamitra
-    const name = count === 10 ? ctx.L('anujanma') : count === 19 ? ctx.L('trijanma') : S.tara[taaraa % 9];
-    return { taaraa, idx: taaraa % 9, poor: [1, 3, 5, 7].includes(taaraa), name };
-  }
+  const taaraOf = (nak) => taaraFrom(ctx, janma, nak);
   const warnOf = (t) => (t ? m.warn_tithis?.[String(t % 15)] : null);   // label key, e.g. w_mAtA
 
   // Every chip starts selected; turning one off drops those days ('wd:<0-6>', a mark such as
@@ -86,7 +82,7 @@ export async function renderMuhurta(ctx, root) {
 
   const picker = m.taarabala && h('label', { class: 'janma-pick', for: 'janma-nakshatra' },
     h('span', { class: 'janma-label' }, ctx.L('janmanakshatram')),
-    h('select', { id: 'janma-nakshatra', onchange: (e) => ctx.saveSettings({ janma: Number(e.target.value) || 0 }) },
+    h('select', { id: 'janma-nakshatra', onchange: (e) => setJanma(ctx, Number(e.target.value) || 0) },
       h('option', { value: 0, selected: !janma }, '—'),
       Array.from({ length: 27 }, (_, i) => h('option', { value: i + 1, selected: janma === i + 1 }, N.nakshatra(i + 1)))),
     janma > 0 && chip('poor', [h('span', { class: 'mu-swatch' }), ' ', ctx.L('taaraabalam')], null, 'fchip-poor'));

@@ -6,6 +6,7 @@ import { missing, names } from './parts.js';
 import { shareButton } from './share.js';
 import { shannavati } from './view-shannavati.js';
 import { yearChips } from './view-parva.js';
+import { nextAshtama, whenText } from './view-bala.js';
 
 const ICONS = {
   guide: 'M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18zM12 11v6M12 7.5v.01',
@@ -31,6 +32,8 @@ const ICONS = {
   feedback: 'M4 5h16v11H9l-4 4v-4H4zM8 9h8M8 12h5',
   contribute: 'M4 10h16v4H4zM6 14v6h12v-6M12 10v10M12 10c-2-4-6-4-6-1.5S10 10 12 10zm0 0c2-4 6-4 6-1.5S14 10 12 10z',
   thanks: 'M12 20c-4-2-6-6-6-10c3 0 5 2 6 4c1-2 3-4 6-4c0 4-2 8-6 10zM12 14V5M9.5 7.5L12 5l2.5 2.5',
+  // Taaraabala and chandrabala: a star beside a crescent.
+  bala: 'M15 4a7 7 0 1 0 5 12a6 6 0 0 1-5-12zM18 3l.9 1.9 2.1.3-1.5 1.4.4 2.1-1.9-1-1.9 1 .4-2.1L15 5.2l2.1-.3z',
   // Janmadinas: a lamp.
   janma: 'M12 3c1.6 2 2.2 3.3 2.2 4.3a2.2 2.2 0 0 1-4.4 0c0-1 .6-2.3 2.2-4.3zM4 13h16c0 3.9-3.6 7-8 7s-8-3.1-8-7zM12 13v-2',
 };
@@ -62,6 +65,10 @@ export async function renderMore(ctx, root) {
   ].filter(Boolean) : [];
   // Guide, settings and About first; then what belongs to the year, to the day, and the lists
   // of days for an undertaking.
+  // Taaraabala and chandrabala: the next chandrashtama, once a janma rashi is chosen.
+  const ash = await nextAshtama(ctx).catch(() => null);
+  const balaSub = ash ? `${L('chandraashtamam')}: ${ash.running ? ctx.U('idaaniim') : whenText(ctx, ash.start)} → ${whenText(ctx, ash.end)}`
+    : ctx.U('bl_menu');
   const S = ctx.S.labels;
   const head = (key) => h('h2', { class: 'menu-head' }, S[key] ?? L(key));
   // From what is used daily to what is used rarely: the day's pages, the lists of days for an
@@ -72,7 +79,8 @@ export async function renderMore(ctx, root) {
     h('ul', { class: 'menu' },
       item('pathana', L('pathanam'), U('mn_pathana'), () => ctx.go({ view: 'pathana' })),
       item('sankalpa', L('sankalpah'), U('mn_sankalpa'), () => ctx.go({ view: 'sankalpa' })),
-      item('varjya', L('vidhinishedhaah'), U('mn_vidhi'), () => ctx.go({ view: 'varjya' }))),
+      item('varjya', L('vidhinishedhaah'), U('mn_vidhi'), () => ctx.go({ view: 'varjya' })),
+      item('bala', `${L('taaraabalam')} · ${L('chandrabalam')}`, balaSub, () => ctx.go({ view: 'taarabala', date: null }))),
     lists.length && head('muhurtadinaani'),
     lists.length && h('ul', { class: 'menu' }, lists),
     head('samvatsaravishayaah'),

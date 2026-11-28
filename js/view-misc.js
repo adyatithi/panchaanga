@@ -6,6 +6,7 @@ import { names } from './parts.js';
 import { shareButton } from './share.js';
 import { placeFinder } from './places.js';
 import { LANGUAGES } from './i18n.js';
+import { setJanma, rashisOf } from './view-bala.js';
 
 const SCRIPT_NAMES = { devanagari: 'देवनागरी', tamil: 'தமிழ்', grantha: '𑌗𑍍𑌰𑌨𑍍𑌥', telugu: 'తెలుగు', kannada: 'ಕನ್ನಡ', iso: 'Roman (ISO)' };
 
@@ -86,14 +87,25 @@ export function renderSettings(ctx, root) {
     group(L('samayarupam'), 'time', [['24', '25:30*', L('horaa24')], ['plus', '+1:30*', L('horaaplus')], ['12', '1:30am*', L('horaa12')]]),
     group(L('varnah'), 'theme', [['auto', L('svatah')], ['light', L('shuklam')], ['dark', L('shyaamam')]]),
     h('p', { class: 'hint' }, '* ', ctx.S.kaala.madhyaraatri || '', ' ▸'),
-    // The reader's janma nakshatra: for taaraabala in the muhurta lists and the Detail page.
+    // The reader's janma nakshatra and rashi: for taaraabala and chandrabala (their page, the
+    // muhurta lists and the Detail page).
     h('fieldset', { class: 'opt-group' }, h('legend', null, L('janmanakshatram')),
       h('select', {
         class: 'opt-select', 'aria-label': L('janmanakshatram'),
-        onchange: (e) => { ctx.saveSettings({ janma: Number(e.target.value) || 0 }); },
+        onchange: (e) => setJanma(ctx, Number(e.target.value) || 0),
       }, h('option', { value: 0, selected: !settings.janma }, '—'),
       Array.from({ length: 27 }, (_, i) => h('option', { value: i + 1, selected: Number(settings.janma) === i + 1 },
         names(ctx).nakshatra(i + 1))))),
+    h('fieldset', { class: 'opt-group' }, h('legend', null, L('janmaraashih')),
+      h('select', {
+        class: 'opt-select', 'aria-label': L('janmaraashih'),
+        onchange: (e) => ctx.saveSettings({ janmaRashi: Number(e.target.value) || 0 }),
+      }, h('option', { value: 0, selected: !settings.janmaRashi }, '—'),
+      Array.from({ length: 12 }, (_, i) => h('option', { value: i + 1, selected: Number(settings.janmaRashi) === i + 1 },
+        names(ctx).rashi(i + 1)))),
+      settings.janma > 0 && settings.janmaRashi > 0 && !rashisOf(Number(settings.janma)).includes(Number(settings.janmaRashi))
+        && h('p', { class: 'hint bala-warn' }, '! ', ctx.U('bl_mismatch').replace('{nak}', names(ctx).nakshatra(Number(settings.janma)))
+          .replace('{r}', rashisOf(Number(settings.janma)).map((r) => names(ctx).rashi(r)).join(' / ')).replace('{c}', names(ctx).rashi(Number(settings.janmaRashi))))),
     repoChooser(ctx),
     h('button', { type: 'button', class: 'more-btn wide', onclick: () => ctx.go({ view: 'about' }) }, L('parichayah'), ' ›'),
     // The nightly build: what is being tried before it reaches everyone (same address, nightly/).

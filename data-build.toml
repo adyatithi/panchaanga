@@ -5,11 +5,11 @@
 [jyotisha]
 repository = "jyotisham/jyotisha"
 # master, with the month-at-kaala (#209), bOdhAyana-amAvAsyA (#211) and places (#212–#214: Seattle, Thoothukudi) fixes.
-commit = "0bd231417faa4781918dabaa20e3bb219eef4ac5"
+commit = "1e05e88cdc3a88a4fec88e7b53117ce181c28b93"
 
 [adyatithi]
 repository = "jyotisham/adyatithi"
-commit = "dae7bff210f2ab42c7bd4ee730c2d8ca49ce0321"
+commit = "a3860a98cdfe1bc00e50b247d4d6fdc1e33009e2"
 
 [adyatithi-panchaanga]
 # The exporter. It lives in a private repository, read with the ADYATITHI_PANCHAANGA_TOKEN secret.

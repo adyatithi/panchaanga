@@ -16,7 +16,8 @@ permissions:
 
 jobs:
   add:
-    if: github.event.label.name == 'approved' && contains(github.event.issue.labels.*.name, 'city-request')
+    # A city request by its label, or by its title (in case GitHub dropped the label).
+    if: github.event.label.name == 'approved' && (contains(github.event.issue.labels.*.name, 'city-request') || startsWith(github.event.issue.title, 'City request:'))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
